@@ -103,3 +103,5 @@ sentence case for descriptions. Keep English terse enough for UI boxes (the owne
 24. 小師妹 = Junior Martial Sister (replaces Little Junior Sister).
 25. 大公子 = Eldest Young Lord (not bare Young Lord).
 26. 第三香 = Di San Xiang (not Third Fragrance).
+27. 小竹 = Xiao Zhu (two words, not Xiaozhu).
+28. 金烏上人 = Venerable Golden Crow (confirms the line above; not Jinwu Shangren).

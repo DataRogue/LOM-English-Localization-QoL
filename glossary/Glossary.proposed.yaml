@@ -130,10 +130,8 @@
 - raw: 金烏上人
   rawTraditional: 金烏上人
   result: Venerable Golden Crow
-  allowalt:
-  - Jinwu Shangren
   literal: Jinwu Shangren
-  context: "Owner ruling (override Character/special207, NOMENCLATURE): 上人=Venerable, 金烏=Golden Crow; overrides base glossary's untranslated 'Jinwu Shangren'."
+  context: "Owner ruling 2026-09-27: Venerable Golden Crow, not Jinwu Shangren. Owner ruling (override Character/special207, NOMENCLATURE): 上人=Venerable, 金烏=Golden Crow; overrides base glossary's untranslated 'Jinwu Shangren'."
   # OWNER RULING
 - raw: 釋明
   rawTraditional: 釋明
@@ -142,11 +140,10 @@
   context: "Antagonist monk's dharma name; matches base glossary and top-used current rendering. Honorific forms (Abbot/Master/Venerable Shi Ming) are separate address variants."
 - raw: 小竹
   rawTraditional: 小竹
-  result: Xiaozhu
-  allowalt:
-  - Xiao Zhu
+  result: Xiao Zhu
   literal: Xiaozhu
-  context: "Nickname of Yu Zhu (郁竹); joining as one word follows the owner's explicit 小梅→'Xiaomei' precedent over the split 'Xiao Zhu' or translated 'Little Bamboo'."
+  context: "Owner ruling 2026-09-27: Xiao Zhu (two words), not Xiaozhu. Nickname of Yu Zhu (郁竹)."
+  # OWNER RULING
 - raw: 南宮深
   rawTraditional: 南宮深
   result: Nangong Shen
