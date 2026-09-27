@@ -70,7 +70,7 @@ check   verifies DIR: BASE_REF overlaid with DIR's files is exactly the workspac
         files the game writes while it runs aside: translation/untranslated.txt and compat_report.txt, which release.py
         never packages) holds a whole OverLlm value of 12+ characters or a run of 4+ words that only OverLlm's
         text has (UTF-8, UTF-16 and stray bytes read; each file's scan stops at its first 20 hits); no binary file other than
-        a well-formed PE file LOM_UI_EN.dll at the folder's root (nothing after its last section), the pinned official
+        a well-formed PE file LOM_UI_EN.dll at the folder's root (nothing after its last section), the pinned
         Newtonsoft.Json.dll there (PINNED_LIBS, byte for byte; a missing one fails too) and well-formed
         sprites/*.png (signature, every chunk's CRC, a sprite's chunk types only, the image data the size its header says,
         IEND last with nothing after it; their text chunks are scanned), no other file over 16 MB, no link or junction, no
@@ -989,9 +989,11 @@ MAX_TEXT_FILE = 16 << 20
 _DLL_NAME = re.compile(r"^LOM_UI_EN\.dll$", re.I)
 _SPRITE_NAME = re.compile(r"^sprites/[^/]+\.png$", re.I)
 # third-party libraries the plugin folder ships, pinned by SHA-256 (a known file, byte for byte, cannot hide anything):
-# Newtonsoft.Json 13.0.2, lib/net45 of the official NuGet package. The game has no Newtonsoft.Json; the OverLlm patch puts
-# its own copy in BepInEx/core (which then loads first), so without that patch the plugin needs this one to load at all.
-PINNED_LIBS = {"Newtonsoft.Json.dll": "c5c83bbc1741be6ff4c490c0aee34c162945423ec577c646538b2d21ce13199e"}
+# Newtonsoft.Json 13.0.2, Unity's AOT build: Runtime/AOT/Newtonsoft.Json.dll of Unity's com.unity.nuget.newtonsoft-json 3.2.2
+# (the same file is in 3.2.1). The game has none; the OverLlm patch puts this same file in BepInEx/core (which then loads
+# first). Not the official NuGet build: that one generates code at run time (Reflection.Emit), which this game's stripped
+# runtime refuses ("Operation is not supported on this platform"), so no rule, image map or font map could be read.
+PINNED_LIBS = {"Newtonsoft.Json.dll": "a56146202232958f46bd6a28b5a7da166aea123ee0d646735a46e5c341dfbf1f"}
 _PNG_SIG = b"\x89PNG\r\n\x1a\n"
 # the chunk types a sprite may carry: image data and fixed-form colour / size information, plus the three text chunks
 # (their text is scanned); anything else (iCCP, eXIf, private chunks) could carry any bytes at all, so it fails
@@ -3150,8 +3152,8 @@ def _verify_folder(inp, files, target, ours, probs, info):
         probs.append("factiontips.tsv is missing (faction names then stay plain)")
     for lib in sorted(PINNED_LIBS):
         if not os.path.exists(os.path.join(target, lib)):
-            probs.append("%s is missing (without the OverLlm patch's copy in BepInEx/core the plugin cannot load; the official "
-                         "file is in LOM_Localization/release/vendor)" % lib)
+            probs.append("%s is missing (without the OverLlm patch's copy in BepInEx/core the plugin cannot load; the pinned "
+                         "file is in LOM_Localization/release/vendor/unity-newtonsoft/Runtime-AOT, see docs/DEVELOPMENT.md)" % lib)
     hdir = os.path.join(target, "harness")
     if os.path.isdir(long_path(hdir)):
         # harness/ may hold cmd.txt and an empty out/ (what a harness run leaves when cleaned up); anything else is dev output

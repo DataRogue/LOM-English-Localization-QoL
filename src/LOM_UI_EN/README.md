@@ -649,10 +649,47 @@ Owner decisions 2026-09-27: public name "LOM English Localization + QoL", reposi
 and a mod-only package.
 - **Newtonsoft.Json ships in the plugin folder.** The plugin references Newtonsoft.Json 13.0.0.0 (fonts.json, rules/,
   spritemap.json and sprite sidecars, MANIFEST.json, compat_verified.json), the game has none, and until now the only copy was the one the OverLlm/KR package
-  put in BepInEx/core: on a clean BepInEx install the plugin would not have loaded. The folder now holds the official
-  `lib/net45` build of Newtonsoft.Json 13.0.2 (pinned by SHA-256 in publish.py `PINNED_LIBS`, notice in
-  THIRD_PARTY_NOTICES.txt). With OverLlm's copy in core it is never loaded: Mono finds core first through Doorstop's
-  `dll_search_path_override`; without it, BepInEx be.692's `UnityPreloaderRunner.LocalResolve` finds it under plugins/.
+  put in BepInEx/core: on a clean BepInEx install the plugin would not have loaded. The folder now holds Newtonsoft.Json
+  13.0.2 as Unity builds it for AOT, `Runtime/AOT/Newtonsoft.Json.dll` of Unity's com.unity.nuget.newtonsoft-json 3.2.2
+  (the same file is in 3.2.1, and it is byte for byte the copy OverLlm's package installs, so every earlier in-game test
+  ran on it). It is pinned by SHA-256 in publish.py `PINNED_LIBS`, with its notices in THIRD_PARTY_NOTICES.txt (MIT, and
+  the Unity Companion License for Unity's build). With OverLlm's copy in core it is never loaded: Mono finds core first
+  through Doorstop's `dll_search_path_override`. Without it, BepInEx be.692's `UnityPreloaderRunner.LocalResolve` finds
+  the plugin folder's copy.
+- **Not the official NuGet build.** The first 1.0.0 candidate shipped `lib/net45` of the official package. The
+  clean-install test (OverLlm, its core extras and the patched Addressables moved aside, the full zip extracted) showed
+  every rule skipped and spritemap.json and fonts.json failing with "Operation is not supported on this platform". That
+  build creates delegates with Reflection.Emit (DynamicMethod), which this game's stripped runtime does not have. The
+  result was 0 rules and 0 sprite replacements, while Compatibility said "all 19 features working".
+- **Verified in game 2026-09-27** with the owner's go-ahead. The scripted setup and teardown hash-checked every move,
+  and restored the saves and the registry.
+  - **A, clean install.** Lash's English Patch moved aside (overllm_aside.ps1), together with the 13 core files the
+    official be.692 zip lacks (Newtonsoft.Json among them) and the patched Unity.Addressables.dll (the stock one went in).
+    The plugin folder and the configs were moved aside and the -full candidate extracted.
+    - 348 rules and 24 images loaded.
+    - All 19 features worked, with 2 "not needed" (in the new wording).
+    - The 11 standard screens and a Story scene showed 0 Chinese. The duel's only Chinese was the two hidden
+      "一二三…" bubble placeholders.
+    - Mod Settings: the Translation page ("Revised | Lash's | UI only", "Not installed. It's optional…", and "Can't
+      switch: Lash's English Patch isn't installed." on the Lash's button), Advanced (the longest renamed labels
+      wrap) and About (name, BepInEx version, "Updates and problems").
+    - Name tips with portraits under the stock Addressables (`portrait=Ready` in the Story scene); in the Free scene a
+      portrait waits for the story's character config, as designed. Faction tips worked in the talk menu.
+    - The extracted plugin folder equals the -mod-only zip, 73 of 73 files.
+  - **B, alongside Lash's English Patch.**
+    - Detected as installed and running with pristine data; all 21 features worked.
+    - The 11 screens showed 0 Chinese.
+    - The Lash's option hands the text back to the patch's plugins (title "player community") and Revised restores it.
+    - Marked as checked for 1.0.0.
+    - `SimulateHookErrors=all` turned 11 features off while 10 kept working; Try again brought back all 21. A Status
+      panel opened while the features were off kept its placeholder until reopened.
+  - **C, `SimulateGameChange=all`.** 1 feature worked and 20 did not. The text fell back to Lash's English Patch (0
+    Chinese on the title). Mod Settings opened, and Compatibility listed every feature in the new wording.
+- `Plugin.CheckLayoutData`: the layout feature declares data parts `rules`, `images` and `fonts`. A part whose data could
+  not be read at startup (`Rules.Unreadable` with no rule loaded, `SpriteStore.MapError`, `FontMap.LoadError`) is marked
+  broken (`Compat.MarkBroken`, listed in Problems and logged). One broken part makes the feature partly working, all
+  three make it not working. So a failure like the one above now shows up in Compatibility, the report and the startup
+  notice.
 - `Plugin.DisplayName` / `Plugin.ProjectUrl`: the Mod Settings subtitle reads "LOM English Localization + QoL · version
   1.0.0", About > Version names the mod, and About has "Updates and problems" (the project page and the report to attach).
   The on-screen notices start with the display name instead of "LOM_UI_EN:".

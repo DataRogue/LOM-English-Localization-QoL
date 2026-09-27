@@ -3,9 +3,10 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2026-09-27)
 
-First public release, tested with game version `release_1.0.5000.13` (Steam build 20337760).
+First public release, tested with game version `release_1.0.5000.13` (Steam build 20337760). It was tested in game on a
+clean install (BepInEx and this mod only) and alongside Lash's English Patch.
 
 - **Two packages.**
   - A full package that includes BepInEx 6.0.0-be.692, so the mod installs on a game with nothing else.

@@ -64,12 +64,17 @@ Lash's English Patch has.
 | File | From | SHA-256 |
 |---|---|---|
 | `BepInEx-Unity.Mono-win-x86-6.0.0-be.692+851521c.zip` | https://builds.bepinex.dev/projects/bepinex_be/692/BepInEx-Unity.Mono-win-x86-6.0.0-be.692%2B851521c.zip | `97720c5f5c70abfb2ae19dba6000529049ae67f053303b3ce2b49e6ad6c0eca6` |
-| `newtonsoft.json.13.0.2.nupkg` | https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.2/newtonsoft.json.13.0.2.nupkg | `112ca3b7f47bcbd743befcf949fb68ce4f9eff73ad9f7f1b39c2c61a1ebd3add` |
+| `unity-newtonsoft/com.unity.nuget.newtonsoft-json-3.2.2.tgz` | https://download.packages.unity.com/com.unity.nuget.newtonsoft-json/-/com.unity.nuget.newtonsoft-json-3.2.2.tgz | `5db19a6ec4478ab974922d155aa32b952bc34abadaa78afc7973cf049b62db41` |
 
-The plugin folder ships `lib/net45/Newtonsoft.Json.dll` from that package (SHA-256
-`c5c83bbc1741be6ff4c490c0aee34c162945423ec577c646538b2d21ce13199e`, pinned in `publish.py` `PINNED_LIBS`). The game
-has no Newtonsoft.Json of its own. Lash's English Patch puts a different build in `BepInEx/core`, and when that one is
-present it loads first.
+The plugin folder ships `package/Runtime/AOT/Newtonsoft.Json.dll` from Unity's package (SHA-256
+`a56146202232958f46bd6a28b5a7da166aea123ee0d646735a46e5c341dfbf1f`, pinned in `publish.py` `PINNED_LIBS`; extracted to
+`release/vendor/unity-newtonsoft/Runtime-AOT/`). The game has no Newtonsoft.Json of its own. Lash's English Patch puts
+this same file in `BepInEx/core`, and when that copy is present it loads first.
+
+It has to be the AOT build. The official NuGet build generates code at run time (Reflection.Emit), and this game's
+stripped runtime refuses that with "Operation is not supported on this platform". The 1.0.0 clean-install test caught
+it: none of the layout rules, the image map or the font map could be read, while every hook installed. Since then the
+plugin marks those data parts as not working in Compatibility (`Plugin.CheckLayoutData`).
 
 ## Release checklist
 

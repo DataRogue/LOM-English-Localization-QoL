@@ -1446,10 +1446,14 @@ namespace LOM_UI_EN
 
 		public static int Count => _cfg.map.Count;
 
+		/// <summary>Why fonts.json could not be read at the last load (null when it was read or is absent).</summary>
+		public static string LoadError;
+
 		public static void Load(string dir)
 		{
 			string path = Path.Combine(dir, "fonts.json");
 			Config cfg = new Config();
+			LoadError = null;
 			if (File.Exists(path))
 			{
 				try
@@ -1458,6 +1462,7 @@ namespace LOM_UI_EN
 				}
 				catch (Exception ex)
 				{
+					LoadError = ex.Message;
 					Plugin.Log.LogError("fonts.json parse failed: " + ex.Message);
 				}
 			}
@@ -2126,6 +2131,7 @@ namespace LOM_UI_EN
 				_harmony = new Harmony("lom.ui.english");
 				Harmony h = _harmony;
 				Compat.Setup(F.Layout, () => Hooks.Patch(h));
+				CheckLayoutData();
 				Compat.Setup(F.GameText, () => TextTable.Patch(h));
 				Compat.Setup(F.SceneText, () => SceneText.Patch(h));
 				Compat.Setup(F.Language, () => EnglishLanguage.Patch(h));
@@ -2179,6 +2185,39 @@ namespace LOM_UI_EN
 				Instance.gameObject.AddComponent<DevHarness>();
 				Log.LogInfo("Plugin dir: " + PluginDir + " runInBackground=" + Application.runInBackground);
 			}
+		}
+
+		/// <summary>
+		/// The layout feature's data as loaded at startup: rules/*.json, sprites/spritemap.json, fonts.json. A part none of whose data
+		/// could be read shows in Compatibility as not working, as a missing game member would, instead of the feature calling
+		/// itself working with nothing to apply. (1.0.0 found this: the official Newtonsoft.Json build could read none of it in
+		/// this game's stripped runtime, while every hook installed and the report said "working".)
+		/// </summary>
+		private static void CheckLayoutData()
+		{
+			Feature f = F.Layout;
+			f.DeclaredParts.Add("rules");
+			f.DeclaredParts.Add("images");
+			f.DeclaredParts.Add("fonts");
+			if (Rules.Files > 0 && Rules.Count == 0 && Rules.Unreadable > 0)
+			{
+				LayoutDataUnreadable(f, "rules", "no layout rule could be read (" + Rules.FirstUnreadable + ")");
+			}
+			if (SpriteStore.MapError != null)
+			{
+				LayoutDataUnreadable(f, "images", "spritemap.json could not be read (" + SpriteStore.MapError + ")");
+			}
+			if (FontMap.LoadError != null)
+			{
+				LayoutDataUnreadable(f, "fonts", "fonts.json could not be read (" + FontMap.LoadError + ")");
+			}
+		}
+
+		private static void LayoutDataUnreadable(Feature f, string part, string what)
+		{
+			f.Problems.Add(what);
+			Compat.MarkBroken(f, what, essential: false, part);
+			Log.LogError("[" + f.Id + "] " + what);
 		}
 
 		/// <summary>Undo every applied rule, font substitution and image swap, then apply them again under the current settings (used when the layout switches change).</summary>
@@ -4360,12 +4399,29 @@ namespace LOM_UI_EN
 			return new Regex(stringBuilder.ToString(), RegexOptions.Compiled | RegexOptions.CultureInvariant);
 		}
 
+		/// <summary>At the last load: rule files found, rules and files that could not be read, and the first reason.</summary>
+		public static int Files;
+
+		public static int Unreadable;
+
+		public static string FirstUnreadable;
+
+		private static void NoteUnreadable(string file, string why)
+		{
+			Unreadable++;
+			FirstUnreadable = FirstUnreadable ?? (file + ": " + why);
+		}
+
 		public static void Load(string dir)
 		{
 			List<Rule> list = new List<Rule>();
+			Files = 0;
+			Unreadable = 0;
+			FirstUnreadable = null;
 			if (Directory.Exists(dir))
 			{
 				string[] array = Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).OrderBy((string f) => f, StringComparer.OrdinalIgnoreCase).ToArray();
+				Files = array.Length;
 				foreach (string text in array)
 				{
 					bool isEnabled;
@@ -4394,6 +4450,7 @@ namespace LOM_UI_EN
 							{
 								// One malformed rule (a wrong type after an edit) is skipped; the rest of its file still loads.
 								Plugin.Log.LogWarning("Rule skipped in " + Path.GetFileName(text) + ": " + exRule.Message);
+								NoteUnreadable(Path.GetFileName(text), exRule.Message);
 								continue;
 							}
 							if (rule == null)
@@ -4455,6 +4512,7 @@ namespace LOM_UI_EN
 							bepInExErrorLogInterpolatedStringHandler.AppendFormatted(ex.Message);
 						}
 						log3.LogError(bepInExErrorLogInterpolatedStringHandler);
+						NoteUnreadable(Path.GetFileName(text), ex.Message);
 					}
 				}
 			}
@@ -4567,6 +4625,7 @@ namespace LOM_UI_EN
 			_ourSprites.Clear();
 			Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
 			string path = Path.Combine(dir, "spritemap.json");
+			MapError = null;
 			if (File.Exists(path))
 			{
 				try
@@ -4585,11 +4644,15 @@ namespace LOM_UI_EN
 				}
 				catch (Exception ex)
 				{
+					MapError = ex.Message;
 					Plugin.Log.LogError("spritemap.json parse failed: " + ex.Message);
 				}
 			}
 			_map = dictionary;
 		}
+
+		/// <summary>Why spritemap.json could not be read at the last load (null when it was read or is absent).</summary>
+		public static string MapError;
 
 		public static bool IsOurs(Sprite s)
 		{

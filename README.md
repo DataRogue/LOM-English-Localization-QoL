@@ -84,7 +84,11 @@ does not remove mods.
 - **Character tooltips.** Names of characters with portrait art are coloured in dialogue and choice menus. Point at one
   for their portrait, title and your affinity with them. A character only gets a tooltip once the story has introduced
   them, so the tooltips never spoil a reveal.
+
+  ![A character tooltip over a line of narration](docs/screenshots/name-tooltip.jpg)
 - **Faction tooltips.** Sect, clan and gang names get a short, spoiler-free description, so you know which is which.
+
+  ![A faction tooltip in a talk menu](docs/screenshots/faction-tooltip.jpg)
 - **Exact affinity.** Hovering a level in Status > Social shows the value out of 100.
 - **Duel gauges.** The poison and paralysis gauges get a mark at every tier (50, 100, 150). Pointing at a gauge shows
   the exact build-up, what each tier does, how far off it is, and how much the build-up falls each round.
@@ -100,6 +104,8 @@ F8, or the button on the title screen and in the pause menus. The pages are:
 - About.
 
 Settings take effect at once, except one font setting on Advanced, which needs a restart.
+
+![The Mod Settings window](docs/screenshots/mod-settings.jpg)
 
 ## Troubleshooting
 
@@ -151,7 +157,8 @@ package releases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 - **[BepInEx](https://github.com/BepInEx/BepInEx)** (LGPL-2.1), the mod loader, bundled unmodified in the full package.
 - **[XUnity.AutoTranslator](https://github.com/bbepis/XUnity.AutoTranslator)** (MIT): its translation-file format and
   lookup are ported in the scene text engine.
-- **[Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)** (MIT), shipped unmodified.
+- **[Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)** (MIT), shipped unmodified as Unity's AOT build from
+  its `com.unity.nuget.newtonsoft-json` package (Unity Companion License).
 - The CSV parser by ideafixxxer, as bundled in [Fungus](https://github.com/snozbot/fungus) (MIT), ported for reading the
   string table exactly as the game does.
 - The Korean UI plugin (LegendOfMortal_UI_KR), whose layout approach the first version of this mod built on.

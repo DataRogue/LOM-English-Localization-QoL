@@ -3,7 +3,8 @@ LOM_UI_EN - THIRD-PARTY NOTICES
 LOM_UI_EN contains code ported from the open-source projects listed under 1 and 2 below,
 and ships the library listed under 3 unmodified. Each is under the MIT License, which
 requires its copyright notice and permission notice to be included with copies or
-substantial portions of the software; they are reproduced verbatim below.
+substantial portions of the software; they are reproduced verbatim below. Unity's build
+of the library under 3 is also under the Unity Companion License (see there).
 
 Translation origin: this mod's English grew from Lash's English Patch by joshfreitas1984
 (https://github.com/joshfreitas1984/LegendOfMortalOverLlm), a machine translation of the game. Since
@@ -86,16 +87,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ==============================================================================
-3. Newtonsoft.Json 13.0.2 (Json.NET)
+3. Newtonsoft.Json 13.0.2 (Json.NET), Unity's AOT build
    https://www.newtonsoft.com/json, https://github.com/JamesNK/Newtonsoft.Json
-   Shipped unmodified as Newtonsoft.Json.dll: lib/net45 of the official NuGet package
-   newtonsoft.json.13.0.2.nupkg (SHA-256 of the DLL c5c83bbc1741be6f...ce13199e).
-   The game has none; Lash's English Patch installs its own copy in BepInEx/core,
+   Shipped unmodified as Newtonsoft.Json.dll: Runtime/AOT/Newtonsoft.Json.dll of Unity's
+   package com.unity.nuget.newtonsoft-json 3.2.2 (the same file is in 3.2.1), from
+   https://packages.unity.com (SHA-256 of the DLL a56146202232958f...5c341dfbf1f).
+   This build creates no code at run time, which this game's runtime does not allow.
+   The game has none; Lash's English Patch installs this same file in BepInEx/core,
    which then loads instead of this one.
+
+Notice of the package (its LICENSE.md):
+
+Nuget.Newtonsoft.Json copyright (c) 2022 Unity Technologies ApS
+Licensed under the Unity Companion License for Unity-dependent projects--see
+http://www.unity3d.com/legal/licenses/Unity_Companion_License.
+Unless expressly provided otherwise, the Software under this license is made available
+strictly on an "AS IS" BASIS WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. Please
+review the license for details on these and other terms and conditions.
+
+The package's third-party components (its Third Party Notices.md), all under the MIT License:
+Newtonsoft.Json (Copyright (c) 2007 James Newton-King), Json.Net.Unity3D (Copyright (c) 2016
+SaladLab), Newtonsoft.Json-for-Unity (Copyright (c) 2019 Kalle Jillheden (jilleJr)) and
+com.newtonsoft.json (Copyright (c) 2019 Mike Wuetherick). The MIT permission notice below
+applies to each, with its own copyright line.
 
 The MIT License (MIT)
 
 Copyright (c) 2007 James Newton-King
+Copyright (c) 2016 SaladLab
+Copyright (c) 2019 Kalle Jillheden (jilleJr)
+Copyright (c) 2019 Mike Wuetherick
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
