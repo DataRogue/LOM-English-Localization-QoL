@@ -85,16 +85,31 @@ plugin marks those data parts as not working in Compatibility (`Plugin.CheckLayo
    - Copy `src/LOM_UI_EN/PLAYER_README.txt` over the plugin's `README.txt`.
    - Run `publish.py build`, then `publish.py check`.
 3. **Candidate packages.** `python tools/release.py --candidate` writes `release/dist/<version>-candidate/`.
-4. **Test in game** with the scripts in `tools/ingame/`, backing up the saves and the registry key first:
-   - **A clean install:**
-     - move Lash's English Patch aside with `overllm_aside.ps1 out`;
-     - put back the stock `Mortal_Data/Managed/Unity.Addressables.dll`;
-     - move the plugin folder aside;
-     - extract the `-full` candidate zip.
-   - **Alongside Lash's English Patch:** the `-mod-only` candidate zip.
-   - **Both ways:**
-     - the 11 standard screens (`screens05.ps1`), a duel and an army battle;
-     - `[Dev] SimulateGameChange=all` and `SimulateHookErrors`, then Try again.
+4. **Test in game** with `tools/ingame/release_test.py`. It sets up and undoes each scenario exactly: every move is
+   hash-checked, and the saves and registry key are backed up and restored. Drive the game with `run_batch.ps1` and
+   `screens05.ps1`.
+   1. `release_test.py prep`
+   2. **A, clean install:** `release_test.py a_setup`. This moves aside Lash's English Patch, the core files the official
+      BepInEx zip lacks and the patched `Unity.Addressables.dll`, then extracts the `-full` candidate. Launch
+      `Mortal.exe` and check:
+      - `detect`, `compat`, the log's "loaded: N rules, N sprite replacements";
+      - the 11 screens, Mod Settings, a Story scene with name tips, a duel.
+
+      Then `release_test.py a_teardown`, which also checks the extracted plugin folder against the `-mod-only` zip.
+   3. **B, alongside Lash's English Patch:** `release_test.py b_setup`, launch, the same checks.
+      - Switch Which translation to Lash's and back.
+      - Mark as checked (step 5).
+      - `cfg Dev/SimulateHookErrors=all`, then `invoke static LOM_UI_EN.Compat.TryAgain`.
+   4. **C, a simulated game update:** `SimulateGameChange = all` in the cfg, then restart. Mod Settings must still open,
+      and the text must fall back to Lash's English Patch.
+   5. `release_test.py b_teardown`, then `release_test.py final`.
+
+   Harness tips:
+   - Slots 001 and 002 may hold the maintainer's own play.
+   - The Story autosave (`click /UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Story/Slot`) opens a Story
+     scene, and the Battle one opens a duel.
+   - At 1600x900 the Mod Settings tabs are at `mouseclick 330 y`: Translation 697, Localization 642, Extras 589,
+     Compatibility 519, Advanced 466, About 412.
 5. **Mark as checked.** Use Mod Settings > Advanced > Mark as checked, or the harness
    `invoke static LOM_UI_EN.Compat.MarkVerified`. This writes `compat_verified.json` for this version and game build.
 6. **Package.** `python tools/release.py` refuses unless all of these hold:
