@@ -527,11 +527,9 @@
   context: Two-syllable given name Gongyuan joins per name rules; matches base glossary and top-used current rendering.
 - raw: 第三香
   rawTraditional: 第三香
-  result: Third Fragrance
-  allowalt:
-  - Di San Xiang
+  result: Di San Xiang
   literal: Disan Xiang
-  context: "Owner decision (override CombatCharacter/Name/special820): rare double-surname 第三 courtesan-style sobriquet translated as 'Third Fragrance', matching an in-file precedent for such names."
+  context: "Owner ruling 2026-09-27: Di San Xiang, replacing the earlier Third Fragrance."
   # OWNER RULING
 - raw: 鈴兒
   rawTraditional: 鈴兒
@@ -3941,10 +3939,8 @@
 - raw: 大公子
   rawTraditional: 大公子
   result: Eldest Young Lord
-  allowalt:
-  - Young Lord
   literal: da gongzi
-  context: "Owner override CombatTalking/1621_01_01_002: 大公子 is the eldest brother, parallel to 二公子=Second Young Lord; '大' should not be dropped."
+  context: "Owner ruling 2026-09-27: Eldest Young Lord, not bare Young Lord. Owner override CombatTalking/1621_01_01_002: 大公子 is the eldest brother, parallel to 二公子=Second Young Lord; '大' should not be dropped."
   # OWNER RULING
 - raw: 高手
   rawTraditional: 高手
@@ -7700,10 +7696,8 @@
 - raw: 小師妹
   rawTraditional: 小師妹
   result: Junior Martial Sister
-  allowalt:
-  - Little Junior Sister
   literal: xiaoshimei
-  context: "Owner override table (CombatTalking/1306_01_003, CharacterIntro3/sister1, many dice headers) fixes 小師妹=Junior Martial Sister Title Case; base glossary's Little Junior Sister is outdated."
+  context: "Owner ruling 2026-09-27: Junior Martial Sister, replacing Little Junior Sister. Owner override table (CombatTalking/1306_01_003, CharacterIntro3/sister1, many dice headers) fixes 小師妹=Junior Martial Sister Title Case."
   # OWNER RULING
 - raw: 師弟
   rawTraditional: 師弟

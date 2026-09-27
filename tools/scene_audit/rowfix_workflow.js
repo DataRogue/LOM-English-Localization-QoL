@@ -25,16 +25,19 @@ Binding terminology: ${LOC}/glossary/conventions.md (the owner's rulings at its 
 Names: each line's "names" lists names found in it ([Chinese, English, key]). For any other name, Grep ${LOC}/base_ref/game_source.tsv (key TAB Chinese) with "\\t<Chinese>$" for the row that is exactly that name, then Grep ${LOC}/workspace/translation/StringTable.csv (key,"English") with "^<key>," for its English; to see how the table renders a term in context, Grep StringTable.csv for the English candidates.
 Keep the wuxia spirit: literary narration, distinct voices (humble, haughty, rustic, playful, menacing), martial courtesy where the Chinese has it; interjections and battle cries read as natural English cries, never word-by-word glosses.`
 const FORMAT = `Each line's zh is the Chinese with the game's markup: {size=..}...{/size} and {punch=..}...{/punch} are the game's text effects. The new en keeps every markup tag of the current en exactly (add none, remove none, even where zh has more), the same line breaks as the current en (a real line break in JSON), every placeholder ({0}), no Chinese characters, no notes or brackets that are not in the Chinese, and a length close to the current en. A dice header stays a short heading with no trailing period (a question keeps its "?").`
+// args.termOnly: a terminology sweep (glossary_sweep/ruling_sweep.py issues): change the ruled terms and nothing else
+const TERM_ONLY = args.termOnly ? `
+This is a terminology pass over lines that were already reviewed: change only what the ruling needs (the retired rendering of the term, or a missing title the reader needs), keep every other word, the punctuation and the line breaks exactly, and do not reword anything else even where you would phrase it differently. A name, a pronoun or a lower-case generic mention ("her junior martial sister") where English reads naturally without the title is fine: keep the line.` : ''
 function fixPrompt(c, only) {
   return `${CONTEXT}
-${FORMAT}
+${FORMAT}${TERM_ONLY}
 Task: chunk ${c.chunk}. Read ${file(c.chunk)}. Each line has id, key, zh, en (what players see now), lives_in, issue (what the audit found), before/after (the rows around it in the story) or, for a dice header, before (the story lines just before the dice check) and same_header (other keys with the same header), and names.${only ? ` Only these ids are yours this time: ${only.join(', ')}.` : ''}
 For every line decide keep=true (the issue is mistaken and the English is right) or keep=false with the corrected en: fix what the issue names and anything else plainly wrong in that line, and keep what is right. The new line says what the Chinese says, fits the rows around it (who speaks to whom, what comes next), and uses the established English of names and terms.
 Output: every id${only ? ' listed above' : ' in the chunk'} exactly once: keep, en (only when keep=false: the full new line), why (only when keep=false, at most 15 words).`
 }
 function verifyPrompt(c, props) {
   return `${CONTEXT}
-${FORMAT}
+${FORMAT}${TERM_ONLY ? TERM_ONLY + ' Reject a fix that changes more than the ruling needs.' : ''}
 Task: adversarially verify the proposed fixes for chunk ${c.chunk}. The chunk (Chinese, current English, issue, surrounding rows, names) is ${file(c.chunk)}; match by id. Proposals below are [{id, new, why}]. Try to refute each: the new line misreads the Chinese or the scene (check the rows around it); it gets a name or term wrong (check a changed name yourself in ${LOC}/base_ref/game_source.tsv and ${LOC}/workspace/translation/StringTable.csv); it adds or removes a markup tag, line break or placeholder; it contains Chinese; it is clumsy or unnatural English for the speaker; it is not clearly better than the current line. Accept only fixes that are right and clearly better. One verdict per id; reason at most 15 words when rejecting.
 Proposals (JSON):
 ${JSON.stringify(props)}`

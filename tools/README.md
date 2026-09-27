@@ -397,7 +397,23 @@ the installed game can still draw, then reviews only those. Working files go to 
   A Sonnet fixer per chunk of about 5 lines, a Sonnet refuter per fix. A fix must keep the markup, placeholders and line
   breaks of the English it replaces. The scene lines showing the same text follow: exactly, or without the markup for a
   line keyed by the Chinese without it, and only where every row and override with that Chinese agrees. `--arbiter`
-  takes `{"reject": {id: why}, "use": {id: text}}`. Chunks in `scene_audit/rowfix/`.
+  takes `{"reject": {id: why}, "use": {id: text}}`. Chunks in `scene_audit/rowfix/` (`--dir` for another folder).
+  `apply --edits FILE` applies exact swaps (below) with the same checks; `--rulings FILE` also swaps the ruled forms into
+  the scene lines players can still see (never the audit's dead lines). The workflow's `termOnly: true` makes the fixer
+  change only the ruled term.
+
+## glossary_sweep/ -- glossary conformance
+
+- **candidates.py**, **glossary_workflow.js**, **merge_audit.py** -- the 2026-09-24 sweep of every ruled term (see their
+  docstrings); applied with `fullpass/apply_fullpass.py --chunks fullpass/glossary`.
+- **ruling_sweep.py** `RULINGS.json --out DIR` -- a new owner ruling across the text players see. RULINGS.json lists
+  `{zh, form, swap: [retired forms], base}`. Each table row and strings override that holds the term more often than the
+  ruled form goes into one of two files:
+  - `DIR/edits.json`, an exact swap: every missing occurrence is a retired form, the counts match, no "a"/"an" stands
+    before one, and `base` (大公子: no other 公子 in the line) holds;
+  - `DIR/issues.json`, a judgment case for `rowfix.py chunks --dir DIR` and the Sonnet workflow with `termOnly`.
+  Then run `rowfix.py apply <journal> --dir DIR --edits DIR/edits.json --rulings RULINGS.json --live`. First used for the
+  owner rulings of 2026-09-27 (小師妹, 大公子, 第三香).
 
 ## checks/ -- one-off verification scripts
 

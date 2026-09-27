@@ -14,7 +14,8 @@ lines that show the same text.
       Then every scene line showing the same text follows, where every row and override with that Chinese agrees: a line keyed
       by the Chinese as the table has it takes the English as it is; a line keyed by the Chinese without its markup, or with
       other line breaks, takes the English without its markup. --arbiter takes the maintainer's calls: {"reject": {id: why},
-      "use": {id: text}} (use: an accepted fix as the maintainer trimmed it, e.g. without markup the fixer added).
+      "use": {id: text}, "force": {id: why}} (use: a fix as the maintainer trimmed it, e.g. without markup the fixer added;
+      force: a fix the refuter turned down only as out of scope, taken anyway; both still pass every format check).
       --live writes the workspace (backups in backups/), logs to scene_audit/ and publishes; otherwise staged copies go to
       staged/rowfix.
 """
@@ -93,7 +94,7 @@ NAME_FAMILIES = ('Character/', 'CombatCharacter/Name/', 'CombatCharacter/Title/'
                  'Facility/Name/', 'EnemyTeam/', 'BattleSkill/Name/', 'CharacterTitle/', 'Library/Title/')
 
 
-def chunks(issues_path, per):
+def chunks(issues_path, per, cdir=DIR):
     zh, en, ov, files = load()
     issues = json.load(open(issues_path, encoding='utf-8'))
     names = collections.defaultdict(dict)
@@ -132,27 +133,28 @@ def chunks(issues_path, per):
         if hints:
             d['names'] = hints
         lines.append(d)
-    os.makedirs(DIR, exist_ok=True)
-    for f in glob.glob(os.path.join(DIR, 'p_*.json')):
+    os.makedirs(cdir, exist_ok=True)
+    for f in glob.glob(os.path.join(cdir, 'p_*.json')):
         os.remove(f)
     manifest = []
     for c in range(0, len(lines), per):
         part = lines[c:c + per]
         num = c // per + 1
-        json.dump({'chunk': num, 'lines': part}, io.open(lom_paths.out_path(DIR, 'p_%04d.json' % num), 'w', encoding='utf-8', newline=LF),
+        json.dump({'chunk': num, 'lines': part}, io.open(lom_paths.out_path(cdir, 'p_%04d.json' % num), 'w', encoding='utf-8', newline=LF),
                   ensure_ascii=False, indent=1)
         manifest.append({'chunk': num, 'ids': [x['id'] for x in part]})
-    json.dump(manifest, io.open(lom_paths.out_path(DIR, 'manifest.json'), 'w', encoding='utf-8', newline=LF), ensure_ascii=False, indent=0)
-    print('%d lines in %d chunks -> %s' % (len(lines), len(manifest), DIR))
+    json.dump(manifest, io.open(lom_paths.out_path(cdir, 'manifest.json'), 'w', encoding='utf-8', newline=LF), ensure_ascii=False, indent=0)
+    print('%d lines in %d chunks -> %s' % (len(lines), len(manifest), cdir))
     print(json.dumps({'chunks': manifest}, separators=(',', ':')))
 
 
 # ---- apply -----------------------------------------------------------------------------------------------------------------------
-def apply(journals, arbiter, live):
+def apply(journals, arbiter, live, cdir=DIR, edits_path=None, rulings_path=None):
     stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     out_dir = lom_paths.log_dir('scene_audit') if live else lom_paths.staged_dir('rowfix')
     arb = json.load(open(arbiter, encoding='utf-8')) if arbiter else {}
     reject, use = arb.get('reject', {}), arb.get('use', {})   # use: {id: the accepted fix as the maintainer trimmed it}
+    force = arb.get('force', {})   # {id: why}: a fix the refuter turned down only as out of scope, which the maintainer takes
     label_of, results = {}, {}
     for jp in journals:
         for line in open(jp, encoding='utf-8'):
@@ -175,7 +177,8 @@ def apply(journals, arbiter, live):
     zh, en, ov, files = load()
     log, skipped = [], []
     table_edits, ov_edits, changed = {}, {}, set()
-    for f in sorted(glob.glob(os.path.join(DIR, 'p_*.json'))):
+    cands = []      # (id, key, zh, old, new, why, refusal): the fixes of the Sonnet runs and the exact swaps of --edits
+    for f in sorted(glob.glob(os.path.join(cdir, 'p_*.json'))):
         ch = json.load(open(f, encoding='utf-8'))
         n = ch['chunk']
         lines = {x['id']: x for x in ch['lines']}
@@ -190,41 +193,51 @@ def apply(journals, arbiter, live):
         for i, ln in lines.items():
             x = items.get(i)
             if x is None:
-                skipped.append((i, ln['key'], ln['en'], '', 'not answered'))
+                if journals:
+                    skipped.append((i, ln['key'], ln['en'], '', 'not answered'))
                 continue
             if x.get('keep') is not False or not x.get('en'):
                 continue
             vs = verdicts.get(i, [])
-            old, new = ln['en'], lf(use.get(i, x['en'])).strip(' \t')
-            why = None
+            refusal = None
             if not vs or not all(v.get('accept') for v in vs):
-                why = 'refuted: ' + '; '.join(v.get('reason', '') for v in vs if not v.get('accept'))
-            elif i in reject:
-                why = 'maintainer: ' + reject[i]
-            elif shown(ln['key'], en, ov, files) != old:
-                why = 'the English changed since the chunk was cut'
-            elif new == old:
-                why = 'no change'
-            elif CJK.search(new):
-                why = 'introduces Chinese'
-            elif sorted(TAG.findall(new)) != sorted(TAG.findall(old)):
-                why = 'markup differs'
-            elif sorted(PH.findall(new)) != sorted(PH.findall(old)):
-                why = 'placeholders differ'
-            elif new.count(LF) not in (old.count(LF), lf(ln['zh']).count(LF)):
-                why = 'line breaks differ'
-            elif ln['key'] in ov and BS + 'n' in new:
-                why = 'a literal backslash-n would read as a line break in a strings file'
-            if why:
-                skipped.append((i, ln['key'], old, new, why))
-                continue
-            k = ln['key']
-            if k in ov:
-                ov_edits[k] = (old, new, x.get('why', ''))
-            else:
-                table_edits[k] = (en[k], new, x.get('why', ''))
-            changed.add(k)
-            log.append((i, k, 'override' if k in ov else 'table', old, new, x.get('why', '')))
+                refusal = 'refuted: ' + '; '.join(v.get('reason', '') for v in vs if not v.get('accept'))
+            cands.append((i, ln['key'], ln['zh'], ln['en'], lf(use.get(i, x['en'])).strip(' \t'), x.get('why', ''), refusal))
+    for n, e in enumerate(json.load(open(edits_path, encoding='utf-8')) if edits_path else [], 1):
+        cands.append(('A%d' % n, e['key'], lf(zh.get(e['key'], '')), lf(e['old']), lf(e['new']), e.get('why', ''), None))
+    for i, k, ztext, old, new, why_text, refusal in cands:
+        why = None if i in force else refusal
+        if i in force:
+            why_text = (why_text + ' | ' if why_text else '') + 'maintainer: ' + force[i]
+        if why:
+            pass
+        elif i in reject:
+            why = 'maintainer: ' + reject[i]
+        elif k in changed:
+            why = 'the key already has a fix in this run'
+        elif shown(k, en, ov, files) != old:
+            why = 'the English changed since the fix was proposed'
+        elif new == old:
+            why = 'no change'
+        elif CJK.search(new):
+            why = 'introduces Chinese'
+        elif sorted(TAG.findall(new)) != sorted(TAG.findall(old)):
+            why = 'markup differs'
+        elif sorted(PH.findall(new)) != sorted(PH.findall(old)):
+            why = 'placeholders differ'
+        elif new.count(LF) not in (old.count(LF), ztext.count(LF)):
+            why = 'line breaks differ'
+        elif k in ov and BS + 'n' in new:
+            why = 'a literal backslash-n would read as a line break in a strings file'
+        if why:
+            skipped.append((i, k, old, new, why))
+            continue
+        if k in ov:
+            ov_edits[k] = (old, new, why_text)
+        else:
+            table_edits[k] = (en[k], new, why_text)
+        changed.add(k)
+        log.append((i, k, 'override' if k in ov else 'table', old, new, why_text))
     print('accepted and checked: %d table rows, %d overrides; skipped %d' % (len(table_edits), len(ov_edits), len(skipped)))
     for s in skipped:
         print('  skipped', s[0], s[1], '-', s[4])
@@ -280,7 +293,7 @@ def apply(journals, arbiter, live):
     sraw = sraw.lstrip(BOM)
     snl = CR + LF if CR + LF in sraw else LF
     slines = sraw.split(snl)
-    mirrored = 0
+    mirrored, followed = 0, set()
     for idx, line in enumerate(slines):
         if not line or line.startswith('//'):
             continue
@@ -309,9 +322,43 @@ def apply(journals, arbiter, live):
             continue
         slines[idx] = nl_
         mirrored += 1
+        followed.add(idx)
         log.append(('scene', 'line %d' % (idx + 1), 'scene', kv[1], val, 'follows its row'))
-    scene_out = (BOM if sbom else '') + snl.join(slines)
     print('scene lines that follow: %d' % mirrored)
+
+    # --rulings: the exact swaps on the other scene lines players can still see (the audit's dead lines are left alone)
+    if rulings_path:
+        sys.path.insert(0, os.path.join(HERE, '..', 'glossary_sweep'))
+        import ruling_sweep
+        rulings = json.load(open(rulings_path, encoding='utf-8'))
+        dead = set()
+        cls = os.path.join(lom_paths.REAL_LOCALIZATION, 'scene_audit', 'classified.tsv')
+        if os.path.exists(cls):
+            for r in csv.DictReader(open(cls, encoding='utf-8'), delimiter='\t'):
+                if r['class'] in ('simplified', 'internal', 'not-in-game', 'junk'):
+                    dead.add(r['key'])
+        swapped = 0
+        for idx, line in enumerate(slines):
+            if idx in followed or not line or line.startswith('//') or raw_key(line) in dead:
+                continue
+            kv = PB.decode(line)
+            if not kv or not kv[0]:
+                continue
+            new = ruling_sweep.swap(lf(kv[0]), lf(kv[1]), rulings)
+            if new is None:
+                continue
+            try:
+                nl_ = rewrite_line(line, raw_key(line), encode_value(new))
+            except ValueError:
+                nl_ = None
+            if nl_ is None:
+                skipped.append(('scene', 'line %d' % (idx + 1), kv[1], new, 'cannot be written as a scene line'))
+                continue
+            slines[idx] = nl_
+            swapped += 1
+            log.append(('scene', 'line %d' % (idx + 1), 'scene', kv[1], new, 'ruled form swapped'))
+        print('scene lines with the ruled form swapped in: %d' % swapped)
+    scene_out = (BOM if sbom else '') + snl.join(slines)
 
     if live:
         for p in [lom_paths.TABLE, lom_paths.SCENE] + sorted(file_out):
@@ -352,12 +399,16 @@ if __name__ == '__main__':
     c = sub.add_parser('chunks')
     c.add_argument('issues')
     c.add_argument('--per', type=int, default=5)
+    c.add_argument('--dir', default=DIR)
     p = sub.add_parser('apply')
-    p.add_argument('journals', nargs='+')
+    p.add_argument('journals', nargs='*')
     p.add_argument('--arbiter')
     p.add_argument('--live', action='store_true')
+    p.add_argument('--dir', default=DIR)
+    p.add_argument('--edits', help='exact swaps from glossary_sweep/ruling_sweep.py (edits.json): applied with the same checks')
+    p.add_argument('--rulings', help="the rulings file ruling_sweep.py read: its exact swaps also go to the scene lines players can see")
     a = ap.parse_args()
     if a.cmd == 'chunks':
-        chunks(a.issues, a.per)
+        chunks(a.issues, a.per, a.dir)
     else:
-        apply(a.journals, a.arbiter, a.live)
+        apply(a.journals, a.arbiter, a.live, a.dir, a.edits, a.rulings)

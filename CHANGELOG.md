@@ -12,6 +12,8 @@ Player-facing changes. The detailed engineering notes for every version are in
   - 20 story lines and dice-check headers that read wrongly were fixed. Examples: 我數十聲 now counts to ten, as the
     countdown after it expects. The crowd's 算！ now answers that he counts as a hero. Several cries no longer read as
     word-by-word glosses. Xiaomei and Eldest Senior Brother are spelled as everywhere else.
+  - Three names the text used two ways for are now the same everywhere: 小師妹 is always "Junior Martial Sister", 大公子
+    always "Eldest Young Lord", and 第三香 always "Di San Xiang" (his name was also shown as "Third Fragrance").
 
 ## 1.0.0 (2026-09-27)
 

@@ -54,7 +54,8 @@ family-run Tang Clan, otherwise Sect (flag) | 宮 Palace | 樓 Tower/House | 山
 道長 Daoist (as title: "Daoist Shentu"); 大師 Master (monk); 禪師 Chan Master; 前輩 Senior; 晚輩 junior; 施主 Benefactor;
 公子 Young Lord (base) — propose Young Master only with rationale; 郡主 Lady (Lady Ningyang); 員外 Squire/Master;
 掌門 Sect Leader; 幫主 Gang Leader; 盟主 Alliance Leader; 堂主 Hall Master; 長老 Elder; 護法 Protector/Guardian (flag);
-師父 Master; 師兄 Senior Brother; 大師兄 Eldest Senior Brother (check owner's table); 小師妹 Little Junior Sister.
+師父 Master; 師兄 Senior Brother; 大師兄 Eldest Senior Brother (check owner's table); 小師妹 Junior Martial Sister (owner
+ruling 2026-09-27, below).
 
 ## Mechanics (game systems; use the code enums for the exact set)
 Stats (GameStatType): 體力 Stamina, 內力 Internal Force (flag vs "Inner Power"), 輕功 Qinggong, 銀兩 Silver Taels,
@@ -97,3 +98,8 @@ sentence case for descriptions. Keep English terse enough for UI boxes (the owne
 21. 風流扇 = Dashing Fan (Dashing Fan Skill / Technique, Nangong Dashing Fan). Never Flowery.
 22. 折花手 = Flower Plucking Hand; 捻花指 = Flower-Twirling Finger; 拈花手 = Flower-Twirling Hand.
 23. One-off calls: accept the arbiter recommendations (上官隼 = Shangguan Sun, 阿隼 = A'Sun; 萬靈油 = Panacea Oil; 苦惱拳 = Suffering Fist; 奇門 = Unorthodox Arms; 師弟 = Junior Brother; 唐老施主 = Benefactor Tang).
+
+## Owner rulings of 2026-09-27 (binding)
+24. 小師妹 = Junior Martial Sister (replaces Little Junior Sister).
+25. 大公子 = Eldest Young Lord (not bare Young Lord).
+26. 第三香 = Di San Xiang (not Third Fragrance).
