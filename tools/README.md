@@ -363,6 +363,35 @@ own folder, e.g. `python proof/extract_scenes.py <lua dir> <out dir> 1,2`.
   `describe()`, line numbers included. `--keep-record` is passed to its publish.
   First run 2026-09-22 (see `LOM_Localization/scene_hygiene/`).
 
+## scene_audit/ -- audit of the scene-only lines (2026-09-27)
+
+The scene-only lines are the workspace scene lines whose Chinese is no row of the game's string table (the full pass's
+definition, `fullpass/extract_all.py`). Most of them come from older game builds, so the audit first finds out which ones
+the installed game can still draw, then reviews only those. Working files go to `LOM_Localization/scene_audit/` (not in git).
+
+- **scan_game.py** -- reads the installed game (Mortal_Data, read only; UnityPy with its TypeTreeGenerator, as `nametips`)
+  and writes `scene_audit/game_text.json`: every LeanLocalization CSV table by language (the harness srcdump misses the
+  DiceHeader table, which only the story scene loads), the Simplified-only characters (zh-cn vs zh-tw text of the same
+  key), every Chinese string in prefabs, scenes and data assets with its object path, and the string literals of the
+  game's assemblies (their `#US` heaps). About a minute.
+- **classify.py** `[--per 10] [--chars 1100] [--also CLASSES]` -- matches each scene-only line against that, the Lua
+  scripts in `gamedata/lua` and the string tables the way `SceneDictionary` looks text up (exact, then with single line
+  breaks and the space around them removed, and the pieces between rich-text tags). Dead lines: `simplified`, `internal`
+  (flag and object names, the dev test panels), `junk`, and `not-in-game` (the Chinese is nowhere in the game: an older
+  wording or removed text). Live lines: `table-variant` / `table-fragment` (a table row without its markup or with other
+  line breaks: the fallback when the table layer does not answer), `dice-header` (the fallback of the strings overrides),
+  `ui`, `data`, `code`, `lua`, `composed` (built at run time). Writes `scene_audit/classified.tsv` (every line) and
+  `scene_audit/chunks/p_NNNN.json` + `manifest.json` (the live lines, with the row or override each should agree with,
+  neighbouring rows, the story lines before a dice check, and the established English of the names in each line).
+  `--also not-in-game` reviews the older wordings too. It refuses when the game changed since `scan_game.py` ran.
+- **audit_workflow.js** -- args `{chunks: [{chunk, ids}]}` from the manifest. A Sonnet reviewer per chunk fixes only real
+  errors (meaning, names, terms, consistency with its row or override, typos), a second call covers any line it left
+  out, and a Sonnet refuter checks every rewrite. Keep the file LF-only.
+- **apply_audit.py** `<journal.jsonl ...> [--live]` -- applies the accepted rewrites that pass the scene-line checks,
+  by exact line match (the raw key is unchanged, so the ledger needs nothing), and writes the change log, the skipped list
+  and the reviewers' notes about rows and overrides (`ref_issues.<stamp>.tsv`, not applied). `--live` backs up the scene
+  file to `backups/` and publishes; run `publish.py check` afterwards.
+
 ## checks/ -- one-off verification scripts
 
 - **check_originals.py** -- reads: a portable-release zip on Downloads (arg-free, hardcoded personal path,

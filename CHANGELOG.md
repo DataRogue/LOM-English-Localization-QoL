@@ -19,7 +19,9 @@ clean install (BepInEx and this mod only) and alongside Lash's English Patch.
 - **Text fixes.**
   - 唐門 now reads "Tang Clan" everywhere, and 唐掌門 "Sect Leader Tang".
   - The four staff handles in the credits are romanized like the rest.
-  - A few scene lines were corrected along the way.
+  - The text drawn outside the string table was checked line by line: dice-check headers, dates, credits, labels,
+    item tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names, terms, and the
+    game's date format.
 
 ## Before 1.0 (private builds, 2026-09)
 
