@@ -1,0 +1,34 @@
+# This repository is LOM_Localization with an allowlist: only what is listed here is tracked.
+/*
+!/.gitignore
+!/.gitattributes
+!/.github/
+!/README.md
+!/CHANGELOG.md
+!/LICENSE
+!/docs/
+!/src/
+!/tools/
+!/workspace/
+!/glossary/
+!/release/
+# Not tracked, and never to be: the game's own data (gamedata/: its Lua scripts), the OverLlm release the workspace is
+# compared with (base_ref/), backups, and the review passes' working files (full of the game's and OverLlm's text).
+
+# Glossary build outputs: terminology.tsv and Glossary.proposed.yaml hold the same data
+/glossary/terminology.json
+/glossary/lom_glossary.html
+/glossary/terminology_review.md
+/glossary/sweep_log.json
+
+# Build and release outputs; third-party downloads (release.py pins their SHA-256 and says where to get them)
+/src/LOM_UI_EN/bin/
+/release/dist/
+/release/vendor/*.zip
+/release/vendor/*.nupkg
+/release/vendor/Newtonsoft.Json-*/*.dll
+__pycache__/
+*.pyc
+tmp_*
+# run state of tools/ingame/overllm_aside.ps1 (written by "out", read by "back")
+/tools/ingame/overllm_aside_hashes.txt

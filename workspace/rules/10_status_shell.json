@@ -1,0 +1,185 @@
+[
+ {
+  "id": "status-home-ledger-plate-left",
+  "comment": "Home tab: the ledger plate (Back (2)) sits in the left column under the upgrade button (screen x ~600) instead of the prefab's right column, where the English caption and amount collide with the facility cards. The ledger rules below were measured in this spot. (The original English patch's LOM_UI_Plugin_KR made the same move with localPosition (-400,-285); this is that position as anchoredPosition, anchors and pivot (0,1) in the 1522x937 Home panel.)",
+  "path": "**/StatusPanel/Container/Panels/Home/Back (2)",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    361,
+    -753.5
+   ]
+  }
+ },
+ {
+  "id": "status-home-ledger-left",
+  "comment": "Home tab: the ledger row (Asset: icon, caption, amount, unit) on the plate above; localPosition (-360,-295) as anchoredPosition. 401 - 199 (the icon's own offset) = 600, the x the ledger rules below use.",
+  "path": "**/StatusPanel/Container/Panels/Home/Asset",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    401,
+    -763.5
+   ]
+  }
+ },
+ {
+  "id": "status-tab-labels-horizontal",
+  "comment": "Left tab strip: Enable/Normal/Disable labels were 20x50 one-glyph-per-line boxes drawn over the icon's left edge. Turn them into a horizontal label to the right of the 79px icon: pivot on the left edge, x=+50 from the button centre (screen x 335), wrap off. XUnity re-applies AutoResize(16,24)+CaplineFlush on TMP after the localized text is set (the plugin's onTextChange hook only covers UGUI Text), so instead of fighting it a horizontal ContentSizeFitter shrinks the box to the text's own width - a flush-justified single line in a box exactly as wide as itself is just left-aligned text. Longest label 'Relationships' ends at ~x 570, left of the Home content at 577.",
+  "paths": [
+   "**/StatusPanel/Container/Buttons/LeftButtons/StatusButton_*/*/Text (TMP)"
+  ],
+  "rect": {
+   "pivot": [
+    0,
+    0.5
+   ],
+   "sizeDelta": [
+    220,
+    36
+   ],
+   "anchoredPos": [
+    50,
+    0
+   ]
+  },
+  "fitter": {
+   "horizontal": "PreferredSize",
+   "vertical": "Unconstrained"
+  },
+  "tmp": {
+   "wordWrap": false,
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 24,
+   "alignment": "MidlineLeft",
+   "overflow": "Overflow"
+  }
+ },
+ {
+  "id": "status-home-level-word",
+  "comment": "Sect emblem level: 'One'..'Twelve' rendered one glyph per line at 72px in a 72x72 box sized for one hanzi. Centre a 96px-wide single-line box on the diamond (x 90 => screen 716..812, diamond centre 764), auto-size 24-48, no wrap.",
+  "path": "**/StatusPanel/Container/Panels/Home/Level/Text (TMP)",
+  "onTextChange": true,
+  "rect": {
+   "x": 90,
+   "width": 96
+  },
+  "tmp": {
+   "wordWrap": false,
+   "autoSize": true,
+   "minSize": 24,
+   "maxSize": 48,
+   "alignment": "Midline"
+  }
+ },
+ {
+  "id": "status-home-fiction-title-brush",
+  "comment": "Brush-stroke banner behind the sect fiction title: stretch the 304px sprite to 404px so the longest English title ('Clouds part to reveal a clear day', ~390px at 28px) sits on the ink instead of spilling onto the background.",
+  "path": "**/StatusPanel/Container/Panels/Home/Title",
+  "rect": {
+   "dw": 100
+  }
+ },
+ {
+  "id": "status-home-fiction-title-text",
+  "comment": "Fiction title text: widen its 237px box to 390px inside the stretched brush and best-fit 18-28 with wrap so no title overflows the art. onTextChange because XUnity sets HorizontalOverflow(overflow) when the text is assigned.",
+  "path": "**/StatusPanel/Container/Panels/Home/Title/Text",
+  "onTextChange": true,
+  "rect": {
+   "x": 8,
+   "width": 390
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 18,
+   "maxSize": 28,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleCenter"
+  }
+ },
+ {
+  "id": "status-home-ledger-icon",
+  "comment": "Ledger row: move the abacus icon to the row's left edge (x 600) so the caption and amount can stack to its right.",
+  "path": "**/StatusPanel/Container/Panels/Home/Asset/Icon",
+  "rect": {
+   "x": 0
+  }
+ },
+ {
+  "id": "status-home-ledger-label",
+  "comment": "Ledger caption was a 30x72 vertical box ('Led/ger'). Make it a 220x30 horizontal caption at 20px (vOverflow Overflow: a 29px line would be truncated away by a Truncate box) above the amount, left-aligned next to the icon. onTextChange beats XUnity's AutoResize(14,24)/VerticalOverflow on this path.",
+  "path": "**/StatusPanel/Container/Panels/Home/Asset/Text",
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    100,
+    -2
+   ],
+   "sizeDelta": [
+    220,
+    30
+   ]
+  },
+  "text": {
+   "bestFit": false,
+   "fontSize": 20,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "alignment": "MiddleLeft"
+  }
+ },
+ {
+  "id": "status-home-ledger-value",
+  "comment": "Money amount: 210px right-aligned box (design max '-10,000,000' ~170px at 30px) placed under the caption, x 700..910.",
+  "path": "**/StatusPanel/Container/Panels/Home/Asset/Value",
+  "rect": {
+   "anchoredPos": [
+    100,
+    -32
+   ],
+   "sizeDelta": [
+    210,
+    50
+   ]
+  }
+ },
+ {
+  "id": "status-home-ledger-unit",
+  "comment": "Currency unit label was glued to the amount ('-10,000Two'). Keep it on the amount's baseline, 6px after the value box (x 916), still left of the facility cards at x=1016.",
+  "path": "**/StatusPanel/Container/Panels/Home/Asset/Text (1)",
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    316,
+    -30
+   ]
+  },
+  "text": {
+   "hOverflow": "Overflow",
+   "alignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "status-home-facility-names",
+  "comment": "Facility cards: 100x50 name box clipped 'Outer Fortress'/'Righteous Field' and overflowed the others. Use a 116x60 box (8px into the 20px card gap on each side) with wrap + best-fit 15-20 (20 keeps a visible gap between neighbouring one-line names): two-word names wrap to two lines, single words stay one line. onTextChange beats XUnity's AutoResize(16,18)+overflow on AssetList.",
+  "paths": [
+   "**/StatusPanel/Container/Panels/Home/AssetList/AssetItem_*/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "x": -8,
+   "width": 116,
+   "height": 60
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 15,
+   "maxSize": 20,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "UpperCenter"
+  }
+ }
+]

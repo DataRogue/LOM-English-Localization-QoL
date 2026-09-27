@@ -1,0 +1,115 @@
+LOM_UI_EN - THIRD-PARTY NOTICES
+
+LOM_UI_EN contains code ported from the open-source projects listed under 1 and 2 below,
+and ships the library listed under 3 unmodified. Each is under the MIT License, which
+requires its copyright notice and permission notice to be included with copies or
+substantial portions of the software; they are reproduced verbatim below.
+
+Translation origin: this mod's English grew from the OverLlm English patch by joshfreitas1984
+(https://github.com/joshfreitas1984/LegendOfMortalOverLlm), a machine translation of the game. Since
+0.6 every line has been reviewed in its scene and many rewritten; the reviewed lines that kept that
+patch's wording, and the three layout files in translation/scene/resize/ (copies of that patch's
+resizers), are that patch's work. When the patch is installed, the plugin also reads the player's own
+copy at runtime (fallback and Original); it never changes it.
+
+==============================================================================
+1. XUnity.AutoTranslator 5.3.1
+   https://github.com/bbepis/XUnity.AutoTranslator
+   Licence file: LICENSE at tag v5.3.1 (identical on master)
+
+Ported in SceneDictionary.cs (translation-file parsing, TextTranslationCache loading and lookup, text trimming/normalization, rich-text and Chinese-text rules) and SceneText.cs (SceneResizeTable: the UI resizer and its undo, plus the text-component ignore rule).
+
+MIT License
+
+Copyright (c) 2018 Bepis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+==============================================================================
+2. Ideafixxxer.CsvParser, as bundled in Fungus
+   Parser by ideafixxxer: "CSV Parser (C#)", CodeProject article 741941 (13 Mar 2014),
+   https://www.codeproject.com/Articles/741941/CSV-Parser-Csharp
+   Bundled in Fungus (https://github.com/snozbot/fungus) as
+   Assets/Fungus/Thirdparty/CSVParser/CsvParser.cs, with Fungus's line-splitting changes,
+   and compiled into the game's Mortal_Data/Managed/Fungus.dll.
+
+Ported in IdeaCsv.cs (a re-implementation of the same five-state CSV parser, with Fungus's line splitting and empty-line skipping).
+
+Notice for the parser, as given in the header of Fungus's CsvParser.cs and in
+Fungus's Assets/Fungus/Thirdparty/ThirdPartyNotices.txt:
+
+MIT License
+
+Copyright 2014 ideafixxxer
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Notice for Fungus (LICENSE at the root of the Fungus repository, master):
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Chris Gregan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+==============================================================================
+3. Newtonsoft.Json 13.0.2 (Json.NET)
+   https://www.newtonsoft.com/json, https://github.com/JamesNK/Newtonsoft.Json
+   Shipped unmodified as Newtonsoft.Json.dll: lib/net45 of the official NuGet package
+   newtonsoft.json.13.0.2.nupkg (SHA-256 of the DLL c5c83bbc1741be6f...ce13199e).
+   The game has none; the OverLlm patch installs its own copy in BepInEx/core,
+   which then loads instead of this one.
+
+The MIT License (MIT)
+
+Copyright (c) 2007 James Newton-King
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

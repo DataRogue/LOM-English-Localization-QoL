@@ -1,0 +1,33 @@
+# LOM_UI_EN faction tips: sects, clans and other factions whose names in dialogue and choices show a short description.
+# TAB-separated columns: id, title, forms, description. Lines starting with '#' are comments.
+#   id           short name for this list (not shown)
+#   title        the name shown at the top of the tip; always matched
+#   forms        more name forms matched for it, comma-separated; all matching is case-sensitive and whole-word, and the
+#                longest form in a text wins
+#   description  the tip's text: who they are, as the story introduces them. Never events, fates or secrets.
+01	Tang Clan	Tang Family	Your own sect: the world's foremost masters of hidden weapons and poison, based in Shu, with inner and outsider disciples.
+02	Nangong Family	Nangong	One of the Wulin's Three Great Families, based in Jiangling; renowned for its wide connections, elegant fan techniques, and long-lived elders.
+03	Shangguan Family	Shangguan	One of the Wulin's Three Great Families, a Fuzhou clan whose ambitious trading and shipping business made it wealthy and far-reaching.
+04	Kongtong Sect	Kongtong	An ancient sect on Mount Kongtong blending martial arts of the Central Plains, Western Xia, and Tubo, organized into four branch gates.
+05	Flying Heaven Gate		Kongtong Sect's leading branch, said to head its four gates; its disciples pursue immortal cultivation alongside their martial arts.
+06	Soul-Stealing Gate		A Kongtong branch charged with night patrols and hunting down criminals; its unconventional hours and methods unsettle other sects.
+07	Iron Fist Gate		A Kongtong branch of smiths and laborers (forging, farming, brewing) trained in tough, hard-hitting fighting styles.
+08	Mystic Skill Gate		A Kongtong branch focused on internal cultivation; its leader also serves as the sect's archivist and record-keeper.
+09	Qingcheng Sect	Qingcheng	A Daoist sect whose priests may marry, unlike the celibate Quanzhen; known for Taiji-based inner arts and for driving out evil spirits.
+10	Jinxiang Palace	Jinxiang	An all-female sect known for elegant swordsmanship, whose disciples often wander the realm righting wrongs.
+11	Diancang Sect	Diancang	A sect on Mount Diancang famed for swordsmanship, with a mountain library of sword manuals passed down through generations.
+12	Beggar Sect		The martial world's largest sect by numbers, made up of wandering beggars organized into branches across the realm.
+13	Imperial Court		The government of the Great Song; the Jianghu's martial artists generally keep it at a wary distance.
+14	Emei Sect	Emei	One of the Six Great Sects; known for its leg techniques, with many members who study Buddhism without taking monastic vows.
+15	Mud Cult		An unorthodox cult based at the Six Paths Gorge near Xiangyang, regarded as the gravest danger facing the Wulin in this era.
+16	Demon Cult		In the Jianghu, this name is given to whichever unorthodox cult poses the era's greatest threat; every generation has had one.
+17	Flying Stone Gang		A local gang known for repeated clashes with the Tang Clan's disciples over the years.
+18	Quanzhen Sect	Quanzhen	A Daoist order of celibate priests with temples across the realm, teaching internal Qi-cultivation; open to all, though true mastery is rare.
+19	Supreme Bliss Cult	Old Demon Cult	A cult from a past era, once the martial world's greatest threat, destroyed by an alliance of righteous sects and clans.
+20	Cang Gang		A gang active in Fujian, skilled with the blade.
+21	White Shark Gang		Pirates who roam the eastern seas.
+22	Thousand Lantern Tower		A shadowy organization that trains assassins from childhood; its killers operate under inherited code names.
+23	Songshan Sect	Songshan Temple,Songshan	A Buddhist sect centered on Songshan Temple, whose monks study Chan teachings and fist techniques; it keeps a branch in Fujian.
+24	Six Great Sects		Kongtong, Qingcheng, Emei, Diancang, Songshan, and Quanzhen: the six most prominent orthodox sects in the Wulin.
+25	Three Great Families		Tang Clan, Nangong Family, and Shangguan Family: the three most prominent great families in the Wulin.
+26	Wulin Alliance		A coalition of the Wulin's righteous factions, led by an elected Wulin Alliance Leader.

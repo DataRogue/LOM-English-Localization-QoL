@@ -1,0 +1,117 @@
+[
+  // ---------------------------------------------------------------------------
+  // StatusPanel > Relationships tab (Panels/Social) and CharacterIntroPanel.
+  // Area: status_social.  Title flag, tab strip and close button are NOT touched.
+  // ---------------------------------------------------------------------------
+
+  {
+    "id": "social-bio-title",
+    "comment": "'Biographies' header sits in a 150x100 CJK box (2 glyphs) and overflowed into the 'One' toggle. Fixed 34px single line, overflow to the right; the toggle strip is moved right (next rule) so nothing sits in its way. onTextChange because XUnity re-applies AutoResize(12,32) when LeanLocalizedText sets the string.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Title"],
+    "onTextChange": true,
+    "rect": { "width": 200, "height": 60 },
+    "text": { "bestFit": false, "fontSize": 34, "alignment": "MiddleLeft", "hOverflow": "Overflow", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "social-bio-buttons-shift",
+    "comment": "Chapter toggles (One/Two/Three/Four) start 138px right of the header, sized for two CJK glyphs; shift the whole strip 60px right so the English header has room (ends ~650, strip starts 669, last toggle ends ~900 < avatar art).",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons"],
+    "rect": { "dx": 60, "dy": 6 }
+  },
+  {
+    "id": "social-bio-navleft-keep",
+    "comment": "Gamepad nav icon is positioned relative to the strip; counter-shift so it does not land on the header when a controller is connected.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons/Icon_NavLeft_2"],
+    "rect": { "dx": -60 }
+  },
+  {
+    "id": "social-bio-toggle-boxes",
+    "comment": "Chapter toggles are 50x50 CJK squares spaced 45px (they overlapped by 5px). Widen to 56 and space at 58 so 'Three' fits at a readable best-fit size without touching its neighbour.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons/Toggle (1)"],
+    "rect": { "width": 56, "height": 50, "x": 0 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "social-bio-toggle-boxes-2",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons/Toggle (2)"],
+    "rect": { "width": 56, "height": 50, "x": 58 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "social-bio-toggle-boxes-3",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons/Toggle (3)"],
+    "rect": { "width": 56, "height": 50, "x": 116 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "social-bio-toggle-boxes-4",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons/Toggle (4)"],
+    "rect": { "width": 56, "height": 50, "x": 174 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "social-bio-toggle-enable",
+    "comment": "Highlighted-state copy of each toggle label (child 'Enable', centre-anchored 50x50): match the widened parent so both states render identically.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Buttons/Toggle (*)/Enable"],
+    "rect": { "width": 56, "height": 50 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+
+  {
+    "id": "social-char-title",
+    "comment": "Relationship title above the name (longest: \"Flying Heaven's Direct Female Disciple\", ~500px at 29px). Keep it left of the character grid (x<1381): box 460 wide, allow a 2-line wrap that grows UPWARD (bottom-aligned, box made 80 tall with its bottom edge where it was) so a second line never lands on the name.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Charater/Info/Title"],
+    "rect": { "width": 460, "height": 80, "dy": 52 },
+    "text": { "alignment": "LowerLeft", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "social-char-name",
+    "comment": "Character name (256x80, centred, 2 lines of CJK). English names up to 'Wanli Pengcheng' (~280px at 36) would wrap into the progress bar. Single-line box 236x50 (918-1154, ends before the star at 1158) starting at the title's left edge, left-aligned; best-fit floor 26 keeps the calligraphic look (longest name lands at ~30). dy 5 lifts the descenders off the relationship progress bar (y911-929) that sits under the name.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Charater/Info/Name"],
+    "rect": { "x": 59, "width": 236, "height": 50, "dy": 5 },
+    "text": { "alignment": "MiddleLeft", "bestFit": true, "minSize": 26, "maxSize": 38, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "social-char-star-level",
+    "comment": "Star + level number are right-anchored next to the (formerly centred) name; nudge them right so a full-width English name (ends ~1168) clears them while both stay on the brush-stroke background (ends 1211).",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Charater/Info/Star",
+              "**/StatusPanel/Container/Panels/Social/Charater/Info/Level"],
+    "rect": { "dx": 44 }
+  },
+
+  // ---------------------------------------------------------------------------
+  // CharacterIntroPanel (first-meeting card). Text is typed in one char per frame,
+  // so XUnity's AutoResize re-runs on every character: onTextChange on all three.
+  // ---------------------------------------------------------------------------
+  {
+    "id": "charintro-title",
+    "comment": "Relationship title above the name: design 40px, XUnity AutoResize(12,20) shrank it to a 20px caption. Fixed 30px single line (longest title ~38 chars = ~430px, box 520 stays inside the frame, ends 1519 < 1636), no best-fit.",
+    "paths": ["**/CharacterIntroPanel/Frame/Title"],
+    "onTextChange": true,
+    "rect": { "width": 520, "height": 40, "dy": 4 },
+    "text": { "bestFit": false, "fontSize": 30, "alignment": "MiddleLeft", "hOverflow": "Overflow", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "charintro-name",
+    "comment": "Name on the ink brush (TMP, 400x60, auto 24-42). Widen to 520 so a long English name ('Fire Dragon Immortal Monarch') needs less auto-shrink; still left-aligned on the brush. (The DFT_S5_SDF_StoryTitle_002 atlas has no Latin glyphs and falls back to a jagged bitmap sans; a tmp.font swap to Palatino was tried but TMP_FontAsset.CreateFontAsset(Font) returns null for OS fonts in this build, so the original font is kept.)",
+    "paths": ["**/CharacterIntroPanel/Frame/Name"],
+    "onTextChange": true,
+    "rect": { "width": 520, "height": 60 },
+    "tmp": { "autoSize": true, "minSize": 26, "maxSize": 42, "wordWrap": false, "overflow": "Overflow" }
+  },
+  {
+    "id": "charintro-intro",
+    "comment": "Intro paragraph (560 wide, paper's inner bottom border ~y840). Unity best-fit is unreliable here: with bf 16-21 it settled at ~15px with 13 lines in a 290 box and Truncate dropped the last line (reviewer regression); the untouched game (bf 8-18) rendered ~14px. So: FIXED 16px, no best-fit, the game's own 0.9 line spacing (Source Han Serif pitch ~1.43em -> ~20.6px/line), box 290 tall (548-838) and vOverflow Overflow so a line can never be lost. Measured: ~64 chars/line at 16px. Worst real string (CharacterIntro0/special405, 570 chars) = ~10 lines / 206px; the 832-char machine-translated placeholder shown by the capture harness = 14 lines / 288px, still inside the paper. onTextChange because the resizer files re-apply AutoResize(8,18) on every translated text set and the game types the string in one char per frame. The prefab's ContentSizeFitter (vertical PreferredSize) is switched to Unconstrained, or it would regrow the box to the text's preferred height and undo the 290.",
+    "paths": ["**/CharacterIntroPanel/Frame/Intro"],
+    "onTextChange": true,
+    "rect": { "height": 290 },
+    "fitter": { "vertical": "Unconstrained" },
+    "text": { "bestFit": false, "fontSize": 16, "lineSpacing": 0.9, "alignment": "UpperLeft", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "social-description-clear-of-tabs",
+    "comment": "The 'Relationships' tab label runs to x=492 while the biography block started at x=472, so the bio text ran across the label. Shift the description group 45px right (it ended at x=896 with room to spare).",
+    "path": "**/StatusPanel/Container/Panels/Social/Description",
+    "rect": { "dx": 45 }
+  }
+]

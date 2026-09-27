@@ -1,0 +1,647 @@
+[
+ {
+  "id": "q01",
+  "title": "娘子 Lady vs Madam",
+  "question": "When a named woman is addressed as X娘子 (辛娘子, 樂娘子, 樂屏娘子), do you want 'Lady X' or 'Madam X'? The bare spousal sense of 娘子 stays 'wife' either way.",
+  "options": [
+   "Lady X — corpus majority (70), matches Lady Shangguan / Lady Zhu",
+   "Madam X — marks married commoner women; 26 current uses",
+   "Wife everywhere — base glossary literal; breaks address lines"
+  ],
+  "recommendation": "Lady X: corpus majority (70 vs 26), matches 夫人 = Lady and the base's Lady Shangguan / Lady Zhu; 'Madam' reads Victorian rather than wuxia.",
+  "themes": [
+   "title:娘子 Lady vs Madam"
+  ],
+  "affected_terms": [
+   "辛娘子",
+   "娘子"
+  ],
+  "linked_terms": [
+   "娘子",
+   "辛娘子"
+  ],
+  "answer": "Lady X",
+  "rule": "娘子 as an address = Lady X (Lady Xin, Lady Shangguan); the bare spousal sense stays wife. 小娘子 = Young Lady X."
+ },
+ {
+  "id": "q02",
+  "title": "釋明 Dharma-name spacing",
+  "question": "The monk 釋明 (also 慧明) is 'Shi Ming' in 353 lines, but one of your notes joins it to 'Shiming' like Juekong. Which spelling do you want?",
+  "options": [
+   "Shi Ming / Huiming — 釋 as Buddhist surname; keeps 353 lines",
+   "Shiming / Huiming — joined like Juekong; rewrites 353 lines"
+  ],
+  "recommendation": "Shi Ming: 釋 is the Buddhist surname (cf. Shi Yongxin), so the space follows your name rule; base glossary and 353 uses agree, only 11 lines say Shiming.",
+  "themes": [
+   "name:釋明 Shi Ming vs Shiming (Dharma name spacing)"
+  ],
+  "affected_terms": [
+   "釋明/慧明"
+  ],
+  "linked_terms": [
+   "釋明/慧明"
+  ],
+  "answer": "Shi Ming / Huiming",
+  "rule": "釋明 = Shi Ming (two words, 釋 is the Buddhist surname); 慧明 = Huiming; compounds follow (Master Shi Ming, Martial Uncle Shi Ming)."
+ },
+ {
+  "id": "q03",
+  "title": "武林大會 event name",
+  "question": "The big leader-electing meeting 武林大會 (239 lines, 西武林大會 follows) has no rendering above 35% today. Which English name?",
+  "options": [
+   "Wulin Assembly — pairs with Wulin Alliance / Alliance Leader",
+   "Wulin Conference — clear but bureaucratic",
+   "Wulin Gathering — casual; undersells a leader-electing meeting"
+  ],
+  "recommendation": "Wulin Assembly: 大會 is a grand assembly, it pairs with Wulin Alliance/Alliance Leader and reads as genre; 'Tournament' is wrong since the script shows a council electing a 盟主.",
+  "themes": [
+   "event:武林大會 Conference vs Assembly"
+  ],
+  "affected_terms": [
+   "武林大會",
+   "西武林大會"
+  ],
+  "linked_terms": [
+   "武林大會",
+   "西武林大會"
+  ],
+  "answer": "Wulin Assembly",
+  "rule": "武林大會 = Wulin Assembly; 西武林大會 = Western Wulin Assembly."
+ },
+ {
+  "id": "q04",
+  "title": "內力 stat name",
+  "question": "Your conventions note lists 內力 = Internal Force, but three of your override notes call 'Inner Strength' the register term. Which is the stat name everywhere (UI, item 補內力, skill text)?",
+  "options": [
+   "Inner Strength — what your override rows already apply",
+   "Internal Force — conventions draft; pairs with Internal Method/Skill",
+   "Inner Power — base-patch alternative; nothing of yours uses it"
+  ],
+  "recommendation": "Inner Strength: it is what you actually applied in Book/Desc/8008, 7015 and CombatTalking/1704_01_03_001 as 'the register term'; Internal Force exists only in the draft note.",
+  "themes": [
+   "core:內力/內功/真氣"
+  ],
+  "affected_terms": [
+   "補內力"
+  ],
+  "linked_terms": [
+   "補內力"
+  ],
+  "answer": "Internal Force",
+  "rule": "內力 = Internal Force everywhere (stat name, item text, skill text); never Inner Strength / Inner Power. 內功 stays Internal Skill, 心法 Internal Method, 真氣 True Qi."
+ },
+ {
+  "id": "q05",
+  "title": "老爺/少爺/老太爺 household set",
+  "question": "The household titles 老爺, 少爺 and 老太爺 (163 lines, six competing renderings) must be one set. Which?",
+  "options": [
+   "Master / Young Master / Old Master — standard translated-fiction set",
+   "Lord / Young Lord / Old Lord — collides with 大人 = Lord",
+   "Master / Young Master / Old Patriarch — Patriarch is already 祖師"
+  ],
+  "recommendation": "Master set: the standard household set in translated Chinese fiction and the corpus's most common form; Lord collides with 大人 and Patriarch is reserved for 祖師.",
+  "themes": [
+   "title:老爺/老太爺 household Master vs Lord"
+  ],
+  "affected_terms": [
+   "老太爺",
+   "老爺"
+  ],
+  "linked_terms": [
+   "老太爺",
+   "老爺"
+  ],
+  "answer": "Master / Young Master / Old Patriarch",
+  "rule": "老爺 = Master (X老爺 = Master X), 少爺 = Young Master (X少爺 = Young Master X), 老太爺 = Old Patriarch (X老太爺 = Old Patriarch X). 公子 stays Young Lord (owner ruling), 相公 stays Young Master."
+ },
+ {
+  "id": "q06",
+  "title": "真人 Daoist honorific",
+  "question": "Daoist priests titled 真人 (Qiu Chuji, Zou, Yin, Chongyang, Fire Dragon; 162 lines) are 'Immortal X' in the base patch. Keep that, or switch the whole family?",
+  "options": [
+   "Immortal X — base term; MacLehose Condor Heroes usage",
+   "Reverend X — other Jin Yong translations; no clash with 仙",
+   "Daoist Master X — descriptive; longer in UI boxes",
+   "Perfected X — sinological; unfamiliar to players"
+  ],
+  "recommendation": "Immortal X: base term with 162 uses and the MacLehose Condor Heroes convention (Changchun the Immortal); the 仙 clash is limited now that 仙君 = Immortal Monarch.",
+  "themes": [
+   "title:真人 Immortal vs Perfected"
+  ],
+  "affected_terms": [
+   "真人",
+   "鄒真人",
+   "尹真人",
+   "火龍真人",
+   "全真丘真人",
+   "長春真人",
+   "丘真人/丘處機",
+   "鄒真人／鄒掌門／鄒道長",
+   "丘真人",
+   "重陽真人",
+   "長春子丘真人",
+   "丘處機/丘真人"
+  ],
+  "linked_terms": [
+   "丘真人",
+   "丘真人/丘處機",
+   "丘處機/丘真人",
+   "全真丘真人",
+   "尹真人",
+   "火龍真人",
+   "真人",
+   "鄒真人",
+   "鄒真人／鄒掌門／鄒道長",
+   "重陽真人",
+   "長春子丘真人",
+   "長春真人"
+  ],
+  "answer": "Immortal X",
+  "rule": "真人 = Immortal X (Immortal Qiu, Immortal Zou, Immortal Changchun, Fire Dragon Immortal); never Reverend / Perfected / Daoist Master / Zhenren."
+ },
+ {
+  "id": "q07",
+  "title": "大人 Lord vs office title",
+  "question": "Officials addressed as X大人 (宋大人 etc., 120 lines): keep the base 'Lord X', or use the office ('Magistrate Song') where the script names it?",
+  "options": [
+   "Lord X — base glossary; top current rendering; one rule",
+   "Office title by context (Magistrate X) — accurate but needs per-line check",
+   "Sir X — English, but reads knightly"
+  ],
+  "recommendation": "Lord X: base glossary and top current rendering with no ruling against it; use an office title only where the script names the office.",
+  "themes": [
+   "title:大人 Lord vs Sir"
+  ],
+  "affected_terms": [
+   "宋大人"
+  ],
+  "linked_terms": [
+   "宋大人"
+  ],
+  "answer": "Office title by context",
+  "rule": "X大人: use the office title when the script names the office the person holds (Magistrate Song for 宋大人 if he is the magistrate, Commissioner X for a 招撫御使, etc.); Lord X only when no office is named."
+ },
+ {
+  "id": "q08",
+  "title": "大哥 Brother vs Senior Brother",
+  "question": "大哥 is the respectful 'elder brother' between non-sect friends (王大哥, 何大哥, 戚大哥). The base glossary says Senior Brother, base text mostly says Brother X. Which?",
+  "options": [
+   "Brother X — keeps Senior Brother exclusive to 師兄; ~1000 base uses",
+   "Big Brother X — literal; casual register",
+   "Senior Brother X — base glossary; blurs with sect seniority"
+  ],
+  "recommendation": "Brother X: 大哥 is not 師兄, so Senior Brother must stay exclusive to sect seniority; base text already uses 'Brother X' about 1000 times.",
+  "themes": [
+   "title:大哥 Big Brother vs Senior Brother"
+  ],
+  "affected_terms": [
+   "王大哥",
+   "何大哥",
+   "戚大哥"
+  ],
+  "linked_terms": [
+   "何大哥",
+   "戚大哥",
+   "王大哥"
+  ],
+  "answer": "Brother X",
+  "rule": "大哥 between non-sect friends = Brother X (Brother He, Brother Wang); Senior Brother stays exclusive to 師兄."
+ },
+ {
+  "id": "q09",
+  "title": "解無塵 surname Xie or Jie",
+  "question": "The Emei hero 解無塵 is 'Jie Wuchen' in 114 lines including three of your own rows, but 解 as a surname reads Xiè. Correct it to Xie everywhere (解大俠, 解公子, 解某 follow)?",
+  "options": [
+   "Xie Wuchen — correct surname reading; revises your 3 rows too",
+   "Jie Wuchen — keeps current spelling; knowingly non-standard"
+  ],
+  "recommendation": "Xie: surname 解 is Xiè (解縉, 解珍) and you already corrected Yunzhou/Yunshang/Moling corpus-wide; only Book/Desc/4002, C537 and Ch_5_3_4_1_001 need syncing.",
+  "themes": [
+   "reading:解 Xie vs Jie"
+  ],
+  "affected_terms": [
+   "解大俠",
+   "風神解無塵",
+   "解公子",
+   "解無塵",
+   "解某",
+   "解無塵/解大俠"
+  ],
+  "linked_terms": [
+   "解公子",
+   "解大俠",
+   "解某",
+   "解無塵",
+   "解無塵/解大俠",
+   "風神解無塵"
+  ],
+  "answer": "Xie Wuchen",
+  "rule": "Surname 解 = Xie everywhere: Xie Wuchen, Great Hero Xie, Young Lord Xie, Wind God Xie Wuchen, I, Xie. Never Jie."
+ },
+ {
+  "id": "q10",
+  "title": "趙郎 spousal address",
+  "question": "The wives call Zhao Huo 趙郎 (87 lines); 郎 is a spousal endearment, not a name. Keep the pinyin 'Zhao Lang' or translate it?",
+  "options": [
+   "Zhao Lang — terse, distinctive, parallels A'Huo; 29 current uses",
+   "'my dear' / 'Husband' — natural English; wording varies per line",
+   "Brother Zhao — wrong register; reads as a friend"
+  ],
+  "recommendation": "Zhao Lang: terse, distinctive and parallel to the retained A'Huo prefix; wuxia readers know X-lang as wifely address (cf. 'Jing-lang' in Condor Heroes translations).",
+  "themes": [
+   "address:X郎 pinyin vs endearment"
+  ],
+  "affected_terms": [
+   "趙郎"
+  ],
+  "linked_terms": [
+   "趙郎"
+  ],
+  "answer": "my dear / Husband",
+  "rule": "趙郎 (and 瑞郎, any spousal X郎 address) is rendered as an English endearment per line: my dear, dearest, Husband; never the pinyin Zhao Lang / Ruilang and never Brother Zhao."
+ },
+ {
+  "id": "q11",
+  "title": "護法 Protector vs Guardian",
+  "question": "The sect rank 護法 (Kongtong's four elemental 護法, the Supreme Bliss Cult's Left/Right 護法) is split between Protector and Guardian. One word for the whole family?",
+  "options": [
+   "Protector — Jin Yong convention; your Right Dharma Protector row",
+   "Guardian — 7 corpus uses; sounds generic",
+   "Dharma Protector — Buddhist literal; long for UI"
+  ],
+  "recommendation": "Protector: the common wuxia sect-rank rendering, your CharacterIntro2/master row already uses it, and it scales to the Kongtong four and Left/Right pairs.",
+  "themes": [
+   "title:護法 Protector vs Guardian"
+  ],
+  "affected_terms": [
+   "護法",
+   "左護法",
+   "崆峒四大護法",
+   "火護法",
+   "地護法",
+   "左右護法",
+   "水護法",
+   "風護法",
+   "飛天護法",
+   "崆峒地水火風四大護法",
+   "極樂教右護法"
+  ],
+  "linked_terms": [
+   "地護法",
+   "崆峒四大護法",
+   "崆峒地水火風四大護法",
+   "左右護法",
+   "左護法",
+   "極樂教右護法",
+   "水護法",
+   "火護法",
+   "護法",
+   "風護法",
+   "飛天護法"
+  ],
+  "answer": "Guardian",
+  "rule": "護法 = Guardian for the whole family: Guardian, Left Guardian, Right Guardian, Earth/Water/Fire/Wind Guardian, Four Guardians of Kongtong, Kongtong's Four Guardians of Earth, Water, Fire, and Wind, Flying Heaven Guardian, Right Guardian of the Supreme Bliss Cult. Never Protector / Dharma Protector."
+ },
+ {
+  "id": "q12",
+  "title": "師叔/師伯 martial-kin titles",
+  "question": "Your master's juniors and seniors (師叔, 師伯, 師姑, 師叔祖) need one family. Your own rows use 'Uncle Shiming' and 'Senior Uncle Shangguan' and reserve 'Master' for 師父. Which set?",
+  "options": [
+   "Martial Uncle / Senior Martial Uncle / Martial Aunt / Grand Martial Uncle — Western wuxia standard",
+   "Uncle / Senior Uncle / Aunt / Granduncle — your rows' short forms",
+   "Master Uncle / Master Aunt — base patch; clashes with reserved Master"
+  ],
+  "recommendation": "Martial Uncle family: the recognized Western wuxia term, avoids 'Master' which you reserved for 師父 (1803_03_04_003), and scales cleanly to 師姑 and 師叔祖.",
+  "themes": [
+   "title:師叔/師伯"
+  ],
+  "affected_terms": [
+   "師叔",
+   "師姑",
+   "師伯",
+   "師叔祖",
+   "不平師叔"
+  ],
+  "linked_terms": [
+   "不平師叔",
+   "師伯",
+   "師叔",
+   "師叔祖",
+   "師姑"
+  ],
+  "answer": "Martial Uncle family",
+  "rule": "師叔 = Martial Uncle (X師叔 = Martial Uncle X), 師伯 = Senior Martial Uncle, 師姑 = Martial Aunt, 師叔祖 = Grand Martial Uncle. Never plain Uncle / Master Uncle."
+ },
+ {
+  "id": "q13",
+  "title": "極招 Ultimate vs Extreme Move",
+  "question": "Your conventions say 極招 = Extreme Move (distinct from 絕招 = Ultimate), but your later rows citing NOMENCLATURE row 264 changed the Sword Saint's First/Second 極招 to 'Ultimate'. Which wins for the whole set (First to Fourth, talents, books)?",
+  "options": [
+   "Ultimate — follows NOMENCLATURE row 264; same word as 絕招",
+   "Extreme Move — keeps 極招/絕招 distinct; realigns the row-264 rows"
+  ],
+  "recommendation": "Ultimate: NOMENCLATURE row 264 is your master list and S8126_1/ultimate_013 explicitly retire Extreme Move; the 'Third Extreme Move' rows are stale carry-overs. Update conventions line 27.",
+  "themes": [
+   "core:極招 Ultimate vs Extreme Move",
+   "core:極招 Extreme Move vs Ultimate"
+  ],
+  "affected_terms": [
+   "極招",
+   "第三極招",
+   "點蒼劍聖第一極招",
+   "第一極招／第二極招／第三極招",
+   "第四極招",
+   "劍聖極招",
+   "劍聖第一極招",
+   "劍聖四大極招",
+   "劍聖第三極招",
+   "劍聖第二極招"
+  ],
+  "linked_terms": [
+   "劍聖四大極招",
+   "劍聖極招",
+   "劍聖第一極招",
+   "劍聖第三極招",
+   "劍聖第二極招",
+   "極招",
+   "第一極招／第二極招／第三極招",
+   "第三極招",
+   "第四極招",
+   "點蒼劍聖第一極招"
+  ],
+  "answer": "Ultimate",
+  "rule": "極招 = Ultimate, same word as 絕招: First/Second/Third/Fourth Ultimate, Sword Saint's First Ultimate, Four Ultimates. Never Extreme Move."
+ },
+ {
+  "id": "q14",
+  "title": "異常狀態 UI term",
+  "question": "The combat UI term 異常狀態 is 'status ailment' in your E001/1100 rows but 'status effects' in your BattleEffect_001 row; the base says Abnormal Status. Which one?",
+  "options": [
+   "Status Effect — matches code StateEffectType; covers Restraint",
+   "Status Ailment — your E001/1100 rows; implies only harmful",
+   "Abnormal Status — base majority; literal calque"
+  ],
+  "recommendation": "Status Effect: matches the code enum and your BattleEffect_001 row, and covers non-ailment states like Restraint; 'ailment' can stay in prose for Poison/Paralysis.",
+  "themes": [
+   "core:異常狀態 Status Effect vs Status Ailment"
+  ],
+  "affected_terms": [
+   "異常狀態"
+  ],
+  "linked_terms": [
+   "異常狀態"
+  ],
+  "answer": "Status Effect",
+  "rule": "異常狀態 = Status Effect (matches StateEffectType); not Status Ailment / Abnormal Status."
+ },
+ {
+  "id": "q15",
+  "title": "奪魄 Soul-Stealer vs Soul-Stealing",
+  "question": "奪魄 appears in Xiahou Lan's epithet, her techniques, the Kongtong gate and two map headers. Your rows use 'Soul-Stealing' for epithet/techniques but 'Soul-Stealer' for the Gate, Forest and Peak. One form everywhere, or split by type?",
+  "options": [
+   "Soul-Stealing everywhere — one adjective; changes Gate/Forest/Peak rows",
+   "Soul-Stealer for Gate/Forest/Peak, Soul-Stealing elsewhere — keeps all rows",
+   "Soul-Stealer everywhere — reverts the register's epithet fix"
+  ],
+  "recommendation": "Soul-Stealing everywhere: your notes say the register retired 'Soul-Stealer' for 奪魄 (Orchid, Phantom Claw, Disciple); one adjective keeps the gate tied to its founder's epithet.",
+  "themes": [
+   "org:奪魄門 Soul-Stealer Gate vs Soul-Stealing Gate",
+   "epithet:奪魄 Soul-Stealer vs Soul-Stealing"
+  ],
+  "affected_terms": [
+   "崆峒奪魄門",
+   "崆峒奪魄門/奪魄門",
+   "奪魄森林",
+   "奪魄峰"
+  ],
+  "linked_terms": [
+   "奪魄峰",
+   "奪魄森林",
+   "崆峒奪魄門",
+   "崆峒奪魄門/奪魄門"
+  ],
+  "answer": "Soul-Stealing everywhere",
+  "rule": "奪魄 = Soul-Stealing in every compound: Soul-Stealing Orchid, Soul-Stealing Gate (of Kongtong), Soul-Stealing Forest, Soul-Stealing Peak, Soul-Stealing Phantom Claw, Soul-Stealing Disciple, Soul-Stealing Wang Laowu. Never Soul-Stealer."
+ },
+ {
+  "id": "q16",
+  "title": "幽蘭 Orchid vs Secluded Orchid",
+  "question": "Xiahou Lan's epithet 奪魄幽蘭: three of your rows say 'Soul-Stealing Orchid', but her title card (CharacterTitle/girl6) keeps 'Soul-Stealer Secluded Orchid'. Which, and 幽蘭師父 follows?",
+  "options": [
+   "Soul-Stealing Orchid / Master Orchid — your three prose rows; terse",
+   "Soul-Stealer Secluded Orchid / Master Secluded Orchid — title card; literal 幽",
+   "Master Youlan — pinyin; but Youlan is not her name"
+  ],
+  "recommendation": "Soul-Stealing Orchid: Book/Desc/6007, CharacterIntro0/girl6 and C521 fix it and reject the pinyin; the girl6 title card was a hyphen-only pass. Full form: Heroine Xiahou, the Soul-Stealing Orchid.",
+  "themes": [
+   "epithet:奪魄幽蘭"
+  ],
+  "affected_terms": [
+   "奪魄幽蘭",
+   "幽蘭師父",
+   "奪魄幽蘭夏侯女俠",
+   "奪魄幽蘭夏侯女魔"
+  ],
+  "linked_terms": [
+   "奪魄幽蘭",
+   "奪魄幽蘭夏侯女俠",
+   "奪魄幽蘭夏侯女魔",
+   "幽蘭師父"
+  ],
+  "answer": "Soul-Stealing Orchid",
+  "rule": "奪魄幽蘭 = Soul-Stealing Orchid; 幽蘭師父 = Master Orchid; full title Heroine Xiahou, the Soul-Stealing Orchid. Never Secluded Orchid / Youlan."
+ },
+ {
+  "id": "q17",
+  "title": "樂屏 surname Le or Yue",
+  "question": "The courtesan 樂屏 is 'Le Ping' in the base patch (18 lines). As a surname 樂 is normally read Yuè, and she comes from a 樂坊 music house. Correct to Yue Ping / Lady Yue?",
+  "options": [
+   "Yue Ping / Lady Yue — standard surname reading; music-house pun works",
+   "Le Ping / Lady Le — keeps base spelling; 18 lines untouched"
+  ],
+  "recommendation": "Yue Ping: surname 樂 reads Yuè (樂毅), the 樂坊 pun only works as Yue, and with 18 uses and no override row the fix is cheap.",
+  "themes": [
+   "reading:樂 Le vs Yue"
+  ],
+  "affected_terms": [
+   "樂小娘子",
+   "樂屏",
+   "樂娘子",
+   "樂屏娘子",
+   "樂娘子／樂屏娘子"
+  ],
+  "linked_terms": [
+   "樂娘子",
+   "樂娘子／樂屏娘子",
+   "樂小娘子",
+   "樂屏",
+   "樂屏娘子"
+  ],
+  "answer": "Yue Ping",
+  "rule": "Surname 樂 (the courtesan) = Yue: Yue Ping, Lady Yue, Young Lady Yue, Lady Yue Ping. Never Le Ping / Lady Le."
+ },
+ {
+  "id": "q18",
+  "title": "舵主 Beggar Sect branch rank",
+  "question": "The Beggar Sect branch rank 舵主 (楊舵主) has three live renderings. Which title?",
+  "options": [
+   "Branch Leader — parallels Gang/Sect/Alliance Leader; 8 current uses",
+   "Helmsman — Book and Sword translation term; Red Flower Society flavour",
+   "Branch Chief — reads corporate; 2 uses"
+  ],
+  "recommendation": "Branch Leader: parallels your X主 = X Leader pattern and is the most-used current form; Helmsman is tied to the Red Flower Society in Western readers' minds.",
+  "themes": [
+   "title:舵主 Helmsman vs Branch Chief"
+  ],
+  "affected_terms": [
+   "舵主",
+   "楊舵主"
+  ],
+  "linked_terms": [
+   "楊舵主",
+   "舵主"
+  ],
+  "answer": "Branch Leader",
+  "rule": "舵主 = Branch Leader (Branch Leader Yang, Dayi Branch Leader); never Helmsman / Branch Chief / Branch Master."
+ },
+ {
+  "id": "q19",
+  "title": "定遠郎/忠國公 court titles",
+  "question": "Wang Shi's hereditary rank 定遠郎 and the Dali duke's title 忠國公: translate them into English ranks or keep pinyin? Note that pinyin 'Zhongguo' reads as 'China' to English players.",
+  "options": [
+   "Commandant Dingyuan / Duke of Loyalty — English ranks; your English-over-pinyin rule",
+   "Dingyuan Lang / Duke Zhongguo — pinyin; keeps the 嫁郎 pun sound",
+   "Captain Dingyuan / Duke of Loyalty — Captain reads modern-military",
+   "Lord Dingyuan / Duke of Loyalty — peerage word for a military rank"
+  ],
+  "recommendation": "Commandant Dingyuan / Duke of Loyalty: xunity_019 shows 定遠郎 is a conferred military rank, 忠 is a virtue not a fief, and your rule prefers English over pinyin for titles.",
+  "themes": [
+   "title:郎 court rank pinyin vs translated",
+   "title:國公 virtue-title pinyin vs translated",
+   "title:定遠郎 Commandant vs Captain"
+  ],
+  "affected_terms": [
+   "定遠郎",
+   "忠國公",
+   "定遠郎王士"
+  ],
+  "linked_terms": [
+   "定遠郎",
+   "定遠郎王士",
+   "忠國公"
+  ],
+  "answer": "Commandant Dingyuan / Duke of Loyalty",
+  "rule": "定遠郎 = Commandant Dingyuan (Commandant Dingyuan Wang Shi); 忠國公 = Duke of Loyalty. No pinyin ranks."
+ },
+ {
+  "id": "q20",
+  "title": "腳 techniques Foot vs Kick",
+  "question": "Named leg techniques ending in 腳 (雷神腳, 風雷神腳, 飛天腳): your rows are split between 'Thunder God Foot' (C555, S8121_1) and 'Thunder God Kick' (special808, Book/Desc/6011). Which suffix?",
+  "options": [
+   "Kick — genre convention (Shadowless Kick); your special808/6011 rows",
+   "Foot — literal; your C555/S8121_1 rows"
+  ],
+  "recommendation": "Kick: the genre convention ('Shadowless Kick', 'Whirlwind Kick') and matches your special808 and Book/Desc/6011 rows; 'Foot' reads as anatomy, not a technique.",
+  "themes": [
+   "suffix:腳 Foot vs Kick"
+  ],
+  "affected_terms": [
+   "心劍・雷神腳"
+  ],
+  "linked_terms": [
+   "心劍・雷神腳"
+  ],
+  "answer": "Kick",
+  "rule": "Named leg techniques ending in 腳 use Kick: Thunder God Kick, Wind-Thunder God Kick, Flying Heaven Kick, Heart Sword · Thunder God Kick. Never Foot."
+ },
+ {
+  "id": "q21",
+  "title": "風流扇 Dashing vs Flowery",
+  "question": "The Nangong fan art 風流扇: your C231 row says 'Dashing Fan Technique' but C545/C909 say 'Flowery Fan'. Which adjective for the family (風流扇功, 風流扇法, 南宮風流扇)?",
+  "options": [
+   "Dashing Fan — 風流 = rakish/dashing; realigns C545/C909",
+   "Flowery Fan — your two rows; loses the rake sense"
+  ],
+  "recommendation": "Dashing Fan: 風流 means rakish/dashing, which suits the Nangong playboy and is how Jin Yong translations render it; Flowery is a calque. Only C545/C909 need realigning.",
+  "themes": [
+   "art:風流扇 Flowery Fan vs Dashing Fan",
+   "epithet:風流扇 Dashing vs Flowery"
+  ],
+  "affected_terms": [
+   "風流扇功",
+   "風流扇"
+  ],
+  "linked_terms": [
+   "風流扇",
+   "風流扇功"
+  ],
+  "answer": "Dashing Fan",
+  "rule": "風流扇 = Dashing Fan; 風流扇功 = Dashing Fan Skill; 風流扇法 = Dashing Fan Technique; 南宮風流扇 = Nangong Dashing Fan. Never Flowery."
+ },
+ {
+  "id": "q22",
+  "title": "折花/捻花/拈花 verb split",
+  "question": "Three techniques currently all say 'Plucking': 折花手 (your G005 Flower Plucking Hand), 捻花指 (your C551 Flower Plucking Finger) and Songshan's 拈花手. Keep Plucking only for 折 and use Twirling for 捻/拈?",
+  "options": [
+   "折 = Plucking, 捻/拈 = Twirling — amends your C551 row",
+   "Keep all three as Plucking — collision stays",
+   "拈花手 = Nianhua Hand — pinyin for the Zen gesture only"
+  ],
+  "recommendation": "Split: 折 = pluck, 捻/拈 = twirl (the Zen flower-sermon gesture); avoids the 採花 womanizer misreading and only C551 needs amending.",
+  "themes": [
+   "name:折花/捻花/拈花 Plucking collision"
+  ],
+  "affected_terms": [
+   "拈花手",
+   "捻花指"
+  ],
+  "linked_terms": [
+   "拈花手",
+   "捻花指"
+  ],
+  "answer": "Split: 折 = Plucking, 捻/拈 = Twirling",
+  "rule": "折花手 = Flower Plucking Hand (owner form), 捻花指 = Flower-Twirling Finger, 拈花手 = Flower-Twirling Hand."
+ },
+ {
+  "id": "q23",
+  "title": "One-off name calls",
+  "question": "Single-term calls that do not form a policy: 萬靈油 = Panacea Oil (your Misc/Name/4106 ruling; Medi_22 and Special/Name/6005 still say Universal Oil), 苦惱拳 = Suffering Fist (your Book/Name/3000 ruling; C906, H007, C522 and talent 3107 still say Sorrowful Fist), 奇門 = Unorthodox Arms (replacing pinyin 'Qimen' on PlayerStat/m-odd). Also listed for information only, already settled by your conventions and just needing row alignment: 施主 = Benefactor (Special206 'Patron' rows realigned), 上官隼 = Shangguan Sun (隼 sǔn per your reading list; 3 'Jun' rows realigned), 師弟 = Junior Brother (per your Senior/Junior Brother rule and Brother1/Dialog_1_1; 14 'Junior Martial Brother' rows realigned).",
+  "options": [
+   "accept all recommendations",
+   "I will edit individually"
+  ],
+  "recommendation": "Accept all: each follows your own latest explicit ruling or conventions note; the remaining rows are un-propagated leftovers that only need syncing.",
+  "themes": [
+   "item:萬靈油 Panacea Oil vs Universal Oil",
+   "name:苦惱拳 Suffering vs Sorrowful Fist",
+   "martial:奇門 Unorthodox Arms vs Exotic Weapons vs Qimen",
+   "title:施主 Benefactor vs Patron",
+   "reading:隼 Sun vs Jun",
+   "title:師弟 Junior Brother vs Junior Martial Brother"
+  ],
+  "affected_terms": [
+   "萬靈油藥方",
+   "萬靈油",
+   "苦惱拳・毀天滅地式",
+   "武功奇門",
+   "唐老施主",
+   "上官隼",
+   "雲舟師弟",
+   "師弟",
+   "葉師弟"
+  ],
+  "linked_terms": [
+   "上官隼",
+   "唐老施主",
+   "師弟",
+   "武功奇門",
+   "苦惱拳・毀天滅地式",
+   "萬靈油",
+   "萬靈油藥方",
+   "葉師弟",
+   "雲舟師弟"
+  ],
+  "answer": "accept all recommendations",
+  "rule": "Each one-off term keeps the arbiter's recommendation (上官隼 = Shangguan Sun and 阿隼 = A'Sun; 萬靈油 = Panacea Oil; 苦惱拳 = Suffering Fist; 奇門 = Unorthodox Arms; 師弟 = Junior Brother; 唐老施主 = Benefactor Tang)."
+ }
+]

@@ -1,0 +1,157 @@
+[
+  // ---------------------------------------------------------------------------
+  // Duel ("Combat") scene HUD. Scene root /[UI]/MainUI:
+  //   Layer_1/Round, Layer_2/{PlayerStatus,EnemyStatus,GameLog,Tip},
+  //   Layer_3/ActionButtonPanel (five 136x472 vertical action cards + "Command" tag),
+  //   Layer_5/{PlayerDialog,EnemyDialog}.
+  // Card roots, ActionText, ActionInfo and Status are MovePanels (they cache their
+  // origin at Awake and tween back to it), so only their children are moved here.
+  // XUnity applies AutoResize(13,28)/ChangeLineSpacing(1.3)/Wrap/Overflow to the whole
+  // ActionButtonPanel on every text set, and CombatActionButton.SetName() re-sets the
+  // font size by string length, hence "onTextChange" on everything under the cards.
+  // ---------------------------------------------------------------------------
+
+  // ----- Action cards (Layer_3/ActionButtonPanel/Action_Curse|Attack|Block|Weapon|Ultimate)
+  {
+    "id": "battle-card-name",
+    "comment": "Action name was a 10x215 one-glyph-per-line column at the card's right edge (55/40/27px by length, then XUnity 13-28 bestFit). Horizontal, centred across the 136px card just above the dark ink band: 128x90 box at card y 100..190, 20px (bestFit 14-22, wraps 'Prepare to be beaten' to 2 lines), line spacing 1.0 instead of XUnity's 1.3.",
+    "paths": ["/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Name"],
+    "onTextChange": true,
+    "rect": { "x": 4, "y": -100, "width": 128, "height": 90 },
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 22, "fontSize": 20, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "battle-card-cost",
+    "comment": "'Consumption of energy: 36' was a 25x204 vertical column at the card's left edge. Horizontal under the name: 128x60 box at card y 195..255, fixed 16px (no bestFit so XUnity cannot shrink it), wraps to 'Consumption of' / 'energy: 36'.",
+    "paths": ["/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Cost"],
+    "onTextChange": true,
+    "rect": { "x": 4, "y": -195, "width": 128, "height": 60 },
+    "text": { "bestFit": false, "fontSize": 16, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Overflow", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "battle-card-info",
+    "comment": "'Hit Rate 74 %' (orange) sat in a 100x97 box at card y 288..385: only its first word was visible on an un-raised card (card top is at screen y 737, screen ends at card y 343) and it collided with the '?' info button at (98..128, 299..329). One 17px line at card y 252..292, full card width, clear of the '?' button.",
+    "paths": ["/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Info"],
+    "onTextChange": true,
+    "rect": { "x": 0, "y": -252, "width": 136, "height": 40 },
+    "text": { "bestFit": false, "fontSize": 17, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Overflow", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "battle-card-tip-width",
+    "comment": "The '?' tooltip text has no preferredWidth (LayoutElement -1) inside a HorizontalLayoutGroup+ContentSizeFitter, so a 150-char English sentence would become one 1400px line. 420px preferred width makes it wrap (same pattern as the PlayerBuff tip which ships with 700).",
+    "paths": ["/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Tip/Container/Text"],
+    "layoutElement": { "preferredWidth": 420 }
+  },
+
+  // ----- "Command" tag left of the cards (ActionText: two rotated '[' glyphs framing a vertical 指令)
+  {
+    "id": "battle-command-word",
+    "comment": "'Command' (key CombatAction/action, longest 'Instruction') rendered at 13px inside a 70x265 vertical box. Horizontal 100x60 box, 20px with a bestFit floor of 15 so 'Instruction' still fits. Position is relative to ActionText, which 72_combat_hud.json moves beside the vertical card stack; these three offsets frame the word wherever the parent goes.",
+    "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/ActionText/Text (2)",
+    "onTextChange": true,
+    "rect": { "x": -46, "y": -88, "width": 100, "height": 60 },
+    "text": { "bestFit": true, "minSize": 15, "maxSize": 20, "fontSize": 20, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Overflow", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "battle-command-bracket-left",
+    "comment": "Top bracket: a '[' rotated -90 (a vertical quotation mark above the word). Upright '[' at the left of the horizontal word: 40x60 box, 40px glyph, offset from ActionText. The glyph's baseline offset draws it ~5px low, so the box sits 5px higher than the word's - an optical correction, not a mistake.",
+    "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/ActionText/Text (1)",
+    "onTextChange": true,
+    "rect": { "x": -81, "y": -83, "width": 40, "height": 60, "rotationZ": 0 },
+    "text": { "bestFit": false, "fontSize": 40, "alignment": "MiddleCenter", "hOverflow": "Overflow", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "battle-command-bracket-right",
+    "comment": "Bottom bracket: '[' rotated +90. Rotated 180 it reads as ']' at the right of the word. The pivot is the box's top-left, so a 180 rotation flips the box to the left/up of the anchoredPos: a 40x60 box at (89,-153) occupies x 49..89, y 93..153 below the ActionText top. Rotated 180 the glyph's baseline offset draws it ~5px high, so the box sits 5px lower than the word's - the mirror of the left bracket's correction.",
+    "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/ActionText/Text (3)",
+    "onTextChange": true,
+    "rect": { "x": 89, "y": -153, "width": 40, "height": 60, "rotationZ": 180 },
+    "text": { "bestFit": false, "fontSize": 40, "alignment": "MiddleCenter", "hOverflow": "Overflow", "vOverflow": "Overflow" }
+  },
+
+  // ----- Player / enemy status frames (Layer_2/*Status/Status)
+  {
+    "id": "battle-status-name",
+    "comment": "Character name: bestFit 3-35 in a 165x50 box, so 'Tang Clan Disciple' shrank to ~17px on one line and 28-char names ('Fire Dragon Immortal Monarch') would drop below 10px. Floor 16px, allow a second line (box 56 tall; the 'Realm' level label below starts at y 55 and is usually empty).",
+    "paths": ["/[UI]/MainUI/Layer_2/*Status/Status/Name"],
+    "onTextChange": true,
+    "rect": { "height": 56 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 35, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "battle-status-tip-width",
+    "comment": "Poison / paralysis accumulation tooltips (~90-char sentences) have no preferredWidth in their HorizontalLayoutGroup+ContentSizeFitter and would render as one 800px line; wrap at 420px.",
+    "paths": ["/[UI]/MainUI/Layer_2/*Status/Status/*Value/Tip/Container/Text"],
+    "layoutElement": { "preferredWidth": 420 }
+  },
+
+  // ----- Buff plates (Layer_2/*Status/BuffContainer/PlayerBuff|EnemyBuff(Clone)/Container)
+  {
+    "id": "battle-buff-name",
+    "comment": "Buff name ('Tang Clan Poison Technique Lv1', up to 48 chars) in a 200x40 box wrapped to 2 lines and lost the second (!V-CLIPPED). Box 215x56 flush with the plate top, 16px with bestFit floor 14 -> 2 lines that fit the 56px plate. Starts at x 112 (right of the dark type plate).",
+    "paths": ["/[UI]/MainUI/Layer_2/*Status/BuffContainer/*/Container/Name"],
+    "onTextChange": true,
+    "rect": { "x": 112, "y": 0, "width": 215, "height": 56 },
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 18, "fontSize": 16, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "battle-buff-type",
+    "comment": "Buff type ('Special' / 'Skills' / 'Hidden Weapon') at 23px in a 152px box overran the ~105px dark plate into the name. 96px box inside the plate (x 20..116), 18px with bestFit floor 14 so 'Hidden Weapon' fits.",
+    "paths": ["/[UI]/MainUI/Layer_2/*Status/BuffContainer/*/Container/Type"],
+    "onTextChange": true,
+    "rect": { "x": 20, "y": 7, "width": 96, "height": 40 },
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 18, "fontSize": 18, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+
+  // ----- Chosen-action cards shown during resolution (Layer_2/*Status/ActionInfo)
+  {
+    "id": "battle-actioninfo-name-player",
+    "comment": "Chosen action name ('Verbal Assault', up to a 38-char skill name) in a 15x215 vertical column at 55/35/27px (CombatActionInfoPanel sets the size by length). Horizontal 128x100 box at card y 100..200 (below the '30' info number at y 30..110), 20px with bestFit 16-24.",
+    "paths": ["/[UI]/MainUI/Layer_2/PlayerStatus/ActionInfo/NormalName", "/[UI]/MainUI/Layer_2/PlayerStatus/ActionInfo/HoverName"],
+    "onTextChange": true,
+    "rect": { "x": 4, "y": -100, "width": 128, "height": 100 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "fontSize": 20, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "battle-actioninfo-name-enemy",
+    "comment": "Enemy copy hangs from the top of the screen (card image flipped, visible y 0..284, 'Destiny 30' info at y 215..295): same horizontal box at y 40..140.",
+    "paths": ["/[UI]/MainUI/Layer_2/EnemyStatus/ActionInfo/NormalName", "/[UI]/MainUI/Layer_2/EnemyStatus/ActionInfo/HoverName"],
+    "onTextChange": true,
+    "rect": { "x": 4, "y": -40, "width": 128, "height": 100 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 24, "fontSize": 20, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate", "lineSpacing": 1.0 }
+  },
+
+  // ----- Misc battle HUD text
+  {
+    "id": "battle-round-height",
+    "comment": "'Round 1' TMP at 40px is 57px tall in a 50px box (!TMP-OVERFLOW); 60px box.",
+    "path": "/[UI]/MainUI/Layer_1/Round/Container/Value",
+    "rect": { "height": 60 }
+  },
+  {
+    "id": "battle-tip-floor",
+    "comment": "Bottom-right combat tip strip: bestFit 1-19 could shrink long tips to unreadable sizes; floor 14px (the 1000px box holds any CombatInfo tip at 14+).",
+    "path": "/[UI]/MainUI/Layer_2/Tip/Back/Text",
+    "onTextChange": true,
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 19 }
+  },
+  {
+    "id": "battle-log-font",
+    "comment": "Battle log text has no font asset (falls back to Arial); use the same serif as the rest of the HUD.",
+    "path": "/[UI]/MainUI/Layer_2/GameLog/Viewport/Content",
+    "text": { "font": "Palatino Linotype" }
+  },
+  {
+    "id": "battle-dialog-name",
+    "comment": "Speaker name in the in-battle dialog boxes: 50px with Truncate in a 278x69 box clips 28-char names ('Fire Dragon Immortal Monarch'); bestFit 22-50 with wrap.",
+    "paths": ["/[UI]/MainUI/Layer_5/PlayerDialog/Name", "/[UI]/MainUI/Layer_5/EnemyDialog/Name"],
+    "onTextChange": true,
+    "text": { "bestFit": true, "minSize": 22, "maxSize": 50, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "battle-buff-plate-width",
+    "comment": "Buff plate (back_buff_1, 284x56 designed for 4-6 vertical hanzi): the English two-line name box (215 wide at x=112) runs 43px past the plate, so the second line floated over the scene art. Widen the plate to cover the name; the sprite's right end is a soft fade, so stretching is invisible.",
+    "paths": ["/[UI]/MainUI/Layer_2/*Status/BuffContainer/*/Container"],
+    "rect": { "width": 340 }
+  }
+]

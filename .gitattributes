@@ -1,0 +1,4 @@
+# Store every file exactly as it is. The translation files' bytes are data: StringTable.csv rows end in CRLF while quoted
+# values may hold bare LF, scene_text.txt has a BOM, and publish.py and the plugin compare them byte for byte. Any line-ending
+# conversion would corrupt them.
+* -text

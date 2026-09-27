@@ -1,0 +1,42 @@
+name: Bug report
+description: Something doesn't work, looks broken, or the game misbehaves with the mod installed.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Two files help most:
+        - **compat_report.txt**: Mod Settings (F8) > Compatibility > *Write a report*. It is saved in `BepInEx/plugins/LOM_UI_EN/`.
+        - **BepInEx/LogOutput.log**, in the game folder.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead? A screenshot helps for anything visual.
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Mod version
+      description: Mod Settings > About shows it.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: package
+    attributes:
+      label: How did you install it?
+      options:
+        - Full package (with BepInEx), nothing else
+        - Mod-only package, next to the OverLlm English patch
+        - Something else (please say below)
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: compat_report.txt and LogOutput.log
+      description: Drag the two files here.
+    validations:
+      required: false

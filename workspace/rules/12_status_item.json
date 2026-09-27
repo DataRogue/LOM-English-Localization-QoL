@@ -1,0 +1,70 @@
+[
+  // StatusPanel > Bag tab (/[UI]/TopPanel/StatusPanel/Container/Panels/Item/**).
+  // Scope: item detail (name brush, type seal, description), item list rows, category toggles.
+  // The tab strip, title flag and close button are handled elsewhere.
+
+  {
+    "id": "item-title-brush",
+    "comment": "Vertical ink-brush stroke (80x417) behind the item name was drawn for a vertical Chinese title. Rotate it 90 deg counter-clockwise so it becomes a horizontal stroke across the top of the detail area (head at the left, x 613-1030, y 105-185) and the English name can sit on it horizontally.",
+    "path": "**/StatusPanel/Container/Panels/Item/Detail/Title/Back",
+    "rect": { "rotationZ": 90, "anchoredPos": [0, -68] }
+  },
+  {
+    "id": "item-title-text",
+    "comment": "Item name: design is a 30x300 one-glyph-per-line box; XUnity forces horizontal overflow so long names run across the icon into the list. Make it a 460x66 horizontal box on the rotated brush, wrap up to 2 lines, best-fit 16-28. onTextChange because the game/XUnity reset the text (and AutoResize 14-26 + overflow) whenever an item is selected.",
+    "path": "**/StatusPanel/Container/Panels/Item/Detail/Title/Text",
+    "onTextChange": true,
+    "rect": { "anchoredPos": [22, 5], "sizeDelta": [460, 66] },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 28, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "item-seal",
+    "comment": "Red type seal (26x64 vertical outline) holds 'Books'/'Miscellaneous'/'Treasure'. Rotate it 90 deg clockwise into a horizontal stamp (120x30 on screen) at the bottom-right of the item frame, x 920-1040 / y 492-522, below the 270px icon so nothing overlaps.",
+    "path": "**/StatusPanel/Container/Panels/Item/Detail/Item/Type",
+    "rect": { "rotationZ": -90, "sizeDelta": [30, 120], "anchoredPos": [-137, 7] }
+  },
+  {
+    "id": "item-seal-text",
+    "comment": "Seal label was 26x54 with wrap (letters stacked one per line, clipped). Counter-rotate +90 inside the rotated seal so it reads upright, centre it, 116x28 box, best-fit 14-18 ('Miscellaneous' fits at ~15). onTextChange beats XUnity's AutoResize(14,22) re-applied on select.",
+    "path": "**/StatusPanel/Container/Panels/Item/Detail/Item/Type/Text",
+    "onTextChange": true,
+    "rect": { "anchorMin": [0.5, 0.5], "anchorMax": [0.5, 0.5], "pivot": [0.5, 0.5], "anchoredPos": [0, 0], "sizeDelta": [116, 28], "rotationZ": 90 },
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 18, "alignment": "MiddleCenter", "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "item-row",
+    "comment": "Item list rows (ItemToggleButton clones, named by item id, parented under Content after Setup - hence the root-time path too). Widen from 240x35 to 290x44 (viewport is 300 wide, 5px scrollbar at the right) so English names get two lines.",
+    "paths": ["/ItemToggleButton(Clone)", "**/StatusPanel/Container/Panels/Item/Detail/List/*/Scroll View/Viewport/Content/*"],
+    "rect": { "sizeDelta": [290, 44] }
+  },
+  {
+    "id": "item-row-name",
+    "comment": "Row name (200x50, 20px, wrap+truncate, line spacing 0.75) clipped long titles to one line ('Tang Clan Hidden'). 230x44 box, best-fit 14-20 wrapping to 2 lines (SourceHanSerif has a 1.45em line height, so 44px + line spacing 0.85 lets a two-line name keep 16px), vertically centred. onTextChange so it wins over the XUnity Content resizer when Setup() writes the name.",
+    "paths": ["/ItemToggleButton(Clone)/*/Name", "**/StatusPanel/Container/Panels/Item/Detail/List/*/Scroll View/Viewport/Content/*/*/Name"],
+    "onTextChange": true,
+    "rect": { "sizeDelta": [230, 44] },
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 20, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate", "lineSpacing": 0.85 }
+  },
+  {
+    "id": "item-row-count",
+    "comment": "Row quantity (80x50 top-right) - narrow it to 50x44 at the right edge of the widened row and centre vertically so it lines up with a one- or two-line name.",
+    "paths": ["/ItemToggleButton(Clone)/*/Count", "**/StatusPanel/Container/Panels/Item/Detail/List/*/Scroll View/Viewport/Content/*/*/Count"],
+    "onTextChange": true,
+    "rect": { "sizeDelta": [50, 44] },
+    "text": { "fontSize": 20, "bestFit": false, "alignment": "MiddleRight", "hOverflow": "Overflow", "vOverflow": "Truncate", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "item-type-labels",
+    "comment": "Category toggle labels under the 120px icons: 150px box makes 'Miscellaneous' auto-shrink. Buttons are 240 wide, so widen the (centre-anchored) label to 200 and keep auto-size 16-24.",
+    "paths": ["**/StatusPanel/Container/Panels/Item/Type/GroupType/*/*/Text (TMP)"],
+    "rect": { "width": 200 },
+    "tmp": { "autoSize": true, "minSize": 16, "maxSize": 24, "alignment": "Center" }
+  },
+  {
+    "id": "item-desc-fit",
+    "comment": "Long English item descriptions overran the 330x241 masked box and the last line was sliced through the middle. 19px with 1.0 line spacing fits the longest Book/Misc description in the box.",
+    "paths": ["**/StatusPanel/Container/Panels/Item/**/DescText"],
+    "onTextChange": true,
+    "text": { "fontSize": 19, "lineSpacing": 1.0, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  }
+]

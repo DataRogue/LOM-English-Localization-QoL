@@ -1,0 +1,201 @@
+[
+ {
+  "id": "martial-points-value-font",
+  "comment": "Martial-point counter next to the idea icon has no font asset (inventory font=None) so it renders in Arial next to serif labels; use the same serif the global font map picks for the panel.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/Points/Value"
+  ],
+  "text": {
+   "font": "Palatino Linotype"
+  }
+ },
+ {
+  "id": "martial-tab-labels",
+  "comment": "Left category tabs: the 25x75 vertical CJK label box (ap -11,0) sits on top of the 80x80 icon at x272-352. Move the label to the right of the icon (x358-558, nothing lives there until the list at x560/604) as a wrapping 2-line max label vertically centred on the icon. onTextChange because story.resizer.txt re-applies AutoResize(12,14) on the Buttons subtree.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Buttons/MartialButton_*/*/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "dx": 120,
+   "dy": 9,
+   "width": 200,
+   "height": 100
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 18,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "lineSpacing": 0.9
+  }
+ },
+ {
+  "id": "martial-list-header-text",
+  "comment": "List header ('Swordsmanship' etc.) sat in a 75x60 box between two rule lines and wrapped to 'Swor/dsma'. Widen to 220 (Line (2) is pushed right to match).",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Panels/MartialListPanel_*/Header/Text"
+  ],
+  "rect": {
+   "width": 220
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 18,
+   "maxSize": 26,
+   "alignment": "UpperCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "martial-list-header-line2",
+  "comment": "Right rule line of the list header: start 150px further right so it does not run through the widened header text; shorten so it still ends at x1410.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Panels/MartialListPanel_*/Header/Line (2)"
+  ],
+  "rect": {
+   "dx": 150,
+   "dw": -150
+  }
+ },
+ {
+  "id": "martial-level-label",
+  "comment": "'Level' label ends 3px before the level bar frame; nudge left for breathing room.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/LevelText"
+  ],
+  "rect": {
+   "dx": -10
+  },
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "martial-maxcount-label",
+  "comment": "'Maximum Spend:' (pref 162) wrapped in a 137x50 box and was clipped; single line, overflow allowed (value is moved right).",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/Points/MaxCountText"
+  ],
+  "rect": {
+   "width": 175
+  },
+  "text": {
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "martial-maxcount-value",
+  "comment": "'8/8' value box started at x1617 on top of 'Spend:'. Shift right so it follows the label.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/Points/MaxCountValue"
+  ],
+  "rect": {
+   "dx": 85
+  },
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "martial-train-button-label",
+  "comment": "'Training' action button: 45px label in a 180x80 box (pref 172) clipped to 'Trainin' with some fonts. Widen to the 250px button art and let best-fit shrink as a fallback.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/TraningButton/*/Text(1)"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 236
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 28,
+   "maxSize": 45,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleCenter"
+  }
+ },
+ {
+  "id": "martial-condition-header",
+  "comment": "'Training Requirements:' header was a 93x31 box (3-line wrap, clipped). Use the full 320px width of the ConditionText block.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/ConditionText/Header"
+  ],
+  "rect": {
+   "width": 320
+  },
+  "text": {
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "martial-stat-relation",
+  "comment": "Stat relation rows (43px pitch, 300x50 boxes): keep one line per row, floor 14px (resizer allowed 12).",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/StatRelation/StatLabel (*)/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 320
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 18,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleLeft"
+  }
+ },
+ {
+  "id": "martial-item-name",
+  "comment": "MartialItem list entries: Name is 144x35 with horizontal Overflow, so 40-char English book names run into neighbours. Wrap inside a 132px box (items are 120 wide on a 138px pitch, so 144px boxes overlapped by 6px and two long names could touch; 132 leaves a 6px gutter) centred on the 120px item (x -6 + 66 = 60), best-fit 14-19 (14px readability floor), box 70 tall moved up 3px so a 4-line 14px name (longest key: 63 chars) still ends at the viewport bottom (y970).",
+  "paths": [
+   "**/MartialListPanel_*/Scroll View/Viewport/Content/MartialItem(Clone)/*/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "x": -6,
+   "width": 132,
+   "height": 70,
+   "dy": 3
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 19,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "UpperCenter"
+  }
+ },
+ {
+  "id": "martial-detail-name",
+  "comment": "Selected book name in the Detail panel: 354x66 Truncate box at fs36 clipped 'Meteor Sword Manual' to one line ('Manual' lost). Widen to 500 centred on the back_gradient art (IconBack ends x944, Points icon starts x1540), raise 10px and make it 88 tall so it still ends above 'Level' (y255), and best-fit 20-34 so 3-line names (longest key: 63 chars) fit. onTextChange because story.resizer.txt targets Detail/Name and the game sets the text on every selection.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "dx": -73,
+   "dy": 10,
+   "width": 500,
+   "height": 88
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 20,
+   "maxSize": 34,
+   "alignment": "UpperCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "lineSpacing": 0.95
+  }
+ }
+]

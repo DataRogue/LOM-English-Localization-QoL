@@ -1,0 +1,169 @@
+
+/[UI]/MainUI/Layer_3/Time/Text=AutoResize(true,16,34)
+
+/[UI]/MainUI/Layer_5/StatModPlaceholder/NormalStat(Clone)/Title=AutoResize(true,6,10)
+/[UI]/MainUI/Layer_5/StatModPlaceholder/NormalStat(Clone)/Title=UGUI_HorizontalOverflow(overflow)
+#/[UI]/MainUI/Layer_5/StatModPlaceholder/NormalStat(Clone)/Title=UGUI_VerticalOverflow(overflow)
+/[UI]/MainUI/Layer_5/StatModPlaceholder/NegativePositiveStat(Clone)/Value=AutoResize(true,6,16)
+/[UI]/MainUI/Layer_5/StatModPlaceholder/NegativePositiveStat(Clone)/Value=UGUI_HorizontalOverflow(overflow)
+
+/[UI]/MainUI/Layer_1/ActionInfo/Action/ActionText=AutoResize(true,8,14)
+/[UI]/MainUI/Layer_1/ActionInfo/MentalBar/Header=AutoResize(true,8,14)
+/[UI]/MainUI/Layer_1/ActionInfo/MentalBar/Header=UGUI_HorizontalOverflow(wrap)
+/[UI]/MainUI/Layer_1/ActionInfo/ContributionText=AutoResize(true,8,14)
+/[UI]/MainUI/Layer_1/ActionInfo/ContributionText=UGUI_HorizontalOverflow(overflow)
+/[UI]/MainUI/Layer_3/ActionInfo/ContributionText=AutoResize(true,8,14)
+/[UI]/MainUI/Layer_3/ActionInfo/ContributionText=UGUI_HorizontalOverflow(overflow)
+/[UI]/MainUI/Layer_3/ActionInfo/MentalBar/Header=AutoResize(true,8,14)
+/[UI]/MainUI/Layer_3/ActionInfo/MentalBar/Header=UGUI_HorizontalOverflow(wrap)
+/[UI]/MainUI/Layer_3/ActionInfo/Action/ActionText=AutoResize(true,8,14)
+
+# /[UI]/MainUI=ChangeFontSizeByPercentage(0.8)
+# /[UI]/MainUI/Layer_1/ActionInfo=ChangeFontSizeByPercentage(0.6)
+# /[UI]/MainUI/Layer_3/ActionInfo/MentalBar=ChangeFontSizeByPercentage(0.5)
+
+
+/[UI]/TopPanel/StatusPanel/Container/TitleFlag/Title=AutoResize(true, 16, 60)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Title/Text=UGUI_HorizontalOverflow(overflow)
+
+# /[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons/StatusButton_Home/Enable/Text (TMP)=UGUI_HorizontalOverflow(overflow)
+# /[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=UGUI_VerticalOverflow(wrap)
+# /[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=IgnoreFontSize()
+/[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=AutoResize(true, 16, 24)
+/[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=UGUI_ChangeLineSpacing(1.3)
+/[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=TMP_Overflow(Overflow)
+/[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=TMP_Alignment(CaplineFlush)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/AssetList=AutoResize(true, 16, 18)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/AssetList=UGUI_HorizontalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/Header=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Buttons=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Buttons=AutoResize(true, 16, 24)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (1)=AutoResize(true, 6, 16)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (1)=UGUI_HorizontalOverflow(wrap)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (1)=UGUI_VerticalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (2)=AutoResize(true, 6, 12)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (2)=UGUI_HorizontalOverflow(wrap)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (2)=UGUI_VerticalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Fate=AutoResize(true,8,16)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Fate=UGUI_ChangeLineSpacing(1.2)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Fate=UGUI_HorizontalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental=AutoResize(true,5,8)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental=UGUI_ChangeLineSpacing(1.2)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental=UGUI_HorizontalOverflow(wrap)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental=UGUI_VerticalOverflow(overflow)
+/[UI]/MainUI/Layer_1/ActionInfo/Mental/Value=UGUI_HorizontalOverflow(overflow)
+/[UI]/MainUI/Layer_1/ActionInfo/Mental/Value=AutoResize(true,5,12)
+/[UI]/MainUI/Layer_1/ActionInfo/Mental/Value=UGUI_ChangeLineSpacing(1.3)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Lover=AutoResize(true,8,16)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Lover=UGUI_ChangeLineSpacing(1.2)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental=UGUI_HorizontalOverflow(overflow)
+
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Stamina/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Sword/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Dex/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Fist/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Str/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Weapon/Title=UGUI_HorizontalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Stamina/Title=AutoResize(true,14,20)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Sword/Title=AutoResize(true,14,20)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Dex/Title=AutoResize(true,14,20)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Fist/Title=AutoResize(true,14,20)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Str/Title=AutoResize(true,14,20)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Weapon/Title=AutoResize(true,14,20)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Stamina/Title=UGUI_ChangeLineSpacing(1.3)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Sword/Title=UGUI_ChangeLineSpacing(1.3)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Dex/Title=UGUI_ChangeLineSpacing(1.3)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Fist/Title=UGUI_ChangeLineSpacing(1.3)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Str/Title=UGUI_ChangeLineSpacing(1.3)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Weapon/Title=UGUI_ChangeLineSpacing(1.3)
+
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (1)=UGUI_HorizontalOverflow(overflow)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)=UGUI_HorizontalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (1)=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (1)=AutoResize(true,8,12)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (1)=UGUI_ChangeLineSpacing(0.8)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)=AutoResize(true,8,12)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)=UGUI_ChangeLineSpacing(0.8)
+
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)=TMP_Overflow(Overflow)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)=TMP_Alignment(Right)
+
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Dex/Value=AutoResize(true, 6, 12)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text=AutoResize(true,14,24)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text=UGUI_VerticalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text (1)=UGUI_HorizontalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Type/GroupType=AutoResize(true, 12, 24)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Type/GroupType=UGUI_HorizontalOverflow(overflow)
+
+
+# /[UI]/MainUI/Layer_1/ActionInfo/Action/ActionText=ChangeFontSizeByPercentage(0.8)
+# /[UI]/MainUI/Layer_1/MenuButton=ChangeFontSizeByPercentage(0.6)
+
+# /[UI]/TopPanel/MartialPanel=ChangeFontSizeByPercentage(0.8)
+# /[UI]/TopPanel/StatusPanel=AutoResize(true,12,36)
+# /[UI]/TopPanel/StatusPanel=UGUI_HorizontalOverflow(overflow)
+
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels=ChangeFontSizeByPercentage(0.7)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Home/Title=ChangeFontSizeByPercentage(0.8)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Home/Scroll View=ChangeFontSizeByPercentage(0.7)
+# /[UI]/TopPanel/StatusPanel/Container/Panels=ChangeFontSizeByPercentage(0.8)
+# /[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons=ChangeFontSizeByPercentage(0.6)
+
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property=ChangeFontSizeByPercentage(0.6)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart=ChangeFontSizeByPercentage(0.6)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel=ChangeFontSizeByPercentage(0.5)
+# /[UI]/TopPanel/StatusPanel/Container/Player/Panels/PropertyPanel/StatPanel=ChangeFontSizeByPercentage(0.3)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Social=ChangeFontSizeByPercentage(0.8)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Buttons/Togglel=ChangeFontSizeByPercentage(0.7)
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Title=ChangeFontSizeByPercentage(0.5)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Buttons=AutoResize(true,12,24)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Title=AutoResize(true,12,32)
+
+# /[UI]/TopPanel/StatusPanel/Container/Panels/Home/UpgradeInfoButton/Title=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Home/UpgradeInfoButton/Title=AutoResize(true,12,24)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Title/Text=AutoResize(true,14,26)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Title/Text=UGUI_HorizontalOverflow(overflow)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Item/Type/Text=AutoResize(true,14,22)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Scroll View/Viewport/DescText=AutoResize(true,10,16)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Book/Scroll View/Viewport/Content=AutoResize(true,10,14)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Book/Scroll View/Viewport/Content=UGUI_ChangeLineSpacing(0.9)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Book/Scroll View/Viewport/Content=UGUI_VerticalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Special/Scroll View/Viewport/Content=AutoResize(true,10,14)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Special/Scroll View/Viewport/Content=UGUI_ChangeLineSpacing(0.9)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Special/Scroll View/Viewport/Content=UGUI_VerticalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Misc/Scroll View/Viewport/Content=AutoResize(true,10,14)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Misc/Scroll View/Viewport/Content=UGUI_ChangeLineSpacing(0.9)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Misc/Scroll View/Viewport/Content=UGUI_VerticalOverflow(overflow)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/SkillPanel/Scroll View/Viewport/Content/Skill_Item(Clone)=AutoResize(true,10,16)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/SkillPanel/Scroll View/Viewport/Content/Skill_Item(Clone)=UGUI_ChangeLineSpacing(0.8)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/SkillPanel/Scroll View/Viewport/Content/Skill_Item(Clone)=UGUI_VerticalOverflow(overflow)
+
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Legend/Mask/Scroll View/Viewport/Content/LegendText(Clone)=AutoResize(true,16,22)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Legend/Mask/Scroll View/Viewport/Content/LegendText(Clone)=UGUI_ChangeLineSpacing(1.2)
+
+/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Desc Scroll View/Viewport/DescText=AutoResize(true,12,20)
+/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Desc Scroll View/Viewport/DescText=UGUI_ChangeLineSpacing(1.1)
+
+/[UI]/TopPanel/StatusPanel/Container/UpgradeInfoPanel/Container/Content=AutoResize(true,12,20)
+/[UI]/TopPanel/StatusPanel/Container/UpgradeInfoPanel/Container/Content=UGUI_ChangeLineSpacing(0.8)
+/[UI]/TopPanel/StatusPanel/Container/UpgradeInfoPanel/Container/Content=UGUI_VerticalOverflow(overflow)

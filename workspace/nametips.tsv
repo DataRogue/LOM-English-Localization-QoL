@@ -1,0 +1,99 @@
+# LOM_UI_EN dialog name tips: the characters whose names in story dialogue show a portrait tip on hover.
+# TAB-separated columns: id, aliases, portrait, crop. Lines starting with '#' are comments.
+#   id        story character id; its served Character/<id> text is the name matched, CharacterTitle/<id> the title shown,
+#             and the affinity record with that id the affinity shown. Characters with an affinity record are linked
+#             only after the game introduces them (Status > Social lists them), unless [Story] NameTooltipsMetOnly is off
+#   aliases   more name forms matched for the same character, comma-separated (a given name used on its own)
+#   portrait  portrait address to use instead of the game's own (only where the game's points at a missing image)
+#   crop      head centre x and top of the figure y in the portrait, 0-1 (tools/nametips/nametips.py crops)
+# Matching is case-sensitive and whole-word. A form that two listed characters share is not linked.
+brother1	Buyi		0.4515,0.2447
+girl4	Xiang'er		0.5056,0.2076
+special402			0.5100,0.2106
+special3	Yunzhou		0.4954,0.2365
+girl6	Lan'er		0.4632,0.1988
+girl2	Yunshang		0.4799,0.3688
+special826			0.4745,0.2324
+special206			0.5072,0.2588
+girl9	Ying'er		0.4856,0.2618
+special404			0.5003,0.1659
+special807			0.4884,0.2394
+special834	Zhixiu		0.4628,0.1741
+brother3			0.5494,0.2429
+special405			0.5054,0.1371
+special102	Shen'er		0.5102,0.0112
+special801	Badao		0.5108,0.1641
+special1			0.4491,0.2641
+special2			0.4920,0.0894
+special207			0.5552,0.0965
+special208			0.4758,0.2665
+girl8			0.4860,0.3606
+special103			0.4918,0.2776
+special808	Wuchen		0.5524,0.2071
+special809	Fugui		0.4695,0.1800
+special101			0.5170,0.1776
+brother2	Zheng'er		0.4431,0.1565
+special832			0.4784,0.3265
+special401			0.4680,0.2088
+special403			0.5541,0.2229
+special811	Shan'er		0.4989,0.2612
+special999			0.4809,0.2041
+special204			0.4655,0.0747
+special7			0.4766,0.2088
+special815			0.4902,0.2606
+special4	Xiaotian		0.4897,0.3688
+special829			0.5380,0.2824
+special812	Shouhong		0.5076,0.2176
+special203			0.5362,0.1847
+special835			0.4904,0.2224
+special407			0.4922,0.1371
+special800			0.4803,0.2018
+girl5	Xiaomei		0.5136,0.2741
+special210			0.5114,0.1806
+special402_3	Yingxiang		0.6147,0.3024
+sister1	Moling		0.4731,0.3971
+special813			0.5315,0.1594
+special211			0.4755,0.0894
+special408			0.4909,0.1894
+girl7			0.5183,0.3576
+master	Zhongling		0.4972,0.2282
+special819			0.5104,0.0406
+lee1			0.4210,0.3759
+firebird1			0.2515,0.4465
+special820			0.5067,0.1618
+special202			0.4390,0.1535
+special104			0.4696,0.2894
+big_trainee_2			0.4906,0.2076
+special201			0.4848,0.2118
+big_trainee_girl_1	Jiaojiao		0.4842,0.3512
+brother4	Weiyuan		0.6032,0.3212
+big_shock1			0.4906,0.2076
+special810			0.5783,0.2806
+special823			0.5311,0.2282
+special818			0.5286,0.3247
+special205			0.4729,0.0976
+special825	Lingxi		0.4668,0.2647
+special830			0.5150,0.3129
+special822			0.4860,0.3606
+special409			0.4755,0.0700
+girl1			0.5427,0.3535
+special209			0.5196,0.1788
+cow_man_1			0.4237,0.0065
+horse_man_1			0.4352,0.0094
+special828			0.4858,0.1912
+special824			0.4657,0.2112
+girl2_4			0.4731,0.3688
+special831			0.5233,0.2247
+special806			0.4755,0.3747
+special821			0.4632,0.1988
+special804			0.4322,0.3000
+special6			0.4613,0.2553
+special827			0.4639,0.2765
+chao1			0.4861,0.4671
+special814			0.5269,0.1965
+special836	Wanqing		0.5008,0.4300
+special837			0.5603,0.2788
+special817			0.4710,0.1724
+special816			0.5869,0.1918
+special406			0.5182,0.1735
+special212			0.4839,0.1806

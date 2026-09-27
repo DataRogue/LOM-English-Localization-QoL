@@ -1,0 +1,452 @@
+[
+ {
+  "id": "upgrade-status-tab-labels",
+  "comment": "Left tab strip (Equipment / Thrown Weapons, Poison / Paralysis / Elixir): 20x50 one-glyph-per-line boxes drawn over the portrait. Make them a horizontal label to the right of the tab icon (icon sprite spans button-centre +-60). XUnity's AutoResize(14,32) on the Buttons parent wins over our size, so cap the size through the box height (30 -> ~24px, matching the item buttons below).",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Buttons/StatusButton_*/*/Text (TMP)",
+   "**/PoisonUpgradePanel/Container/Buttons/StatusButton_*/*/Text (TMP)"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 200,
+   "height": 30,
+   "anchoredPos": [
+    165,
+    0
+   ]
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 24,
+   "wordWrap": false,
+   "alignment": "MidlineLeft",
+   "overflow": "Overflow"
+  }
+ },
+ {
+  "id": "upgrade-detail-name",
+  "comment": "Item name over the level bar: 300x79 at 40px wrapped 'Tang Clan Small Sword' onto the Level row. Use the full width of the gradient back (1023-1406) and best-fit 22-36; height 56 so a 2-line fallback only happens at <=26px and stays above the Level row (y 251).",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/Name",
+   "**/PoisonUpgradePanel/Container/Detail/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "x": 1027,
+   "width": 376,
+   "height": 56
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 22,
+   "maxSize": 36,
+   "alignment": "UpperCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "lineSpacing": 0.9
+  }
+ },
+ {
+  "id": "upgrade-detail-level-label",
+  "comment": "'Level' label left of the bar was 47px wide and wrapped to 'Lev'. Let it overflow (bar starts 48px to the right, text is ~54px) and nudge it 8px left so it does not touch the bar frame.",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/Level/Text",
+   "**/PoisonUpgradePanel/Container/Detail/Level/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "dx": -8,
+   "width": 56
+  },
+  "text": {
+   "bestFit": false,
+   "fontSize": 19,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "alignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "upgrade-detail-nextlevel",
+  "comment": "'Insufficient points\\n' has a trailing newline and got flagged V-CLIPPED; allow vertical overflow so longer next-level messages are never cut.",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/Level/NextLevel",
+   "**/PoisonUpgradePanel/Container/Detail/Level/NextLevel"
+  ],
+  "text": {
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "upgrade-points-labels",
+  "comment": "'Maximum Spend:' / 'Cost:' (StringTable: 'Maximum consumption:', 'Spending silver dollars:') in 153x36 boxes wrapped and ran into the value. Widen to 178 and best-fit 13-19 on one line (height 30 forbids a 2nd line).",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/ForgePoints/MaxCountText",
+   "**/WeaponUpgradePanel/Container/Detail/ForgePoints/MoneyText",
+   "**/PoisonUpgradePanel/Container/Detail/Points/MaxCountText",
+   "**/PoisonUpgradePanel/Container/Detail/Points/MoneyText"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 178,
+   "height": 30
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 13,
+   "maxSize": 19,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "upgrade-points-values",
+  "comment": "Move the '8/8' and '50' values right of the widened labels (label ends at x=1706).",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/ForgePoints/MaxCountValue",
+   "**/WeaponUpgradePanel/Container/Detail/ForgePoints/MoneyValue",
+   "**/PoisonUpgradePanel/Container/Detail/Points/MaxCountValue",
+   "**/PoisonUpgradePanel/Container/Detail/Points/MoneyValue"
+  ],
+  "rect": {
+   "dx": 88,
+   "width": 80
+  },
+  "text": {
+   "hOverflow": "Overflow",
+   "alignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "upgrade-item-desc",
+  "comment": "Item description (369x265, 22px, Truncate): the sword text already fills all 9 lines; best-fit 16-22 so longer descriptions shrink instead of losing their last line.",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/Desc",
+   "**/PoisonUpgradePanel/Container/Detail/Desc"
+  ],
+  "onTextChange": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "upgrade-desc-title-brackets",
+  "comment": "CombatDesc/BattleDesc/MiscDesc Title/Top and Title/Down are '[' and ']' glyphs rotated -91 that capped the two-hanzi vertical title. With a horizontal English title they are stray brackets; hide them if the game ever enables them.",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/*Desc/Title/Top",
+   "**/WeaponUpgradePanel/Container/Detail/*Desc/Title/Down",
+   "**/PoisonUpgradePanel/Container/Detail/*Desc/Title/Top",
+   "**/PoisonUpgradePanel/Container/Detail/*Desc/Title/Down"
+  ],
+  "active": false
+ },
+ {
+  "id": "upgrade-desc-titles",
+  "comment": "Section titles (Duel / Battle / Misc): 100x111 box sized for two stacked hanzi. Make it a single horizontal line so the Info text 38px below never collides with a wrapped title.",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Detail/*Desc/Title/Text",
+   "**/PoisonUpgradePanel/Container/Detail/*Desc/Title/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 300,
+   "height": 36
+  },
+  "text": {
+   "bestFit": false,
+   "fontSize": 26,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "alignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "upgrade-panel-header",
+  "comment": "Section header between the two rule lines ('Equipment', 'Hidden Weapon', 'Alchemy'): 80x50 box clipped to 'Equi'/'Alche'. Widen to 180 with best-fit 18-28 on one line.",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Panels/*/Header/Text",
+   "**/PoisonUpgradePanel/Container/Panels/*/Header/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 180,
+   "height": 40,
+   "dy": 3
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 18,
+   "maxSize": 28,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleCenter"
+  }
+ },
+ {
+  "id": "upgrade-panel-header-line",
+  "comment": "Right-hand rule line starts after the widened header (header spans x 613-793).",
+  "paths": [
+   "**/WeaponUpgradePanel/Container/Panels/*/Header/Line (2)",
+   "**/PoisonUpgradePanel/Container/Panels/*/Header/Line (2)"
+  ],
+  "rect": {
+   "dx": 110,
+   "dw": -110
+  }
+ },
+ {
+  "id": "develop-current-name",
+  "comment": "Current item name: 30x200 vertical column drawn over the big item icon. Put it horizontally above the diamond frame (frame top ~y 632), centred on the frame (x 360), best-fit 16-25.",
+  "paths": [
+   "**/WeaponUpgradePanel/DevelopPanel/Current/Name",
+   "**/PoisonUpgradePanel/DevelopPanel/Current/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    125,
+    30
+   ],
+   "width": 320,
+   "height": 44
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 25,
+   "alignment": "LowerCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "lineSpacing": 0.9
+  }
+ },
+ {
+  "id": "develop-card-icon",
+  "comment": "Develop cards (paper tilted 11 deg): shrink the 180px icon to 140 and move it up-right so a name line fits along the paper's bottom inner border.",
+  "paths": [
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/Public/Icon",
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/Lock/Icon"
+  ],
+  "rect": {
+   "width": 140,
+   "height": 140,
+   "anchoredPos": [
+    12,
+    31
+   ]
+  }
+ },
+ {
+  "id": "develop-card-name",
+  "comment": "Card item name: 30x166 column rotated 11 deg along the paper's left margin ('Ta/ng/Cl/an/...'). Keep the 11 deg tilt but make it a 195x40 line along the bottom of the inner border (pivot moved to paper-frame (-5,16)); best-fit 13-15, up to 2 lines. Lock/Name shows '???'.",
+  "paths": [
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/Public/Name",
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/Lock/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    59,
+    53
+   ],
+   "width": 195,
+   "height": 40
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 13,
+   "maxSize": 15,
+   "alignment": "LowerLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "lineSpacing": 0.85
+  }
+ },
+ {
+  "id": "develop-card-lock-name",
+  "comment": "Locked cards show '???' - allow the original 28px there.",
+  "paths": [
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/Lock/Name"
+  ],
+  "onTextChange": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 13,
+   "maxSize": 28
+  }
+ },
+ {
+  "id": "develop-card-require",
+  "comment": "'Requirement: Level 10' (179px at 16pt via develop-card-require-text) belongs on the develop card's bottom margin strip, between the inner frame and the torn edge of pic_dev_paper_1. The old dx -46 started it 46px left of the prefab x (101.3 -> 55): 'Requ' hung off the paper's left edge and, the line being tilted 11 degrees with the paper, the rest rode up onto the frame line (review_upgrade_r1dev_story_weapon.png). The prefab x already starts inside the strip and the 205px Level box ends inside the paper (about x281 of the 360 card); raised 4px to centre the text band in the strip. Checked on an offline mockup with the real sprite, calibrated against that capture.",
+  "paths": [
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/RequireLevel"
+  ],
+  "rect": {
+   "dy": 4
+  }
+ },
+ {
+  "id": "develop-card-require-text",
+  "paths": [
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/RequireLevel/Level"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 205,
+   "height": 26
+  },
+  "text": {
+   "fontSize": 16,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "alignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "develop-card-seal-text",
+  "comment": "'Developed' inside the red seal stamp (37x83 vertical sprite): the 34x69 box stacked one glyph per line. Read it sideways top-to-bottom along the stamp instead (local -90 on top of the seal's 12 deg).",
+  "paths": [
+   "**/DevelopPanel/Scroll View/Viewport/List/DevelopItemPanel(Clone)/Public/AlreadyDev/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "anchorMin": [
+    0.5,
+    0.5
+   ],
+   "anchorMax": [
+    0.5,
+    0.5
+   ],
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "anchoredPos": [
+    0,
+    0
+   ],
+   "width": 78,
+   "height": 30,
+   "rotationZ": -90
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 15,
+   "alignment": "MiddleCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "develop-condition-column",
+  "comment": "Condition list: rows are 50px tall but 'Equipment Level 5' wrapped to two lines in a 200px box, so its 2nd line sat next to the next checkbox. Shift the column 40px left (gradient back starts at x 470) and widen the text to 270 on a single line.",
+  "paths": [
+   "**/WeaponUpgradePanel/DevelopPanel/Detail/Condition",
+   "**/WeaponUpgradePanel/DevelopPanel/Detail/ConditionText",
+   "**/PoisonUpgradePanel/DevelopPanel/Detail/Condition",
+   "**/PoisonUpgradePanel/DevelopPanel/Detail/ConditionText"
+  ],
+  "rect": {
+   "dx": -40
+  }
+ },
+ {
+  "id": "develop-condition-text",
+  "paths": [
+   "**/DevelopPanel/Detail/Condition/DevelopItemConditionText(Clone)/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 270,
+   "height": 40
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 24,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleLeft",
+   "lineSpacing": 1.0
+  }
+ },
+ {
+  "id": "develop-detail-name",
+  "comment": "Develop target name (450x50, 32-40px): long names would wrap and truncate; best-fit 20-36 on one line.",
+  "paths": [
+   "**/WeaponUpgradePanel/DevelopPanel/Detail/Name",
+   "**/PoisonUpgradePanel/DevelopPanel/Detail/Name"
+  ],
+  "onTextChange": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 20,
+   "maxSize": 36,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "develop-mouse-hint",
+  "comment": "'Long press to develop' hint under the mouse icon: centre it under the icon (icon centre x 1026) and drop it 12px so it clears the icon.",
+  "paths": [
+   "**/WeaponUpgradePanel/DevelopPanel/Detail/DevelopMouse/Text",
+   "**/PoisonUpgradePanel/DevelopPanel/Detail/DevelopMouse/Text",
+   "**/WeaponUpgradePanel/DevelopPanel/Detail/DisableText/Text",
+   "**/PoisonUpgradePanel/DevelopPanel/Detail/DisableText/Text"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "x": 20,
+   "dy": -12,
+   "width": 300,
+   "height": 90
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 20,
+   "maxSize": 30,
+   "alignment": "UpperCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "develop-refund-block",
+  "comment": "Refund info (shown when a development is affordable): three 300x47 rows 31px apart; the English header and 'Return N points of forging points' wrapped and clipped. Move the block left (clear of the description column at x 1240) so rows can be 400 wide, one line each.",
+  "paths": [
+   "**/WeaponUpgradePanel/DevelopPanel/Detail/RefundInfo",
+   "**/PoisonUpgradePanel/DevelopPanel/Detail/RefundInfo"
+  ],
+  "rect": {
+   "x": -150
+  }
+ },
+ {
+  "id": "develop-refund-rows",
+  "paths": [
+   "**/DevelopPanel/Detail/RefundInfo/Header",
+   "**/DevelopPanel/Detail/RefundInfo/Point",
+   "**/DevelopPanel/Detail/RefundInfo/Money"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "width": 400,
+   "height": 30
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "UpperLeft"
+  }
+ }
+]

@@ -1,0 +1,168 @@
+[
+  // ---------------------------------------------------------------------------
+  // Story backlog (Log button -> /[UI]/MainUI/Layer_6/LogMenu/NarrativeLog)
+  // ---------------------------------------------------------------------------
+  {
+    "id": "log-header",
+    "comment": "Vertical calligraphy title strip (200x530, 135px, wrap) broke 'Recall' into 'Rec/all'. Make it a single horizontal word at the top of the left column (the column is x=125..390, bounded by the vertical line art).",
+    "path": "**/LogMenu/NarrativeLog/Header",
+    "rect": { "x": 255, "y": -155, "width": 260, "height": 110 },
+    "text": { "fontSize": 70, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperLeft" }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Position menu dialogs (Study, Forge, Kitchen, Section01_01, ... : the
+  // PositionMenuDialog family with PositionOptionButton0..2 in a diagonal
+  // cascade). Explicit list because Dice/Option dialogs also own a 'Header'
+  // object that is a plain container.
+  // ---------------------------------------------------------------------------
+  {
+    "id": "position-header",
+    "comment": "Location name (up to 'Hall of Correcting the Heart'): the 80x500 vertical strip + the resizer's horizontal overflow at 81px runs across the whole screen and over the first option card. Horizontal title box left of the cascade (x=560..940, y=200..370; option card 0 art starts at x=950, card 1 art at y=388) with best fit and 2-line wrap. onTextChange because XUnity re-applies its overflow when the localized text is set.",
+    "paths": [
+      "/StoryCore/MenuDialogs/AlchemyMenuDialog/Header",
+      "/StoryCore/MenuDialogs/BackMountainMenuDialog/Header",
+      "/StoryCore/MenuDialogs/CenterMenuDialog/Header",
+      "/StoryCore/MenuDialogs/ForgeMenuDialog/Header",
+      "/StoryCore/MenuDialogs/GirlRoomMenuDialog/Header",
+      "/StoryCore/MenuDialogs/KitchenMenuDialog/Header",
+      "/StoryCore/MenuDialogs/MallMenuDialog/Header",
+      "/StoryCore/MenuDialogs/RoomMenuDialog/Header",
+      "/StoryCore/MenuDialogs/StudyMenuDialog/Header",
+      "/StoryCore/MenuDialogs/DownTownMenuDialog/Header",
+      "/StoryCore/MenuDialogs/TowerMenuDialog/Header",
+      "/StoryCore/MenuDialogs/TeashopMenuDialog/Header",
+      "/StoryCore/MenuDialogs/SpaMenuDialog/Header",
+      "/StoryCore/MenuDialogs/PharmacyMenuDialog/Header",
+      "/StoryCore/MenuDialogs/FortressMenuDialog/Header",
+      "/StoryCore/MenuDialogs/FarmMenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section01_01_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section01_02_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section01_03_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section01_04_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section01_05_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section01_06_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section02_01_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section02_02_MenuDialog/Header",
+      "/StoryCore/MenuDialogs/Section02_03_MenuDialog/Header"
+    ],
+    "onTextChange": true,
+    "rect": { "x": 560, "y": -200, "width": 380, "height": 170 },
+    "text": { "bestFit": true, "minSize": 28, "maxSize": 64, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft", "lineSpacing": 0.95 }
+  },
+  {
+    "id": "position-option-type",
+    "comment": "'Work'/'Idle chat'/'Freedom' tag in a 106x80 box: the resizer forces horizontal overflow, which runs into the Title on the right. Widen the box 20px to the left (free space between the diamond icon and the tag) and wrap + best fit so 'Idle chat' stays on one line. onTextChange because XUnity re-applies its overflow when UpdateContent sets the text.",
+    "paths": ["/StoryCore/MenuDialogs/*/ButtonGroup/PositionOptionButton*/*/Type"],
+    "onTextChange": true,
+    "rect": { "dx": -22, "dw": 22 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 26, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "position-option-title",
+    "comment": "Activity title (up to 'Burning incense. Lighting the lamp.') in a 240x80 box: wrap to two lines with best fit instead of the resizer's single-line overflow; 30px wider (the hover border art ends 34px right of the box).",
+    "paths": ["/StoryCore/MenuDialogs/*/ButtonGroup/PositionOptionButton*/*/Title"],
+    "onTextChange": true,
+    "rect": { "dw": 30 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 26, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter", "lineSpacing": 0.9 }
+  },
+
+  {
+    "id": "position-option-desc",
+    "comment": "Activity description (up to 300 chars, e.g. Position/desc/transaction) in the 400x100 box the original patch's LOM_UI_Plugin_KR forces on every SetActive when it is installed (design value was 400x140): best fit 10-20 lands at ~13px. Restore the 140px height and add 40px of width (the card art 'Back' is 760x360 and ends 56px right of the box, 5px below it) so the same text fits at ~16px; 'always' because the KR prefix re-sets the height on every enable. Keep the resizer's floor but raise it to 14.",
+    "paths": ["/StoryCore/MenuDialogs/*/ButtonGroup/PositionOptionButton*/*/Desc"],
+    "always": true,
+    "onTextChange": true,
+    "rect": { "width": 440, "height": 140 },
+    "text": { "bestFit": true, "minSize": 14, "maxSize": 20, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft", "lineSpacing": 1.15 }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Say dialogs (/StoryCore/SayDialogs/*) - not capturable through screens.json,
+  // judged from the inventory + the --all dump. Only the name plate needs work:
+  // StoryText is already 1050x200 horizontal with the resizer's 10-24 best fit.
+  // ---------------------------------------------------------------------------
+  {
+   "id": "say-name-plate",
+   "comment": "Speaker name (350x97 TMP, TopRight, overflow), right edge at x554 above the story text; the dialog art starts at x192. Auto-size keeps long localized names inside the plate instead of overflowing left over the art. onTextChange because the name is assigned after enable (SetCharacterName) and the resizer's ChangeFontSizeByPercentage(0.7) re-applies on that assignment. No font swap (the box's DFT_S5_SDF_StoryTitle_001 is a dynamic atlas; a 'Palatino Linotype' TMP asset cannot be built by TMP 3.0 and the failed build was retried on every line). Floor 20 rather than 24: of the 341 named speakers in character/think dialogs, 'Fire Dragon Immortal Monarch' (special204, 91 lines) is the only one wider than 350px at 24 with Source Han Serif metrics (389px, reaching x164); at 20 it settles at ~21.6px inside the plate. With the 0.5em-per-letter advances TMP reports for this atlas in the live dumps it already fits at 25px, and every other name stays >= 24.4px, so the lower floor changes nothing else.",
+   "paths": [
+    "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name/Text (TMP)",
+    "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Name/Text (TMP)"
+   ],
+   "onTextChange": true,
+   "tmp": {
+    "autoSize": true,
+    "minSize": 20,
+    "maxSize": 42,
+    "wordWrap": false,
+    "overflow": "Overflow",
+    "alignment": "TopRight"
+   }
+  },
+  // ---------------------------------------------------------------------------
+  // Dice (fate) dialog
+  // ---------------------------------------------------------------------------
+  {
+    "id": "dice-round-button-labels",
+    "comment": "Round 130x130 buttons with the label below the icon: 'Narrow'/'Defy Heaven'/'Activate'/'Continue' (labels come from XUnity lines 1826-1827 and 52653, not the dead System/DiceRange table row) at 26px wrap over the icon. 20px and moved down so two lines sit under the icon.",
+    "paths": [
+      "/StoryCore/MenuDialogs/DiceMenuDialog/Panel/*Button/Normal/Text",
+      "/StoryCore/MenuDialogs/DiceMenuDialog/Panel/*Button/Hover/Text",
+      "/StoryCore/MenuDialogs/DiceMenuDialog/StartButton/Normal/Text",
+      "/StoryCore/MenuDialogs/DiceMenuDialog/StartButton/Hover/Text"
+    ],
+    "onTextChange": true,
+    "rect": { "dy": -14 },
+    "text": { "fontSize": 20, "lineSpacing": 0.9, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter" }
+  },
+  {
+    "id": "dice-continue-hint",
+    "comment": "'Click to continue' hint: the 160x40 text box was sized for 4 CJK glyphs with the animated arrow placed at x=81 inside it, so the English hint runs under the arrow. Single-line overflow for the text and the arrow moved 110px right (screen x=1425, still inside the 1920 canvas).",
+    "path": "/StoryCore/MenuDialogs/DiceMenuDialog/Continue/Text",
+    "onTextChange": true,
+    "text": { "hOverflow": "Overflow", "vOverflow": "Truncate", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "dice-continue-arrow",
+    "comment": "See dice-continue-hint: arrow icon moved right of the English hint.",
+    "path": "/StoryCore/MenuDialogs/DiceMenuDialog/Continue/ContinueImage",
+    "rect": { "dx": 110 }
+  },
+  {
+   "id": "option-menu-text",
+   "comment": "OptionMenuDialog choice text: 774x55 inside each 875x87 button (Normal/Hover/Disable copies), Source Han Serif 22, best fit 19-22, Wrap/Truncate, no XUnity resizer. Measured all 2556 Story/O_ strings (1275 are referenced after setmenudialog(menudialogs.Options) in the Lua dump): 2417 fit one line at 22px, 137 fit at 21px (99 of them on two lines), and exactly 2 need three lines at the 19px floor and lose their end: O_8_2_6_5_002 ('...to prepare for a decisive battle.') and O_S0003_02_09_003 ('...I might have to call for help.'). A floor of 16 fits both on two lines (16px and 18px); nothing else moves because best fit starts at 22.",
+   "paths": [
+    "/StoryCore/MenuDialogs/OptionMenuDialog/ButtonGroup/OptionButton*/*/Text"
+   ],
+   "onTextChange": true,
+   "text": {
+    "bestFit": true,
+    "minSize": 16,
+    "maxSize": 22
+   }
+  },
+  {
+   "id": "say-title-size",
+   "comment": "Speaker title above the name plate (CharacterTitle/<id>, or PlayerInfo/Title/<n> for the player via '{title}'): Text 500x60 UpperRight, Wrap + Truncate, so one line. CharacterSayDialog gets XUnity's ChangeFontSizeByPercentage(0.7) and renders the title at 25px (28 after a rule reload); ThinkSayDialog has no resizer line and renders it at the FontMap size 36 (40 after a reload). At 36 the player title 'Eldest Disciple of Snow Mountain' (PlayerInfo/Title/7, 542px) wraps and loses 'Mountain' on every one of the player's 2343 thought lines while he holds it; at 40 four NPC titles are cut too ('Former Wulin Alliance [Leader]', 'Soul-Stealer Secluded [Orchid]', 'Flying Heaven Gate [Disciple]', 'Young Swordsman in [White]'). Pin both dialogs to 25 so a title looks the same in speech and in thought; the widest title is 377px at 25.",
+   "paths": [
+    "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name/Title",
+    "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Name/Title"
+   ],
+   "onTextChange": true,
+   "text": {
+    "bestFit": false,
+    "fontSize": 25
+   }
+  },
+  {
+   "id": "center-narrative-measure",
+   "comment": "CenterNarrativeSayDialog story text is stretched over the whole canvas (anchors 0,0-1,1, sizeDelta 0,-700 -> 1920x380), 45px centred, no best fit. The Chinese lines carry their own line breaks; the English ones do not, so 450 of the 513 lines said through saydialogs.center wrap edge to edge (lines up to 1916px wide on a 1920 screen). 1600 wide (160px margins) keeps a readable measure; the tallest block becomes 7 lines = 323px, still inside the 380px box.",
+   "path": "/StoryCore/SayDialogs/CenterNarrativeSayDialog/Panel/StoryText",
+   "rect": {
+    "sizeDelta": [
+     -320,
+     -700
+    ]
+   }
+  }
+]

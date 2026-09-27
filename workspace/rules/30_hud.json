@@ -1,0 +1,203 @@
+[
+  // ---------------------------------------------------------------------------
+  // HUD (free scene /[UI]/MainUI/Layer_1, story scene /[UI]/MainUI/Layer_3)
+  // ActionInfo block: "30 / Contribution", "Mind Affinity" bar, "Action" pips.
+  // The `*` in /[UI]/MainUI/*/ActionInfo covers both Layer_1 and Layer_3 copies.
+  // ---------------------------------------------------------------------------
+  {
+    "id": "hud-contribution-label",
+    "comment": "'Contribution' sat under the big number and spilled out of the dark box (box 0-102px). Centre it in the dark box on one line, keep 14px (XUnity bestFit 8-14 re-applies on text set, so onTextChange).",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/ContributionText"],
+    "onTextChange": true,
+    "rect": { "dx": -21, "dy": -6, "width": 104, "height": 24 },
+    "text": { "bestFit": false, "fontSize": 14, "hOverflow": "Overflow", "alignment": "UpperCenter" }
+  },
+  {
+    "id": "hud-mental-header",
+    "comment": "'Mind Affinity' was a 2-line 14px stack in a 50px box sized for two hanzi. One line, 16px (~110px wide, x 110..220). The 16px line is 23px tall, so the box must be taller than the 21px bar or vOverflow Truncate drops the whole line: 25px box centred on the bar (box y -2..23 vs bar 0..21 in MentalBar space; original ap y=8, so dy -6).",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/MentalBar/Header"],
+    "onTextChange": true,
+    "rect": { "dy": -6, "width": 110, "height": 25 },
+    "text": { "bestFit": false, "fontSize": 16, "hOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "hud-mental-bar",
+    "comment": "Make room for the one-line header ('Mind Affinity' ~109px at 16px): bar starts 58px further right (x 226) and is 114px wide (ends x 340) so it stays clear of the mood face icon (x 349).",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/MentalBar/Bar"],
+    "rect": { "dx": 58, "width": 114 }
+  },
+  {
+    "id": "hud-mental-value",
+    "comment": "Keep the '100' value centred on the shifted/narrowed bar.",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/MentalBar/Text"],
+    "rect": { "dx": 37 }
+  },
+  {
+    "id": "hud-action-label",
+    "comment": "'Action' in a 50x56 box sized for two hanzi, wrapped 14px. One line at 16px, centred on the pip row, and moved 14px left (x 110) so its left edge lines up with 'Mind Affinity' above it.",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/Action/ActionText"],
+    "onTextChange": true,
+    "rect": { "dx": -14, "dy": -2, "width": 64, "height": 24 },
+    "text": { "bestFit": false, "fontSize": 16, "hOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "hud-action-points",
+    "comment": "Action pips: 'Action' at 16px now ends at x~163, so the pips start at x 173 (10px gap, same rhythm as the header/bar gap above).",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/Action/Points"],
+    "rect": { "dx": 2 }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Free scene top-right menu: Save / Status / System were 72px apart with
+  // 65-75px labels -> 'StatusSystem'. Spread the buttons and widen the gradient.
+  // ---------------------------------------------------------------------------
+  {
+    "id": "hud-free-menu-save",
+    "comment": "Move Save button 36px left.",
+    "path": "/[UI]/MainUI/Layer_1/MenuButton/ToggleButton_Save",
+    "rect": { "dx": -36 }
+  },
+  {
+    "id": "hud-free-menu-status",
+    "comment": "Move Status button 18px left (System stays).",
+    "path": "/[UI]/MainUI/Layer_1/MenuButton/ToggleButton_Status_2",
+    "rect": { "dx": -18 }
+  },
+  {
+    "id": "hud-free-menu-back",
+    "comment": "Gradient backing is rotated -90, so its 'height' is the horizontal extent; extend 40px to the left to cover the moved Save button.",
+    "path": "/[UI]/MainUI/Layer_1/MenuButton/Back",
+    "rect": { "dh": 40 }
+  },
+  {
+    "id": "hud-free-menu-labels",
+    "comment": "Never wrap the one-word labels (Normal and Enable/hover copies).",
+    "paths": ["/[UI]/MainUI/Layer_1/MenuButton/ToggleButton_*/*/Text"],
+    "text": { "hOverflow": "Overflow" }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Story scene HUD (Layer_3): Status/System top-right, Log/Auto bottom-right, Info.
+  // ---------------------------------------------------------------------------
+  {
+    "id": "hud-story-menu-status",
+    "comment": "'Status' and 'System' labels were 4px apart; move the Status button 16px left.",
+    "path": "/[UI]/MainUI/Layer_3/MenuButtons/Status",
+    "rect": { "dx": -16 }
+  },
+  {
+    "id": "hud-story-menu-back",
+    "comment": "Rotated gradient backing: extend 40px to the left behind the moved Status button.",
+    "path": "/[UI]/MainUI/Layer_3/MenuButtons/Back",
+    "rect": { "dh": 40 }
+  },
+  {
+    "id": "hud-story-menu-top-labels",
+    "comment": "Never wrap the one-word labels (Normal and Enable copies).",
+    "paths": ["/[UI]/MainUI/Layer_3/MenuButtons/Menu/*/Text", "/[UI]/MainUI/Layer_3/MenuButtons/Status/*/Text"],
+    "text": { "hOverflow": "Overflow" }
+  },
+  {
+    "id": "hud-story-log-auto-labels",
+    "comment": "'Recall' / 'Automatic' under the bottom-right buttons: XUnity shrinks them to 10-16px. Fixed 18px in a 110px box (buttons are 95px apart, 'Automatic' ~97px).",
+    "paths": ["/[UI]/MainUI/Layer_3/MenuButtons/Log/*/Text", "/[UI]/MainUI/Layer_3/MenuButtons/Auto/*/Text"],
+    "onTextChange": true,
+    "rect": { "dx": -10, "width": 110 },
+    "text": { "bestFit": false, "fontSize": 18, "hOverflow": "Overflow", "alignment": "UpperCenter" }
+  },
+  {
+    "id": "hud-story-info-label",
+    "comment": "'Actions' beside the (i) icon was shrunk to 14px by XUnity; 18px, one line, centred on the 30px icon.",
+    "path": "/[UI]/MainUI/Layer_3/Info/Text",
+    "onTextChange": true,
+    "rect": { "height": 30 },
+    "text": { "bestFit": false, "fontSize": 18, "hOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Misc HUD text
+  // ---------------------------------------------------------------------------
+  {
+    "id": "hud-player-name",
+    "comment": "Player name 'Zhao Huo' (63px) wrapped in the 257px box and the 2nd line was clipped -> only 'Zhao' showed. 400px box centred on the same point (435), no wrap.",
+    "path": "/[UI]/MainUI/Layer_1/Name",
+    "rect": { "x": 235, "width": 400 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow" }
+  },
+  {
+   "id": "hud-date-text",
+   "comment": "Date label 'April‧Early Month' (400x80 box, wrap+truncate): 'September‧Early Month' is ~416px at 41px, so it wrapped and the 2nd line was cut off at 80px. Nothing sits to its right, so let it overflow on one line. XUnity AutoResize(16,34) on the Layer_3 copy shrank it to 34px; pin 41px in both scenes (onTextChange so the resizer cannot re-shrink it). Pattern narrowed from '/[UI]/MainUI/*/Time/Text' to Layer_*: the wildcard also matched the army-battle countdown /[UI]/MainUI/Level_1/Time/Text (116x80, UpperCenter), where it forced 41px single-line overflow, so 'Infinite' (156px) ran over the 'Time' caption.",
+   "paths": [
+    "/[UI]/MainUI/Layer_*/Time/Text"
+   ],
+   "onTextChange": true,
+   "text": {
+    "bestFit": false,
+    "fontSize": 41,
+    "hOverflow": "Overflow",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+    "id": "hud-money-font",
+    "comment": "Money value had no font (renders in Arial); use the same serif as the date text.",
+    "paths": ["/[UI]/MainUI/*/Money/Text"],
+    "text": { "font": "Palatino Linotype" }
+  },
+
+  // ---------------------------------------------------------------------------
+  // TalkMenuDialog option table (/StoryCore/MenuDialogs/TalkMenuDialog)
+  // ---------------------------------------------------------------------------
+  {
+    "id": "talk-header-agenda",
+    "comment": "Keep the 'Agenda' header's top aligned with the two-line headers below.",
+    "paths": ["/StoryCore/**/TalkMenuDialog/**/Header/Text (1)"],
+    "rect": { "dy": 6 }
+  },
+  {
+    "id": "talk-header-action",
+    "comment": "'Consuming Action' in a 130x33 box clipped its 2nd line. Start at the header top (y 199), 46px tall, 17px with tight line spacing so both lines sit above the table rule at y 245; centred over the value column.",
+    "paths": ["/StoryCore/**/TalkMenuDialog/**/Header/Text (2)"],
+    "onTextChange": true,
+    "rect": { "dy": 6, "height": 46 },
+    "text": { "bestFit": false, "fontSize": 17, "lineSpacing": 0.85, "alignment": "UpperCenter", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "talk-header-contribution",
+    "comment": "'Consume Contribution' clipped to 'Consume' and its box (1507-1637) ran past the table rule (ends x 1597). Two 17px lines, box moved 32px left and centred over its value column (x~1540), inside the rule.",
+    "paths": ["/StoryCore/**/TalkMenuDialog/**/Header/Text (3)"],
+    "onTextChange": true,
+    "rect": { "dx": -32, "dy": 6, "height": 46 },
+    "text": { "bestFit": false, "fontSize": 17, "lineSpacing": 0.85, "alignment": "UpperCenter", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+  {
+    "id": "talk-option-type",
+    "comment": "'Leave' column (100x50): longer types like 'Casual Talk' would wrap and clip; best-fit down to 15px instead.",
+    "paths": ["/StoryCore/**/TalkMenuDialog/**/TypeText"],
+    "text": { "bestFit": true, "minSize": 15, "maxSize": 23 }
+  },
+  {
+    "id": "hud-float-title",
+    "comment": "Room-entry banner: 70px in an 800x100 box, where 'Tang Sect - Alchemy Room' measures 844x145. Unity's best-fit only constrains an axis that is set to Wrap or Truncate, so it needs BOTH: with vertical Overflow it ignored height and stayed at 70, wrapping to two lines that spilled out of the box (the first line was cut off by the top of the screen and 'Room' landed on the location label below), and with horizontal Overflow it ignored width and did not shrink long names at all. Wrap+Truncate constrains both axes, and the box is widened to 1400x110 (centred, 260..1660 on a 1920 screen) so ordinary names stay at 70 on one line and only genuinely long ones shrink.",
+    "paths": ["**/MainUI/*/FloatTitle/Text"],
+    "onTextChange": true,
+    "rect": { "width": 1400, "height": 110 },
+    "text": { "bestFit": true, "minSize": 36, "maxSize": 70, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter" }
+  },
+  {
+    "id": "hud-map-place-names",
+    "comment": "World-map place names were 20x73 vertical strips (one letter per line, most clipped). Horizontal 160x30 plates, no wrap, normal line spacing; anchor point is unchanged so each label still starts at its station marker.",
+    "paths": ["**/Map/Background/[Name]/*", "**/MainMap/**/[Name]/*"],
+    "onTextChange": true,
+    "rect": { "width": 160, "height": 30 },
+    "text": { "fontSize": 15, "hOverflow": "Overflow", "vOverflow": "Overflow", "lineSpacing": 1.0, "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "talk-header-contribution-fit",
+    "comment": "Follow-up to talk-header-contribution: 'Contribution' alone measures 158px at 17px and overflowed the 130px header box, and the header centre sat 14px right of its value column. 15px in a 150px box, shifted to line up with the values.",
+    "paths": ["/StoryCore/**/TalkMenuDialog/**/Header/Text (3)"],
+    "onTextChange": true,
+    "rect": { "dx": -30, "dy": 4, "width": 130, "height": 52 },
+    "text": { "bestFit": false, "fontSize": 16, "lineSpacing": 0.9, "alignment": "UpperCenter", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  }
+]

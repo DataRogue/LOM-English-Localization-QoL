@@ -1,0 +1,4509 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+using System.Text;
+using System.Text.RegularExpressions;
+using BepInEx;
+using BepInEx.Configuration;
+using BepInEx.Core.Logging.Interpolation;
+using BepInEx.Logging;
+using BepInEx.Unity.Mono;
+using DG.Tweening;
+using Fungus;
+using HarmonyLib;
+using Lean.Localization;
+using Microsoft.CodeAnalysis;
+using MoonSharp.Interpreter;
+using Mortal.Combat;
+using Mortal.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+[assembly: TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName = ".NET Framework 4.7.2")]
+namespace LOM_UI_EN
+{
+	public class DevHarness : MonoBehaviour
+	{
+		private string _dir;
+
+		private string _outDir;
+
+		private string _cmdFile;
+
+		private bool _busy;
+
+		private StringBuilder _log = new StringBuilder();
+
+		private static readonly Vector3[] _corners = new Vector3[4];
+
+		private static readonly HashSet<string> _skip = new HashSet<string> { "RectTransform", "Transform", "CanvasRenderer", "UIFixMarker" };
+
+		private void Awake()
+		{
+			_dir = Path.Combine(Plugin.PluginDir, "harness");
+			_outDir = Path.Combine(_dir, "out");
+			_cmdFile = Path.Combine(_dir, "cmd.txt");
+			Directory.CreateDirectory(_outDir);
+			Log("harness ready");
+		}
+
+		private void Update()
+		{
+			if (!_busy && Plugin.CfgHarness.Value && File.Exists(_cmdFile))
+			{
+				string[] lines;
+				try
+				{
+					lines = File.ReadAllLines(_cmdFile);
+					File.Delete(_cmdFile);
+				}
+				catch (IOException)
+				{
+					return;
+				}
+				StartCoroutine(RunBatch(lines));
+			}
+		}
+
+		public void HotkeyDump()
+		{
+			if (_dir == null)
+			{
+				Awake();
+			}
+			string text = "hotkey_" + DateTime.Now.ToString("HHmmss");
+			StartCoroutine(RunBatch(new string[3]
+			{
+				"batch " + text,
+				"dump " + text,
+				"screenshot " + text
+			}));
+		}
+
+		private void Log(string s)
+		{
+			string text = DateTime.Now.ToString("HH:mm:ss.fff") + " " + s;
+			Plugin.Log.LogInfo("[harness] " + s);
+			try
+			{
+				File.AppendAllText(Path.Combine(_outDir, "log.txt"), text + "\n");
+			}
+			catch
+			{
+			}
+		}
+
+		private IEnumerator RunBatch(string[] lines)
+		{
+			_busy = true;
+			string batch = "batch";
+			foreach (string text in lines)
+			{
+				string line = text.Trim();
+				if (line.Length == 0 || line.StartsWith("#"))
+				{
+					continue;
+				}
+				int num = line.IndexOf(' ');
+				string text2 = ((num < 0) ? line : line.Substring(0, num)).ToLowerInvariant();
+				string text3 = ((num < 0) ? "" : line.Substring(num + 1).Trim());
+				IEnumerator co = null;
+				try
+				{
+					switch (text2)
+					{
+					case "batch":
+						batch = text3;
+						Log("batch " + batch);
+						break;
+					case "wait":
+						co = WaitCmd(text3);
+						break;
+					case "screenshot":
+						co = ScreenshotCmd(text3);
+						break;
+					case "dump":
+						DumpCmd(text3);
+						break;
+					case "find":
+						FindCmd(text3);
+						break;
+					case "click":
+						ClickCmd(text3);
+						break;
+					case "hover":
+						PointerCmd(text3, enter: true);
+						break;
+					case "unhover":
+						PointerCmd(text3, enter: false);
+						break;
+					case "active":
+						ActiveCmd(text3);
+						break;
+					case "show":
+						ShowCmd(text3);
+						break;
+					case "settext":
+						SetTextCmd(text3);
+						break;
+					case "loadsave":
+						LoadSaveCmd(text3);
+						break;
+					case "title":
+						SceneController.Instance.LoadTitle();
+						Log("title");
+						break;
+					case "lang":
+						SystemSettings.SetLanguage(int.Parse(text3));
+						Log("lang " + text3);
+						break;
+					case "fix":
+						FixCmd(text3);
+						break;
+					case "sprites":
+						Plugin.CfgSpriteReplace.Value = text3.Trim() == "1";
+						Log("sprites " + text3);
+						break;
+					case "reload":
+						Plugin.Reload();
+						Log("reload");
+						break;
+					case "reset":
+						RuleApplier.ResetAllMarkers();
+						Log("reset");
+						break;
+					case "scan":
+						RuleApplier.ApplyToAll(includeInactive: true);
+						Log("scan");
+						break;
+					case "res":
+					{
+						string[] array = text3.Split(' ');
+						Screen.SetResolution(int.Parse(array[0]), int.Parse(array[1]), fullscreen: false);
+						Log("res " + text3);
+						break;
+					}
+					case "info":
+						InfoCmd();
+						break;
+					case "invoke":
+						co = InvokeCmd(text3);
+						break;
+					case "trace":
+						StringsPlugin.CfgTrace.Value = text3.Trim() == "1";
+						Log("trace " + text3);
+						break;
+					case "strings":
+						StringsPlugin.CfgEnabled.Value = text3.Trim() == "1";
+						StringOverrides.Load();
+						StringOverrides.Refresh();
+						Log($"strings {text3} ({StringOverrides.Count} overrides)");
+						break;
+					case "lua":
+						LuaCmd(text3);
+						break;
+					case "quit":
+						Log("quit");
+						Application.Quit();
+						break;
+					default:
+						Log("ERR unknown command: " + line);
+						break;
+					}
+				}
+				catch (Exception ex)
+				{
+					Log("ERR " + line + ": " + ex.GetType().Name + ": " + ex.Message);
+				}
+				if (co != null)
+				{
+					while (true)
+					{
+						bool flag;
+						try
+						{
+							flag = co.MoveNext();
+						}
+						catch (Exception ex2)
+						{
+							Log("ERR " + line + ": " + ex2.GetType().Name + ": " + ex2.Message);
+							break;
+						}
+						if (!flag)
+						{
+							break;
+						}
+						yield return co.Current;
+					}
+				}
+				yield return null;
+			}
+			try
+			{
+				File.WriteAllText(Path.Combine(_outDir, batch + ".done"), DateTime.Now.ToString("o"));
+			}
+			catch
+			{
+			}
+			Log("done " + batch);
+			_busy = false;
+		}
+
+		private IEnumerator WaitCmd(string arg)
+		{
+			float time = float.Parse(arg, CultureInfo.InvariantCulture);
+			yield return new WaitForSecondsRealtime(time);
+		}
+
+		private IEnumerator ScreenshotCmd(string name)
+		{
+			yield return new WaitForEndOfFrame();
+			string path = Path.Combine(_outDir, name + ".png");
+			try
+			{
+				if (File.Exists(path))
+				{
+					File.Delete(path);
+				}
+			}
+			catch
+			{
+			}
+			ScreenCapture.CaptureScreenshot(path, 1);
+			float t = 0f;
+			while (!File.Exists(path) && t < 5f)
+			{
+				t += Time.unscaledDeltaTime;
+				yield return null;
+			}
+			yield return null;
+			Log((File.Exists(path) ? "screenshot " : "ERR screenshot missing ") + path);
+		}
+
+		private void InfoCmd()
+		{
+			Log($"info scene={SceneManager.GetActiveScene().name} screen={Screen.width}x{Screen.height} fullscreen={Screen.fullScreen} lang={SystemSettings.Language}({LeanLocalization.CurrentLanguage}) isChinese={SystemSettings.IsChineseLanguage} isKorean={SystemSettings.IsKoreanLanguage} rules={Rules.Count} applications={RuleApplier.Applications} spriteReplacements={SpriteStore.Replacements} time={Time.realtimeSinceStartup:F1} timeScale={Time.timeScale}");
+		}
+
+		private void FixCmd(string arg)
+		{
+			if (!(arg.Trim() == "1"))
+			{
+				RuleApplier.ResetAllMarkers();
+				Plugin.CfgEnabled.Value = false;
+			}
+			else
+			{
+				Plugin.CfgEnabled.Value = true;
+				RuleApplier.ApplyToAll(includeInactive: true);
+			}
+			Log("fix " + arg);
+		}
+
+		private void LoadSaveCmd(string slot)
+		{
+			slot = slot.Trim();
+			SaveSystem.Instance.SetSlot(slot);
+			SoundManager.Instance.StopMusic();
+			SaveSystem.Instance.LoadGameData();
+			SaveSystem.Instance.SaveUniverseData();
+			MissionManagerData.Instance.UpdateCheckMissions();
+			SceneController.Instance.LoadCurrentScene();
+			Log("loadsave " + slot);
+		}
+
+		private IEnumerator InvokeCmd(string arg)
+		{
+			string[] array = arg.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+			if (array.Length < 2)
+			{
+				Log("ERR invoke needs PATH Type.Method");
+				yield break;
+			}
+			object obj = null;
+			string text2;
+			Type type;
+			string[] array2;
+			if (array[0] == "static")
+			{
+				string obj2 = array[1];
+				int num = obj2.LastIndexOf('.');
+				string text = obj2.Substring(0, num);
+				text2 = obj2.Substring(num + 1);
+				type = AccessTools.TypeByName(text);
+				if (type == null)
+				{
+					Log("ERR type not found: " + text);
+					yield break;
+				}
+				array2 = array.Skip(2).ToArray();
+			}
+			else
+			{
+				Transform transform = Find(array[0]);
+				if (transform == null)
+				{
+					yield break;
+				}
+				string text3 = array[1];
+				int num2 = text3.LastIndexOf('.');
+				string text4 = ((num2 < 0) ? null : text3.Substring(0, num2));
+				text2 = ((num2 < 0) ? text3 : text3.Substring(num2 + 1));
+				Component component = null;
+				Component[] components = transform.GetComponents<Component>();
+				foreach (Component component2 in components)
+				{
+					if (!(component2 == null) && (text4 == null || component2.GetType().Name == text4 || component2.GetType().FullName == text4))
+					{
+						component = component2;
+						if (text4 != null)
+						{
+							break;
+						}
+					}
+				}
+				if (component == null)
+				{
+					Log("ERR component not found: " + text4);
+					yield break;
+				}
+				obj = component;
+				type = component.GetType();
+				array2 = array.Skip(2).ToArray();
+			}
+			BindingFlags bindingAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+			MethodInfo methodInfo = null;
+			MethodInfo[] methods = type.GetMethods(bindingAttr);
+			foreach (MethodInfo methodInfo2 in methods)
+			{
+				if (methodInfo2.Name == text2 && methodInfo2.GetParameters().Length == array2.Length)
+				{
+					methodInfo = methodInfo2;
+					break;
+				}
+			}
+			if (methodInfo == null)
+			{
+				methods = type.GetMethods(bindingAttr);
+				foreach (MethodInfo methodInfo3 in methods)
+				{
+					if (methodInfo3.Name == text2 && methodInfo3.GetParameters().Length >= array2.Length && methodInfo3.GetParameters().Skip(array2.Length).All((ParameterInfo p) => p.IsOptional))
+					{
+						methodInfo = methodInfo3;
+						break;
+					}
+				}
+			}
+			if (methodInfo == null)
+			{
+				Log($"ERR method not found: {type.Name}.{text2}/{array2.Length}");
+				yield break;
+			}
+			ParameterInfo[] parameters = methodInfo.GetParameters();
+			object[] array3 = new object[parameters.Length];
+			for (int num3 = 0; num3 < parameters.Length; num3++)
+			{
+				if (num3 >= array2.Length)
+				{
+					array3[num3] = Type.Missing;
+					continue;
+				}
+				Type parameterType = parameters[num3].ParameterType;
+				string text5 = array2[num3];
+				try
+				{
+					if (parameterType == typeof(string))
+					{
+						array3[num3] = text5;
+					}
+					else if (parameterType == typeof(int))
+					{
+						array3[num3] = int.Parse(text5);
+					}
+					else if (parameterType == typeof(float))
+					{
+						array3[num3] = float.Parse(text5, CultureInfo.InvariantCulture);
+					}
+					else if (parameterType == typeof(bool))
+					{
+						array3[num3] = text5 == "1" || text5.Equals("true", StringComparison.OrdinalIgnoreCase);
+					}
+					else if (parameterType.IsEnum)
+					{
+						array3[num3] = Enum.Parse(parameterType, text5, ignoreCase: true);
+					}
+					else
+					{
+						array3[num3] = Convert.ChangeType(text5, parameterType, CultureInfo.InvariantCulture);
+					}
+				}
+				catch (Exception ex)
+				{
+					Log($"ERR arg {num3} ({parameterType.Name}) '{text5}': {ex.Message}");
+					yield break;
+				}
+			}
+			object obj3;
+			try
+			{
+				obj3 = methodInfo.Invoke(methodInfo.IsStatic ? null : obj, array3);
+			}
+			catch (Exception ex2)
+			{
+				Log("ERR invoke " + type.Name + "." + text2 + ": " + (ex2.InnerException ?? ex2).GetType().Name + ": " + (ex2.InnerException ?? ex2).Message);
+				yield break;
+			}
+			if (obj3 is IEnumerator enumerator)
+			{
+				MonoBehaviour monoBehaviour = obj as MonoBehaviour;
+				Log("invoke " + type.Name + "." + text2 + " -> coroutine (started)");
+				if (monoBehaviour != null && monoBehaviour.isActiveAndEnabled)
+				{
+					monoBehaviour.StartCoroutine(enumerator);
+				}
+				else
+				{
+					StartCoroutine(Guarded(enumerator, type.Name + "." + text2));
+				}
+			}
+			else
+			{
+				Log(string.Format("invoke {0}.{1} -> {2}", type.Name, text2, obj3 ?? "void"));
+			}
+		}
+
+		private IEnumerator Guarded(IEnumerator en, string label)
+		{
+			while (true)
+			{
+				bool flag;
+				try
+				{
+					flag = en.MoveNext();
+				}
+				catch (Exception ex)
+				{
+					Log("ERR coroutine " + label + ": " + ex.GetType().Name + ": " + ex.Message);
+					yield break;
+				}
+				if (!flag)
+				{
+					break;
+				}
+				yield return en.Current;
+			}
+			Log("coroutine " + label + " finished");
+		}
+
+		private void LuaCmd(string code)
+		{
+			object obj = null;
+			string[] array = new string[5] { "Mortal.Core.LuaManager", "Mortal.Story.LuaManager", "Mortal.LuaManager", "LuaManager", "Fungus.LuaManager" };
+			for (int i = 0; i < array.Length; i++)
+			{
+				Type type = AccessTools.TypeByName(array[i]);
+				if (!(type == null))
+				{
+					PropertyInfo propertyInfo = AccessTools.Property(type, "Instance");
+					obj = ((propertyInfo != null) ? propertyInfo.GetValue(null, null) : null);
+					if (obj != null)
+					{
+						break;
+					}
+				}
+			}
+			if (obj == null)
+			{
+				Log("ERR LuaManager not found");
+				return;
+			}
+			LuaEnvironment value = Traverse.Create(obj).Field("_luaEnvironment").GetValue<LuaEnvironment>();
+			if (value == null)
+			{
+				Log("ERR no lua environment");
+				return;
+			}
+			string ret = null;
+			value.DoLuaString(code, "harness", runAsCoroutine: false, delegate(DynValue r)
+			{
+				ret = r.ToString();
+			});
+			Log("lua -> " + ret);
+		}
+
+		private Transform Find(string path)
+		{
+			Transform obj = PathUtil.FindByPath(path);
+			if (obj == null)
+			{
+				Log("ERR not found: " + path);
+			}
+			return obj;
+		}
+
+		private void ActiveCmd(string arg)
+		{
+			int num = arg.LastIndexOf(' ');
+			string text = arg.Substring(0, num).Trim();
+			bool flag = arg.Substring(num + 1).Trim() == "1";
+			Transform transform = Find(text);
+			if (!(transform == null))
+			{
+				transform.gameObject.SetActive(flag);
+				Log($"active {text} {flag}");
+			}
+		}
+
+		private void ShowCmd(string arg)
+		{
+			int num = arg.LastIndexOf(' ');
+			string text = arg.Substring(0, num).Trim();
+			bool flag = arg.Substring(num + 1).Trim() == "1";
+			Transform transform = Find(text);
+			if (!(transform == null))
+			{
+				CommonPanel component = transform.GetComponent<CommonPanel>();
+				if (component == null)
+				{
+					Log("ERR no CommonPanel on " + text);
+					return;
+				}
+				component.Show(flag);
+				Log($"show {text} {flag}");
+			}
+		}
+
+		private void SetTextCmd(string arg)
+		{
+			int num = arg.IndexOf('|');
+			string text;
+			string text2;
+			if (num >= 0)
+			{
+				text = arg.Substring(0, num).Trim();
+				text2 = arg.Substring(num + 1);
+			}
+			else
+			{
+				int num2 = arg.IndexOf(' ');
+				text = ((num2 < 0) ? arg : arg.Substring(0, num2));
+				text2 = ((num2 < 0) ? "" : arg.Substring(num2 + 1));
+			}
+			text2 = text2.Replace("\\n", "\n");
+			Transform transform = Find(text);
+			if (!(transform == null))
+			{
+				Text component = transform.GetComponent<Text>();
+				if (component != null)
+				{
+					component.text = text2;
+				}
+				TMP_Text component2 = transform.GetComponent<TMP_Text>();
+				if (component2 != null)
+				{
+					component2.text = text2;
+				}
+				Log("settext " + text);
+			}
+		}
+
+		private void ClickCmd(string path)
+		{
+			Transform transform = Find(path);
+			if (!(transform == null))
+			{
+				GameObject gameObject = transform.gameObject;
+				EventSystem current = EventSystem.current;
+				PointerEventData pointerEventData = new PointerEventData(current)
+				{
+					button = PointerEventData.InputButton.Left,
+					clickCount = 1
+				};
+				RectTransform rectTransform = transform as RectTransform;
+				if (rectTransform != null)
+				{
+					Canvas componentInParent = transform.GetComponentInParent<Canvas>();
+					Camera cam = ((componentInParent != null && componentInParent.renderMode != RenderMode.ScreenSpaceOverlay) ? componentInParent.worldCamera : null);
+					pointerEventData.position = RectTransformUtility.WorldToScreenPoint(cam, rectTransform.TransformPoint(rectTransform.rect.center));
+					pointerEventData.pressPosition = pointerEventData.position;
+				}
+				bool flag = false;
+				Button component = gameObject.GetComponent<Button>();
+				ExecuteEvents.Execute(gameObject, pointerEventData, ExecuteEvents.pointerEnterHandler);
+				ExecuteEvents.Execute(gameObject, pointerEventData, ExecuteEvents.pointerDownHandler);
+				ExecuteEvents.Execute(gameObject, pointerEventData, ExecuteEvents.pointerUpHandler);
+				GameObject gameObject2 = ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.pointerClickHandler);
+				flag = gameObject2 != null;
+				if (!flag && component != null)
+				{
+					component.onClick.Invoke();
+					flag = true;
+				}
+				if (!flag)
+				{
+					flag = ExecuteEvents.ExecuteHierarchy(gameObject, new BaseEventData(current), ExecuteEvents.submitHandler) != null;
+				}
+				Log((flag ? "click " : "ERR click not handled ") + path + ((gameObject2 != null) ? (" -> " + gameObject2.name) : ""));
+			}
+		}
+
+		private void PointerCmd(string path, bool enter)
+		{
+			Transform transform = Find(path);
+			if (!(transform == null))
+			{
+				PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+				RectTransform rectTransform = transform as RectTransform;
+				if (rectTransform != null)
+				{
+					pointerEventData.position = RectTransformUtility.WorldToScreenPoint(null, rectTransform.TransformPoint(rectTransform.rect.center));
+				}
+				GameObject gameObject = (enter ? ExecuteEvents.ExecuteHierarchy(transform.gameObject, pointerEventData, ExecuteEvents.pointerEnterHandler) : ExecuteEvents.ExecuteHierarchy(transform.gameObject, pointerEventData, ExecuteEvents.pointerExitHandler));
+				Log((enter ? "hover " : "unhover ") + path + ((gameObject != null) ? (" -> " + gameObject.name) : " (no handler)"));
+			}
+		}
+
+		private void FindCmd(string sub)
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+			int num = 0;
+			foreach (Transform item in PathUtil.AllSceneTransforms())
+			{
+				string path = PathUtil.GetPath(item);
+				if (path.IndexOf(sub, StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					stringBuilder.Append(item.gameObject.activeInHierarchy ? "A " : "- ").Append(path).Append("  [")
+						.Append(ComponentList(item.gameObject))
+						.Append("]\n");
+					num++;
+				}
+			}
+			File.WriteAllText(Path.Combine(_outDir, "find.txt"), stringBuilder.ToString(), Encoding.UTF8);
+			Log($"find '{sub}': {num} matches -> find.txt");
+		}
+
+		private void DumpCmd(string arg)
+		{
+			string[] array = arg.Split(' ');
+			string text = array[0];
+			bool all = array.Contains("all");
+			string text2 = ((array.Length > 1 && array[1] != "all") ? array[1] : null);
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append($"# scene={SceneManager.GetActiveScene().name} screen={Screen.width}x{Screen.height} lang={SystemSettings.Language} isChinese={SystemSettings.IsChineseLanguage} time={Time.realtimeSinceStartup:F1}\n");
+			stringBuilder.Append("# columns: path [components] rect=x,y-x2,y2(WxH) (screen px, origin top-left) | text/image details | flags\n");
+			List<Transform> list = new List<Transform>();
+			if (text2 != null)
+			{
+				Transform transform = Find(text2);
+				if (transform != null)
+				{
+					list.Add(transform);
+				}
+			}
+			else
+			{
+				list = PathUtil.GetAllRoots();
+			}
+			foreach (Transform item in list.OrderBy((Transform t) => t.name))
+			{
+				DumpTransform(item, stringBuilder, 0, all);
+			}
+			string text3 = Path.Combine(_outDir, text + ".txt");
+			File.WriteAllText(text3, stringBuilder.ToString(), Encoding.UTF8);
+			Log("dump -> " + text3);
+		}
+
+		private void DumpTransform(Transform t, StringBuilder sb, int depth, bool all)
+		{
+			GameObject gameObject = t.gameObject;
+			if (!all && !gameObject.activeInHierarchy)
+			{
+				return;
+			}
+			RectTransform rectTransform = t as RectTransform;
+			if (rectTransform != null || depth == 0)
+			{
+				sb.Append(' ', depth).Append(gameObject.activeSelf ? "" : "(inactive) ").Append(t.name);
+				sb.Append(" [").Append(ComponentList(gameObject)).Append(']');
+				if (rectTransform != null)
+				{
+					Canvas componentInParent = t.GetComponentInParent<Canvas>();
+					Camera cam = ((componentInParent != null && componentInParent.renderMode != RenderMode.ScreenSpaceOverlay) ? componentInParent.worldCamera : null);
+					rectTransform.GetWorldCorners(_corners);
+					Vector2 vector = RectTransformUtility.WorldToScreenPoint(cam, _corners[0]);
+					Vector2 vector2 = RectTransformUtility.WorldToScreenPoint(cam, _corners[2]);
+					float num = Mathf.Min(vector.x, vector2.x);
+					float num2 = Mathf.Max(vector.x, vector2.x);
+					float num3 = (float)Screen.height - Mathf.Max(vector.y, vector2.y);
+					float num4 = (float)Screen.height - Mathf.Min(vector.y, vector2.y);
+					sb.Append($" rect={num:F0},{num3:F0}-{num2:F0},{num4:F0}({num2 - num:F0}x{num4 - num3:F0})");
+					sb.Append($" local=sz{rectTransform.sizeDelta.x:F0}x{rectTransform.sizeDelta.y:F0} ap{rectTransform.anchoredPosition.x:F0},{rectTransform.anchoredPosition.y:F0} an{rectTransform.anchorMin.x:F2},{rectTransform.anchorMin.y:F2}-{rectTransform.anchorMax.x:F2},{rectTransform.anchorMax.y:F2}");
+					float z = rectTransform.localRotation.eulerAngles.z;
+					if (Mathf.Abs(z) > 0.5f && Mathf.Abs(z - 360f) > 0.5f)
+					{
+						sb.Append($" rot={z:F0}");
+					}
+					if (rectTransform.localScale != Vector3.one)
+					{
+						sb.Append($" scale={rectTransform.localScale.x:F2},{rectTransform.localScale.y:F2}");
+					}
+					CanvasGroup component = gameObject.GetComponent<CanvasGroup>();
+					if (component != null && component.alpha < 0.99f)
+					{
+						sb.Append($" alpha={component.alpha:F2}");
+					}
+				}
+				Text component2 = gameObject.GetComponent<Text>();
+				if (component2 != null)
+				{
+					float num5 = ((rectTransform != null) ? rectTransform.rect.width : 0f);
+					float num6 = ((rectTransform != null) ? rectTransform.rect.height : 0f);
+					float num7 = 0f;
+					float num8 = 0f;
+					try
+					{
+						num7 = component2.preferredWidth;
+						num8 = component2.preferredHeight;
+					}
+					catch
+					{
+					}
+					sb.Append($" | T:\"{Esc(component2.text)}\" fs={component2.fontSize}");
+					if (component2.resizeTextForBestFit)
+					{
+						sb.Append($" bf={component2.resizeTextMinSize}-{component2.resizeTextMaxSize}");
+					}
+					sb.Append(string.Format(" al={0} h={1} v={2} ls={3:F2} font={4} pref={5:F0}x{6:F0}", component2.alignment, component2.horizontalOverflow, component2.verticalOverflow, component2.lineSpacing, (component2.font != null) ? component2.font.name : "null", num7, num8));
+					LeanLocalizedText component3 = gameObject.GetComponent<LeanLocalizedText>();
+					if (component3 != null)
+					{
+						sb.Append(" key=").Append(component3.TranslationName);
+					}
+					if (!string.IsNullOrEmpty(component2.text))
+					{
+						if (component2.horizontalOverflow == HorizontalWrapMode.Overflow && num7 > num5 + 1f)
+						{
+							sb.Append(" !H-OVERFLOW");
+						}
+						if (component2.horizontalOverflow == HorizontalWrapMode.Wrap && component2.verticalOverflow == VerticalWrapMode.Truncate && num8 > num6 + 1f && !component2.resizeTextForBestFit)
+						{
+							sb.Append(" !V-CLIPPED");
+						}
+						if (component2.horizontalOverflow == HorizontalWrapMode.Wrap && component2.verticalOverflow == VerticalWrapMode.Overflow && num8 > num6 + 1f)
+						{
+							sb.Append(" !V-OVERFLOW");
+						}
+						if (num5 > 0f && num5 < 40f && component2.horizontalOverflow == HorizontalWrapMode.Wrap && component2.text.Length > 1)
+						{
+							sb.Append(" !NARROW-VERTICAL");
+						}
+					}
+				}
+				TMP_Text component4 = gameObject.GetComponent<TMP_Text>();
+				if (component4 != null)
+				{
+					float num9 = ((rectTransform != null) ? rectTransform.rect.width : 0f);
+					if (rectTransform != null)
+					{
+						_ = rectTransform.rect.height;
+					}
+					float num10 = 0f;
+					float num11 = 0f;
+					int num12 = 0;
+					bool flag = false;
+					try
+					{
+						num10 = component4.preferredWidth;
+						num11 = component4.preferredHeight;
+						num12 = ((component4.textInfo != null) ? component4.textInfo.lineCount : 0);
+						flag = component4.isTextOverflowing;
+					}
+					catch
+					{
+					}
+					sb.Append($" | TMP:\"{Esc(component4.text)}\" fs={component4.fontSize:F1}");
+					if (component4.enableAutoSizing)
+					{
+						sb.Append($" auto={component4.fontSizeMin:F0}-{component4.fontSizeMax:F0}");
+					}
+					sb.Append(string.Format(" al={0} ov={1} wrap={2} font={3} pref={4:F0}x{5:F0} lines={6}", component4.alignment, component4.overflowMode, component4.enableWordWrapping, (component4.font != null) ? component4.font.name : "null", num10, num11, num12));
+					LeanLocalizedTextMeshProUGUI component5 = gameObject.GetComponent<LeanLocalizedTextMeshProUGUI>();
+					if (component5 != null)
+					{
+						sb.Append(" key=").Append(component5.TranslationName);
+					}
+					if (flag)
+					{
+						sb.Append(" !TMP-OVERFLOW");
+					}
+					if (num9 > 0f && num9 < 40f && component4.enableWordWrapping && !string.IsNullOrEmpty(component4.text) && component4.text.Length > 1)
+					{
+						sb.Append(" !NARROW-VERTICAL");
+					}
+				}
+				Image component6 = gameObject.GetComponent<Image>();
+				if (component6 != null)
+				{
+					sb.Append(string.Format(" | I:{0} type={1}", (component6.sprite != null) ? component6.sprite.name : "null", component6.type));
+					if (SpriteStore.IsOurs(component6.sprite))
+					{
+						sb.Append(" (replaced)");
+					}
+					if (!component6.enabled)
+					{
+						sb.Append(" (disabled)");
+					}
+				}
+				LayoutGroup component7 = gameObject.GetComponent<LayoutGroup>();
+				if (component7 != null)
+				{
+					sb.Append(" | ").Append(component7.GetType().Name);
+					if (component7 is HorizontalOrVerticalLayoutGroup horizontalOrVerticalLayoutGroup)
+					{
+						sb.Append($"(sp={horizontalOrVerticalLayoutGroup.spacing},pad={horizontalOrVerticalLayoutGroup.padding.left}/{horizontalOrVerticalLayoutGroup.padding.right}/{horizontalOrVerticalLayoutGroup.padding.top}/{horizontalOrVerticalLayoutGroup.padding.bottom},ctrl={B(horizontalOrVerticalLayoutGroup.childControlWidth)}{B(horizontalOrVerticalLayoutGroup.childControlHeight)},exp={B(horizontalOrVerticalLayoutGroup.childForceExpandWidth)}{B(horizontalOrVerticalLayoutGroup.childForceExpandHeight)},al={horizontalOrVerticalLayoutGroup.childAlignment})");
+					}
+					if (component7 is GridLayoutGroup gridLayoutGroup)
+					{
+						sb.Append($"(cell={gridLayoutGroup.cellSize.x}x{gridLayoutGroup.cellSize.y},sp={gridLayoutGroup.spacing.x},{gridLayoutGroup.spacing.y},{gridLayoutGroup.constraint}:{gridLayoutGroup.constraintCount},axis={gridLayoutGroup.startAxis})");
+					}
+				}
+				ContentSizeFitter component8 = gameObject.GetComponent<ContentSizeFitter>();
+				if (component8 != null)
+				{
+					sb.Append($" | CSF(h={component8.horizontalFit},v={component8.verticalFit})");
+				}
+				LayoutElement component9 = gameObject.GetComponent<LayoutElement>();
+				if (component9 != null)
+				{
+					sb.Append(string.Format(" | LE(min={0}x{1},pref={2}x{3},flex={4}x{5}{6})", component9.minWidth, component9.minHeight, component9.preferredWidth, component9.preferredHeight, component9.flexibleWidth, component9.flexibleHeight, component9.ignoreLayout ? ",ignore" : ""));
+				}
+				UIFixMarker component10 = gameObject.GetComponent<UIFixMarker>();
+				if (component10 != null && component10.AppliedOnce.Count > 0)
+				{
+					sb.Append(" | fixed:").Append(string.Join(",", component10.AppliedOnce.Select((int i) => (i >= Rules.Count) ? i.ToString() : Rules.All[i].ToString()).ToArray()));
+				}
+				sb.Append('\n');
+			}
+			for (int num13 = 0; num13 < t.childCount; num13++)
+			{
+				DumpTransform(t.GetChild(num13), sb, depth + 1, all);
+			}
+		}
+
+		private static string B(bool b)
+		{
+			if (!b)
+			{
+				return "0";
+			}
+			return "1";
+		}
+
+		private static string Esc(string s)
+		{
+			if (s == null)
+			{
+				return "";
+			}
+			s = s.Replace("\r", "").Replace("\n", "\\n").Replace("\"", "'");
+			if (s.Length <= 70)
+			{
+				return s;
+			}
+			return s.Substring(0, 70) + "…";
+		}
+
+		public static string ComponentList(GameObject go)
+		{
+			Component[] components = go.GetComponents<Component>();
+			List<string> list = new List<string>(components.Length);
+			Component[] array = components;
+			foreach (Component component in array)
+			{
+				if (component == null)
+				{
+					list.Add("<missing>");
+					continue;
+				}
+				string item = component.GetType().Name;
+				if (!_skip.Contains(item))
+				{
+					list.Add(item);
+				}
+			}
+			return string.Join(",", list.ToArray());
+		}
+	}
+	public static class FontMap
+	{
+		private class Config
+		{
+			public Dictionary<string, string[]> map = new Dictionary<string, string[]>();
+
+			public Dictionary<string, float> sizeScale = new Dictionary<string, float>();
+
+			public bool enabled = true;
+		}
+
+		private static Config _cfg = new Config();
+
+		private static readonly Dictionary<string, Font> _resolved = new Dictionary<string, Font>();
+
+		private static readonly HashSet<int> _ourFonts = new HashSet<int>();
+
+		public static int Applications;
+
+		public static int Count => _cfg.map.Count;
+
+		public static void Load(string dir)
+		{
+			string path = Path.Combine(dir, "fonts.json");
+			Config cfg = new Config();
+			if (File.Exists(path))
+			{
+				try
+				{
+					cfg = JsonConvert.DeserializeObject<Config>(File.ReadAllText(path)) ?? new Config();
+				}
+				catch (Exception ex)
+				{
+					Plugin.Log.LogError("fonts.json parse failed: " + ex.Message);
+				}
+			}
+			_cfg = cfg;
+			_resolved.Clear();
+		}
+
+		public static bool IsOurs(Font f)
+		{
+			if (f != null)
+			{
+				return _ourFonts.Contains(f.GetInstanceID());
+			}
+			return false;
+		}
+
+		private static Font Resolve(string gameFont)
+		{
+			if (_resolved.TryGetValue(gameFont, out var value) && value != null)
+			{
+				return value;
+			}
+			if (!_cfg.map.TryGetValue(gameFont, out var value2) || value2 == null)
+			{
+				return null;
+			}
+			HashSet<string> hashSet = new HashSet<string>(Font.GetOSInstalledFontNames(), StringComparer.OrdinalIgnoreCase);
+			string[] array = value2;
+			bool isEnabled;
+			foreach (string text in array)
+			{
+				if (string.IsNullOrEmpty(text) || !hashSet.Contains(text))
+				{
+					continue;
+				}
+				value = RuleApplier.GetOsFont(text);
+				if (value != null)
+				{
+					_resolved[gameFont] = value;
+					_ourFonts.Add(value.GetInstanceID());
+					ManualLogSource log = Plugin.Log;
+					BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(14, 2, out isEnabled);
+					if (isEnabled)
+					{
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Font map: ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(gameFont);
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" -> ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(text);
+					}
+					log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+					return value;
+				}
+			}
+			_resolved[gameFont] = null;
+			ManualLogSource log2 = Plugin.Log;
+			BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(40, 2, out isEnabled);
+			if (isEnabled)
+			{
+				bepInExWarningLogInterpolatedStringHandler.AppendLiteral("Font map: no installed candidate for ");
+				bepInExWarningLogInterpolatedStringHandler.AppendFormatted(gameFont);
+				bepInExWarningLogInterpolatedStringHandler.AppendLiteral(" (");
+				bepInExWarningLogInterpolatedStringHandler.AppendFormatted(string.Join(", ", value2));
+				bepInExWarningLogInterpolatedStringHandler.AppendLiteral(")");
+			}
+			log2.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+			return null;
+		}
+
+		public static bool Apply(Text t)
+		{
+			if (!_cfg.enabled || !Plugin.CfgEnabled.Value || t == null || t.font == null)
+			{
+				return false;
+			}
+			Font font = t.font;
+			if (_ourFonts.Contains(font.GetInstanceID()))
+			{
+				return false;
+			}
+			Font font2 = Resolve(font.name);
+			if (font2 == null)
+			{
+				return false;
+			}
+			UIFixMarker uIFixMarker = t.GetComponent<UIFixMarker>();
+			if (uIFixMarker == null)
+			{
+				uIFixMarker = t.gameObject.AddComponent<UIFixMarker>();
+				uIFixMarker.hideFlags = HideFlags.HideAndDontSave;
+			}
+			uIFixMarker.CaptureText(t);
+			t.font = font2;
+			if (!uIFixMarker.FontScaleApplied && _cfg.sizeScale != null && _cfg.sizeScale.TryGetValue(font.name, out var value) && Math.Abs(value - 1f) > 0.001f)
+			{
+				t.fontSize = Mathf.Max(1, Mathf.RoundToInt((float)uIFixMarker.OFontSize * value));
+				uIFixMarker.FontScaleApplied = true;
+			}
+			Applications++;
+			return true;
+		}
+	}
+	public static class Hooks
+	{
+		[ThreadStatic]
+		private static bool _inFontSetter;
+
+		[ThreadStatic]
+		private static bool _inTextSetter;
+
+		[ThreadStatic]
+		private static bool _inSpriteSetter;
+
+		public static void Patch(Harmony h)
+		{
+			PatchPostfix(h, typeof(Text), "OnEnable", "OnEnable_Component");
+			PatchPostfix(h, typeof(TextMeshProUGUI), "OnEnable", "OnEnable_Component");
+			PatchPostfix(h, typeof(Image), "OnEnable", "OnEnable_Component");
+			PatchPostfix(h, typeof(LayoutGroup), "OnEnable", "OnEnable_Component");
+			PatchPostfix(h, typeof(ContentSizeFitter), "OnEnable", "OnEnable_Component");
+			PatchPostfix(h, typeof(LayoutElement), "OnEnable", "OnEnable_Component");
+			MethodInfo methodInfo = AccessTools.PropertySetter(typeof(Text), "text");
+			if (methodInfo != null)
+			{
+				h.Patch(methodInfo, null, new HarmonyMethod(typeof(Hooks), "Text_set_text_Postfix")
+				{
+					priority = 0
+				});
+			}
+			MethodInfo methodInfo2 = AccessTools.PropertySetter(typeof(TMP_Text), "text");
+			if (methodInfo2 != null)
+			{
+				h.Patch(methodInfo2, null, new HarmonyMethod(typeof(Hooks), "TMP_set_text_Postfix")
+				{
+					priority = 0
+				});
+			}
+			MethodInfo methodInfo3 = AccessTools.PropertySetter(typeof(Image), "sprite");
+			if (methodInfo3 != null)
+			{
+				h.Patch(methodInfo3, null, new HarmonyMethod(typeof(Hooks), "Image_set_sprite_Postfix")
+				{
+					priority = 0
+				});
+			}
+			MethodInfo methodInfo4 = AccessTools.Method(typeof(LeanLocalizedTextMeshProUGUIFont), "UpdateTranslation");
+			if (methodInfo4 != null)
+			{
+				h.Patch(methodInfo4, null, new HarmonyMethod(typeof(Hooks), "LeanTmpFont_Postfix")
+				{
+					priority = 0
+				});
+			}
+			MethodInfo methodInfo5 = AccessTools.PropertySetter(typeof(Text), "font");
+			if (methodInfo5 != null)
+			{
+				h.Patch(methodInfo5, null, new HarmonyMethod(typeof(Hooks), "Text_set_font_Postfix")
+				{
+					priority = 0
+				});
+			}
+			MethodInfo methodInfo6 = AccessTools.Method(typeof(CombatActionButton), "FocusPanel");
+			if (methodInfo6 != null)
+			{
+				h.Patch(methodInfo6, new HarmonyMethod(typeof(Hooks), "CombatFocusPanel_Prefix"));
+			}
+			else
+			{
+				Plugin.Log.LogWarning("Hook target not found: CombatActionButton.FocusPanel (hover stays vertical)");
+			}
+		}
+
+		private static bool CombatFocusPanel_Prefix(CombatActionButton __instance)
+		{
+			try
+			{
+				if (!Plugin.CfgEnabled.Value)
+				{
+					return true;
+				}
+				float value = Plugin.CfgCombatHoverOffsetX.Value;
+				if (Mathf.Approximately(value, 0f))
+				{
+					return true;
+				}
+				Traverse traverse = Traverse.Create(__instance);
+				MovePanel value2 = traverse.Field("_movePanel").GetValue<MovePanel>();
+				if (value2 == null)
+				{
+					return true;
+				}
+				Vector3 originAnchoredPosition = value2.OriginAnchoredPosition;
+				originAnchoredPosition.x -= value;
+				float value3 = traverse.Field("_focusDuration").GetValue<float>();
+				Ease value4 = traverse.Field("_moveEase").GetValue<Ease>();
+				__instance.StartCoroutine(value2.LocalMoveTo(originAnchoredPosition, value3, value4));
+				return false;
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("combat hover hook failed, falling back to the game's own animation: " + ex);
+				return true;
+			}
+		}
+
+		private static void LeanTmpFont_Postfix(LeanLocalizedTextMeshProUGUIFont __instance)
+		{
+			try
+			{
+				if (!(__instance == null))
+				{
+					UIFixMarker component = __instance.GetComponent<UIFixMarker>();
+					if (component != null && component.HasOnTextChangeRule && !component.Reentrancy)
+					{
+						RuleApplier.Process(__instance.gameObject, fromTextChange: true);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("Lean TMP font hook failed: " + ex);
+			}
+		}
+
+		private static void Text_set_font_Postfix(Text __instance)
+		{
+			if (_inFontSetter)
+			{
+				return;
+			}
+			try
+			{
+				_inFontSetter = true;
+				FontMap.Apply(__instance);
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("font setter hook failed: " + ex);
+			}
+			finally
+			{
+				_inFontSetter = false;
+			}
+		}
+
+		private static void PatchPostfix(Harmony h, Type type, string method, string postfixName)
+		{
+			MethodInfo methodInfo = AccessTools.Method(type, method);
+			if (methodInfo == null)
+			{
+				ManualLogSource log = Plugin.Log;
+				bool isEnabled;
+				BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(24, 2, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("Hook target not found: ");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(type.Name);
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral(".");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(method);
+				}
+				log.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+			}
+			else
+			{
+				h.Patch(methodInfo, null, new HarmonyMethod(typeof(Hooks), postfixName)
+				{
+					priority = 0
+				});
+			}
+		}
+
+		private static void OnEnable_Component(Component __instance)
+		{
+			try
+			{
+				if (!(__instance == null))
+				{
+					GameObject gameObject = __instance.gameObject;
+					if (__instance is Image img)
+					{
+						SpriteStore.TryReplace(img);
+					}
+					if (__instance is Text t)
+					{
+						FontMap.Apply(t);
+					}
+					RuleApplier.Process(gameObject);
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("OnEnable hook failed: " + ex);
+			}
+		}
+
+		private static void Text_set_text_Postfix(Text __instance)
+		{
+			try
+			{
+				if (__instance == null)
+				{
+					return;
+				}
+				if (!_inTextSetter)
+				{
+					string text = __instance.text;
+					string text2 = StringOverrides.PostProcessDynamic(text);
+					if ((object)text2 != text)
+					{
+						try
+						{
+							_inTextSetter = true;
+							__instance.text = text2;
+						}
+						finally
+						{
+							_inTextSetter = false;
+						}
+					}
+				}
+				UIFixMarker component = __instance.GetComponent<UIFixMarker>();
+				if (component != null && component.HasOnTextChangeRule && !component.Reentrancy)
+				{
+					RuleApplier.Process(__instance.gameObject, fromTextChange: true);
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("text setter hook failed: " + ex);
+			}
+		}
+
+		private static void TMP_set_text_Postfix(TMP_Text __instance)
+		{
+			try
+			{
+				if (!(__instance == null))
+				{
+					UIFixMarker component = __instance.GetComponent<UIFixMarker>();
+					if (component != null && component.HasOnTextChangeRule && !component.Reentrancy)
+					{
+						RuleApplier.Process(__instance.gameObject, fromTextChange: true);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("TMP text setter hook failed: " + ex);
+			}
+		}
+
+		private static void Image_set_sprite_Postfix(Image __instance)
+		{
+			if (_inSpriteSetter)
+			{
+				return;
+			}
+			try
+			{
+				_inSpriteSetter = true;
+				SpriteStore.TryReplace(__instance);
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("sprite setter hook failed: " + ex);
+			}
+			finally
+			{
+				_inSpriteSetter = false;
+			}
+		}
+	}
+	public static class LanguagePatches
+	{
+		public static void Patch(Harmony h)
+		{
+			MethodInfo methodInfo = AccessTools.PropertyGetter(typeof(SystemSettings), "IsChineseLanguage");
+			MethodInfo methodInfo2 = AccessTools.PropertyGetter(typeof(SystemSettings), "IsKoreanLanguage");
+			if (methodInfo != null)
+			{
+				h.Patch(methodInfo, new HarmonyMethod(typeof(LanguagePatches), "IsChinese_Prefix"));
+			}
+			else
+			{
+				Plugin.Log.LogWarning("SystemSettings.IsChineseLanguage not found");
+			}
+			if (methodInfo2 != null)
+			{
+				h.Patch(methodInfo2, new HarmonyMethod(typeof(LanguagePatches), "IsKorean_Prefix"));
+			}
+			else
+			{
+				Plugin.Log.LogWarning("SystemSettings.IsKoreanLanguage not found");
+			}
+		}
+
+		private static bool IsChinese_Prefix(ref bool __result)
+		{
+			if (!Plugin.CfgEnabled.Value || !Plugin.CfgForceHorizontalBranches.Value)
+			{
+				return true;
+			}
+			__result = false;
+			return false;
+		}
+
+		private static bool IsKorean_Prefix(ref bool __result)
+		{
+			if (!Plugin.CfgEnabled.Value || !Plugin.CfgPretendKorean.Value)
+			{
+				return true;
+			}
+			__result = true;
+			return false;
+		}
+	}
+	public static class PathUtil
+	{
+		[ThreadStatic]
+		private static List<string> _parts;
+
+		public static string GetPath(Transform t)
+		{
+			if (t == null)
+			{
+				return "";
+			}
+			if (_parts == null)
+			{
+				_parts = new List<string>(24);
+			}
+			_parts.Clear();
+			Transform transform = t;
+			int num = 0;
+			while (transform != null && num++ < 128)
+			{
+				_parts.Add(transform.name);
+				transform = transform.parent;
+			}
+			StringBuilder stringBuilder = new StringBuilder(_parts.Count * 12);
+			for (int num2 = _parts.Count - 1; num2 >= 0; num2--)
+			{
+				stringBuilder.Append('/');
+				stringBuilder.Append(_parts[num2]);
+			}
+			return stringBuilder.ToString();
+		}
+
+		public static string GetPath(GameObject go)
+		{
+			if (!(go == null))
+			{
+				return GetPath(go.transform);
+			}
+			return "";
+		}
+
+		public static Transform FindByPath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+			{
+				return null;
+			}
+			path = path.Trim();
+			if (!path.StartsWith("/"))
+			{
+				path = "/" + path;
+			}
+			string[] array = path.Substring(1).Split('/');
+			foreach (Transform allRoot in GetAllRoots())
+			{
+				if (allRoot.name != array[0])
+				{
+					continue;
+				}
+				Transform transform = allRoot;
+				bool flag = true;
+				for (int i = 1; i < array.Length; i++)
+				{
+					Transform transform2 = FindChildExact(transform, array[i]);
+					if (transform2 == null)
+					{
+						flag = false;
+						break;
+					}
+					transform = transform2;
+				}
+				if (flag)
+				{
+					return transform;
+				}
+			}
+			return null;
+		}
+
+		private static Transform FindChildExact(Transform parent, string name)
+		{
+			int num = 0;
+			if (name.EndsWith("]"))
+			{
+				int num2 = name.LastIndexOf('[');
+				if (num2 > 0 && int.TryParse(name.Substring(num2 + 1, name.Length - num2 - 2), out var result))
+				{
+					num = result;
+					name = name.Substring(0, num2);
+				}
+			}
+			int num3 = 0;
+			for (int i = 0; i < parent.childCount; i++)
+			{
+				Transform child = parent.GetChild(i);
+				if (child.name == name)
+				{
+					if (num3 == num)
+					{
+						return child;
+					}
+					num3++;
+				}
+			}
+			return null;
+		}
+
+		public static List<Transform> GetAllRoots()
+		{
+			List<Transform> list = new List<Transform>();
+			HashSet<int> hashSet = new HashSet<int>();
+			for (int i = 0; i < SceneManager.sceneCount; i++)
+			{
+				Scene sceneAt = SceneManager.GetSceneAt(i);
+				if (!sceneAt.isLoaded)
+				{
+					continue;
+				}
+				GameObject[] rootGameObjects = sceneAt.GetRootGameObjects();
+				foreach (GameObject gameObject in rootGameObjects)
+				{
+					if (hashSet.Add(gameObject.GetInstanceID()))
+					{
+						list.Add(gameObject.transform);
+					}
+				}
+			}
+			Transform[] array = Resources.FindObjectsOfTypeAll<Transform>();
+			foreach (Transform transform in array)
+			{
+				if (!(transform == null) && !(transform.parent != null))
+				{
+					GameObject gameObject2 = transform.gameObject;
+					if (gameObject2.scene.IsValid() && gameObject2.scene.isLoaded && gameObject2.hideFlags == HideFlags.None && hashSet.Add(gameObject2.GetInstanceID()))
+					{
+						list.Add(transform);
+					}
+				}
+			}
+			return list;
+		}
+
+		public static IEnumerable<Transform> AllSceneTransforms()
+		{
+			Transform[] array = Resources.FindObjectsOfTypeAll<Transform>();
+			foreach (Transform transform in array)
+			{
+				if (!(transform == null))
+				{
+					GameObject gameObject = transform.gameObject;
+					if (gameObject.scene.IsValid() && gameObject.scene.isLoaded && gameObject.hideFlags == HideFlags.None)
+					{
+						yield return transform;
+					}
+				}
+			}
+		}
+	}
+	[BepInPlugin("lom.ui.english", "LOM_UI_EN", "0.1.0")]
+	public class Plugin : BaseUnityPlugin
+	{
+		public const string GUID = "lom.ui.english";
+
+		public const string NAME = "LOM_UI_EN";
+
+		public const string VERSION = "0.1.0";
+
+		public static ConfigEntry<bool> CfgEnabled;
+
+		public static ConfigEntry<bool> CfgForceHorizontalBranches;
+
+		public static ConfigEntry<bool> CfgPretendKorean;
+
+		public static ConfigEntry<bool> CfgSpriteReplace;
+
+		public static ConfigEntry<float> CfgCombatHoverOffsetX;
+
+		public static ConfigEntry<string> CfgTmpFallbackFont;
+
+		public static ConfigEntry<bool> CfgHarness;
+
+		public static ConfigEntry<bool> CfgVerbose;
+
+		public static ConfigEntry<KeyCode> CfgDumpKey;
+
+		public static ConfigEntry<KeyCode> CfgReloadKey;
+
+		private static readonly Queue<Action> _deferred = new Queue<Action>();
+
+		private Harmony _harmony;
+
+		private static bool _tmpFallbackDone;
+
+		private static int _tmpFallbackAttempts;
+
+		public static Plugin Instance { get; private set; }
+
+		public static ManualLogSource Log { get; private set; }
+
+		public static string PluginDir { get; private set; }
+
+		private void Awake()
+		{
+			Instance = this;
+			Log = base.Logger;
+			PluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			CfgEnabled = base.Config.Bind("General", "Enabled", defaultValue: true, "Master switch for the UI fix rules.");
+			CfgForceHorizontalBranches = base.Config.Bind("General", "ForceHorizontalLanguageBranches", defaultValue: true, "Make SystemSettings.IsChineseLanguage return false so the game uses its own horizontal-text code paths (game-over screen, CG descriptions, text size tables) built for the Korean release.");
+			CfgPretendKorean = base.Config.Bind("General", "PretendKorean", defaultValue: true, "Make SystemSettings.IsKoreanLanguage return true so TextSizePanel/TextLineSpacingPanel use the Korean (horizontal) size tables instead of the Chinese ones.");
+			CfgSpriteReplace = base.Config.Bind("General", "SpriteReplacement", defaultValue: true, "Replace baked-text sprites listed in sprites/spritemap.json.");
+			CfgCombatHoverOffsetX = base.Config.Bind("General", "CombatHoverOffsetX", 60f, "How far a combat action card slides when hovered, in pixels. The game moves it 100px UP, which suited the original horizontal row of narrow cards; the rules turn those into a vertical stack down the right edge, where sliding up makes a card overlap the one above it. A positive value here slides the card LEFT instead, out of the stack towards the battlefield. Set to 0 to keep the game's own upward slide.");
+			CfgTmpFallbackFont = base.Config.Bind("General", "TmpLatinFallbackFont", "SourceHanSerifTC-Bold", "Font registered as a global TextMeshPro fallback so TMP labels whose atlas has no Latin glyphs render properly. Name of one of the game's Font assets (recommended: SourceHanSerifTC-Bold, whose Latin glyphs are Source Serif) or of an existing TMP font asset. Empty = off.");
+			CfgVerbose = base.Config.Bind("General", "VerboseLog", defaultValue: false, "Log every rule application.");
+			CfgHarness = base.Config.Bind("Dev", "Harness", defaultValue: false, "Enable the file-driven dev harness (reads harness/cmd.txt, writes screenshots and hierarchy dumps to harness/out). Off for normal play.");
+			CfgDumpKey = base.Config.Bind("Dev", "DumpKey", KeyCode.F10, "Hotkey: dump active UI hierarchy + screenshot to harness/out.");
+			CfgReloadKey = base.Config.Bind("Dev", "ReloadKey", KeyCode.F11, "Hotkey: reload rules and sprites and re-apply to the live UI.");
+			try
+			{
+				Rules.Load(Path.Combine(PluginDir, "rules"));
+				SpriteStore.Load(Path.Combine(PluginDir, "sprites"));
+				FontMap.Load(PluginDir);
+			}
+			catch (Exception ex)
+			{
+				Log.LogError("Failed to load rules/sprites/fonts: " + ex);
+			}
+			try
+			{
+				_harmony = new Harmony("lom.ui.english");
+				Hooks.Patch(_harmony);
+				LanguagePatches.Patch(_harmony);
+				ManualLogSource log = Log;
+				bool isEnabled;
+				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(48, 5, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted("LOM_UI_EN");
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted("0.1.0");
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" loaded: ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Rules.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" rules, ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(SpriteStore.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" sprite replacements. Harness=");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(CfgHarness.Value ? "on" : "off");
+				}
+				log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+			}
+			catch (Exception ex2)
+			{
+				Log.LogError("Failed to apply Harmony patches: " + ex2);
+			}
+			SceneManager.sceneLoaded += OnSceneLoaded;
+			if (CfgHarness.Value)
+			{
+				Application.runInBackground = true;
+				base.gameObject.AddComponent<DevHarness>();
+				Log.LogInfo("Plugin dir: " + PluginDir + " runInBackground=" + Application.runInBackground);
+			}
+		}
+
+		private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+		{
+			if (CfgVerbose.Value)
+			{
+				Log.LogInfo("Scene loaded: " + scene.name);
+			}
+			EnsureTmpLatinFallback();
+			long callsAtStart = Rules.MatchCalls;
+			long testsAtStart = Rules.RegexTests;
+			int appsAtStart = RuleApplier.Applications;
+			Defer(delegate
+			{
+				Stopwatch stopwatch = Stopwatch.StartNew();
+				RuleApplier.ApplyToAll(includeInactive: true);
+				stopwatch.Stop();
+				Log.LogInfo($"scene '{scene.name}': rule pass {stopwatch.ElapsedMilliseconds} ms ({Rules.MatchCalls - callsAtStart} lookups, {Rules.RegexTests - testsAtStart} regex tests, {RuleApplier.Applications - appsAtStart} rules applied)");
+			});
+		}
+
+		private static void EnsureTmpLatinFallback()
+		{
+			if (_tmpFallbackDone || !CfgEnabled.Value)
+			{
+				return;
+			}
+			string value = CfgTmpFallbackFont.Value;
+			if (string.IsNullOrEmpty(value))
+			{
+				_tmpFallbackDone = true;
+				return;
+			}
+			try
+			{
+				TMP_FontAsset tmpFont = RuleApplier.GetTmpFont(value);
+				if (tmpFont == null)
+				{
+					if (++_tmpFallbackAttempts >= 8)
+					{
+						Log.LogWarning("TMP Latin fallback: giving up on " + value);
+						_tmpFallbackDone = true;
+					}
+					return;
+				}
+				List<TMP_FontAsset> list = TMP_Settings.fallbackFontAssets;
+				if (list == null)
+				{
+					list = new List<TMP_FontAsset>();
+					FieldInfo fieldInfo = AccessTools.Field(typeof(TMP_Settings), "m_fallbackFontAssets");
+					if (fieldInfo == null)
+					{
+						Log.LogWarning("TMP_Settings.m_fallbackFontAssets not found");
+						_tmpFallbackDone = true;
+						return;
+					}
+					fieldInfo.SetValue(TMP_Settings.instance, list);
+				}
+				if (!list.Contains(tmpFont))
+				{
+					list.Insert(0, tmpFont);
+				}
+				_tmpFallbackDone = true;
+				Log.LogInfo("TMP global Latin fallback font: " + value);
+			}
+			catch (Exception ex)
+			{
+				Log.LogWarning("TMP fallback setup failed: " + ex.Message);
+				_tmpFallbackDone = true;
+			}
+		}
+
+		public static void Defer(Action a)
+		{
+			lock (_deferred)
+			{
+				_deferred.Enqueue(a);
+			}
+		}
+
+		private void Update()
+		{
+			if (_deferred.Count > 0)
+			{
+				Action[] array;
+				lock (_deferred)
+				{
+					array = _deferred.ToArray();
+					_deferred.Clear();
+				}
+				Action[] array2 = array;
+				foreach (Action action in array2)
+				{
+					try
+					{
+						action();
+					}
+					catch (Exception ex)
+					{
+						Log.LogError("Deferred action failed: " + ex);
+					}
+				}
+			}
+			if (Input.GetKeyDown(CfgReloadKey.Value))
+			{
+				Reload();
+			}
+			if (Input.GetKeyDown(CfgDumpKey.Value))
+			{
+				(GetComponent<DevHarness>() ?? base.gameObject.AddComponent<DevHarness>()).HotkeyDump();
+			}
+		}
+
+		public static void Reload()
+		{
+			try
+			{
+				Rules.Load(Path.Combine(PluginDir, "rules"));
+				SpriteStore.Load(Path.Combine(PluginDir, "sprites"));
+				FontMap.Load(PluginDir);
+				StringOverrides.Load();
+				StringOverrides.Refresh();
+				RuleApplier.ResetAllMarkers();
+				RuleApplier.ApplyToAll(includeInactive: true);
+				Text[] array = Resources.FindObjectsOfTypeAll<Text>();
+				foreach (Text text in array)
+				{
+					if (text != null && text.gameObject.scene.IsValid())
+					{
+						FontMap.Apply(text);
+					}
+				}
+				ManualLogSource log = Log;
+				bool isEnabled;
+				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(51, 3, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Reloaded: ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Rules.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" rules, ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(SpriteStore.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" sprite replacements, ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(FontMap.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" font maps.");
+				}
+				log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+			}
+			catch (Exception ex)
+			{
+				Log.LogError("Reload failed: " + ex);
+			}
+		}
+	}
+	public class UIFixMarker : MonoBehaviour
+	{
+		public int RulesVersion = -1;
+
+		public string Path;
+
+		public HashSet<int> AppliedOnce = new HashSet<int>();
+
+		public bool HasOnTextChangeRule;
+
+		public List<Rule> Matches;
+
+		public bool MatchesResolved;
+
+		public Transform PathParent;
+
+		public Transform PathRoot;
+
+		public bool Reentrancy;
+
+		public bool FontScaleApplied;
+
+		public bool HasRectOriginal;
+
+		public Vector2 OAnchorMin;
+
+		public Vector2 OAnchorMax;
+
+		public Vector2 OAnchoredPos;
+
+		public Vector2 OSizeDelta;
+
+		public Vector2 OPivot;
+
+		public Quaternion ORotation;
+
+		public Vector3 OScale;
+
+		public bool HasTextOriginal;
+
+		public int OFontSize;
+
+		public bool OBestFit;
+
+		public int OMin;
+
+		public int OMax;
+
+		public TextAnchor OAlign;
+
+		public HorizontalWrapMode OHWrap;
+
+		public VerticalWrapMode OVWrap;
+
+		public float OLineSpacing;
+
+		public Font OFont;
+
+		public FontStyle OFontStyle;
+
+		public Color OColor;
+
+		public bool HasTmpOriginal;
+
+		public float OTmpSize;
+
+		public bool OTmpAuto;
+
+		public float OTmpMin;
+
+		public float OTmpMax;
+
+		public TextAlignmentOptions OTmpAlign;
+
+		public TextOverflowModes OTmpOverflow;
+
+		public bool OTmpWrap;
+
+		public Vector4 OTmpMargin;
+
+		public float OTmpChar;
+
+		public float OTmpWord;
+
+		public float OTmpLine;
+
+		public float OTmpPara;
+
+		public Color OTmpColor;
+
+		public TMP_FontAsset OTmpFont;
+
+		public TMP_Style OTmpStyle;
+
+		public bool HasImageOriginal;
+
+		public Sprite OSprite;
+
+		public Color OImageColor;
+
+		public bool OPreserveAspect;
+
+		public Image.Type OImageType;
+
+		public bool OImageEnabled;
+
+		public bool HasActiveOriginal;
+
+		public bool OActive;
+
+		public void SetPath(string path, Transform t)
+		{
+			Path = path;
+			PathParent = t.parent;
+			PathRoot = t.root;
+		}
+
+		public bool HasMoved(Transform t)
+		{
+			if (Path != null)
+			{
+				if (!(PathParent != t.parent))
+				{
+					return PathRoot != t.root;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public void CaptureRect(RectTransform rt)
+		{
+			if (!HasRectOriginal && !(rt == null))
+			{
+				HasRectOriginal = true;
+				OAnchorMin = rt.anchorMin;
+				OAnchorMax = rt.anchorMax;
+				OAnchoredPos = rt.anchoredPosition;
+				OSizeDelta = rt.sizeDelta;
+				OPivot = rt.pivot;
+				ORotation = rt.localRotation;
+				OScale = rt.localScale;
+			}
+		}
+
+		public void CaptureText(Text t)
+		{
+			if (!HasTextOriginal && !(t == null))
+			{
+				HasTextOriginal = true;
+				OFontSize = t.fontSize;
+				OBestFit = t.resizeTextForBestFit;
+				OMin = t.resizeTextMinSize;
+				OMax = t.resizeTextMaxSize;
+				OAlign = t.alignment;
+				OHWrap = t.horizontalOverflow;
+				OVWrap = t.verticalOverflow;
+				OLineSpacing = t.lineSpacing;
+				OFont = t.font;
+				OFontStyle = t.fontStyle;
+				OColor = t.color;
+			}
+		}
+
+		public void CaptureTmp(TMP_Text t)
+		{
+			if (!HasTmpOriginal && !(t == null))
+			{
+				HasTmpOriginal = true;
+				OTmpSize = t.fontSize;
+				OTmpAuto = t.enableAutoSizing;
+				OTmpMin = t.fontSizeMin;
+				OTmpMax = t.fontSizeMax;
+				OTmpAlign = t.alignment;
+				OTmpOverflow = t.overflowMode;
+				OTmpWrap = t.enableWordWrapping;
+				OTmpMargin = t.margin;
+				OTmpChar = t.characterSpacing;
+				OTmpWord = t.wordSpacing;
+				OTmpLine = t.lineSpacing;
+				OTmpPara = t.paragraphSpacing;
+				OTmpColor = t.color;
+				OTmpFont = t.font;
+				OTmpStyle = t.textStyle;
+			}
+		}
+
+		public void CaptureImage(Image img)
+		{
+			if (!HasImageOriginal && !(img == null))
+			{
+				HasImageOriginal = true;
+				OSprite = img.sprite;
+				OImageColor = img.color;
+				OPreserveAspect = img.preserveAspect;
+				OImageType = img.type;
+				OImageEnabled = img.enabled;
+			}
+		}
+
+		public void Restore()
+		{
+			try
+			{
+				RectTransform component = GetComponent<RectTransform>();
+				if (HasRectOriginal && component != null)
+				{
+					component.anchorMin = OAnchorMin;
+					component.anchorMax = OAnchorMax;
+					component.anchoredPosition = OAnchoredPos;
+					component.sizeDelta = OSizeDelta;
+					component.pivot = OPivot;
+					component.localRotation = ORotation;
+					component.localScale = OScale;
+				}
+				Text component2 = GetComponent<Text>();
+				if (HasTextOriginal && component2 != null)
+				{
+					component2.fontSize = OFontSize;
+					component2.resizeTextForBestFit = OBestFit;
+					component2.resizeTextMinSize = OMin;
+					component2.resizeTextMaxSize = OMax;
+					component2.alignment = OAlign;
+					component2.horizontalOverflow = OHWrap;
+					component2.verticalOverflow = OVWrap;
+					component2.lineSpacing = OLineSpacing;
+					if (OFont != null)
+					{
+						component2.font = OFont;
+					}
+					component2.fontStyle = OFontStyle;
+					component2.color = OColor;
+				}
+				TMP_Text component3 = GetComponent<TMP_Text>();
+				if (HasTmpOriginal && component3 != null)
+				{
+					component3.fontSize = OTmpSize;
+					component3.enableAutoSizing = OTmpAuto;
+					component3.fontSizeMin = OTmpMin;
+					component3.fontSizeMax = OTmpMax;
+					component3.alignment = OTmpAlign;
+					component3.overflowMode = OTmpOverflow;
+					component3.enableWordWrapping = OTmpWrap;
+					component3.margin = OTmpMargin;
+					component3.characterSpacing = OTmpChar;
+					component3.wordSpacing = OTmpWord;
+					component3.lineSpacing = OTmpLine;
+					component3.paragraphSpacing = OTmpPara;
+					component3.color = OTmpColor;
+					if (OTmpFont != null)
+					{
+						component3.font = OTmpFont;
+					}
+					if (OTmpStyle != null)
+					{
+						component3.textStyle = OTmpStyle;
+					}
+				}
+				Image component4 = GetComponent<Image>();
+				if (HasImageOriginal && component4 != null)
+				{
+					component4.sprite = OSprite;
+					component4.color = OImageColor;
+					component4.preserveAspect = OPreserveAspect;
+					component4.type = OImageType;
+					component4.enabled = OImageEnabled;
+				}
+				if (HasActiveOriginal)
+				{
+					base.gameObject.SetActive(OActive);
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("Restore failed for " + Path + ": " + ex.Message);
+			}
+			AppliedOnce.Clear();
+			Matches = null;
+			MatchesResolved = false;
+			FontScaleApplied = false;
+			RulesVersion = -1;
+		}
+	}
+	public static class RuleApplier
+	{
+		private static readonly Dictionary<string, Font> _osFonts = new Dictionary<string, Font>();
+
+		public static int Applications;
+
+		private static readonly Dictionary<string, TMP_FontAsset> _tmpFonts = new Dictionary<string, TMP_FontAsset>();
+
+		private static readonly HashSet<string> _tmpFontUnbuildable = new HashSet<string>(StringComparer.Ordinal);
+
+		public static void Process(GameObject go, bool fromTextChange = false)
+		{
+			if (!Plugin.CfgEnabled.Value || go == null)
+			{
+				return;
+			}
+			try
+			{
+				ProcessSingle(go, fromTextChange);
+				if (!fromTextChange)
+				{
+					Transform parent = go.transform.parent;
+					int num = 0;
+					while (parent != null && num++ < 64)
+					{
+						ProcessSingle(parent.gameObject, fromTextChange: false, ancestorsOnly: true);
+						parent = parent.parent;
+					}
+				}
+			}
+			catch (Exception t)
+			{
+				ManualLogSource log = Plugin.Log;
+				bool isEnabled;
+				BepInExErrorLogInterpolatedStringHandler bepInExErrorLogInterpolatedStringHandler = new BepInExErrorLogInterpolatedStringHandler(29, 2, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExErrorLogInterpolatedStringHandler.AppendLiteral("Rule processing failed for ");
+					bepInExErrorLogInterpolatedStringHandler.AppendFormatted(PathUtil.GetPath(go));
+					bepInExErrorLogInterpolatedStringHandler.AppendLiteral(": ");
+					bepInExErrorLogInterpolatedStringHandler.AppendFormatted(t);
+				}
+				log.LogError(bepInExErrorLogInterpolatedStringHandler);
+			}
+		}
+
+		private static void ProcessSingle(GameObject go, bool fromTextChange, bool ancestorsOnly = false)
+		{
+			UIFixMarker uIFixMarker = go.GetComponent<UIFixMarker>();
+			if (uIFixMarker != null && uIFixMarker.RulesVersion == Rules.Version && uIFixMarker.HasMoved(go.transform))
+			{
+				uIFixMarker.RulesVersion = -1;
+				uIFixMarker.Matches = null;
+				uIFixMarker.MatchesResolved = false;
+			}
+			if (ancestorsOnly && uIFixMarker != null && uIFixMarker.RulesVersion == Rules.Version)
+			{
+				return;
+			}
+			int num;
+			string path;
+			if (uIFixMarker != null)
+			{
+				num = ((uIFixMarker.RulesVersion == Rules.Version) ? 1 : 0);
+				if (num != 0 && uIFixMarker.Path != null)
+				{
+					path = uIFixMarker.Path;
+					goto IL_008c;
+				}
+			}
+			else
+			{
+				num = 0;
+			}
+			path = PathUtil.GetPath(go);
+			goto IL_008c;
+			IL_008c:
+			string text = path;
+			List<Rule> list;
+			if (num != 0 && uIFixMarker.MatchesResolved)
+			{
+				list = uIFixMarker.Matches;
+			}
+			else
+			{
+				list = Rules.Match(text);
+				if (uIFixMarker != null)
+				{
+					uIFixMarker.Matches = list;
+					uIFixMarker.MatchesResolved = true;
+				}
+			}
+			if (list == null)
+			{
+				if (uIFixMarker != null)
+				{
+					uIFixMarker.RulesVersion = Rules.Version;
+					uIFixMarker.SetPath(text, go.transform);
+					uIFixMarker.Matches = null;
+					uIFixMarker.MatchesResolved = true;
+				}
+				else if (ancestorsOnly)
+				{
+					UIFixMarker uIFixMarker2 = go.AddComponent<UIFixMarker>();
+					uIFixMarker2.hideFlags = HideFlags.HideAndDontSave;
+					uIFixMarker2.RulesVersion = Rules.Version;
+					uIFixMarker2.SetPath(text, go.transform);
+					uIFixMarker2.Matches = null;
+					uIFixMarker2.MatchesResolved = true;
+				}
+				return;
+			}
+			if (uIFixMarker == null)
+			{
+				uIFixMarker = go.AddComponent<UIFixMarker>();
+				uIFixMarker.hideFlags = HideFlags.HideAndDontSave;
+			}
+			if (uIFixMarker.Reentrancy)
+			{
+				return;
+			}
+			uIFixMarker.Reentrancy = true;
+			try
+			{
+				if (uIFixMarker.RulesVersion != Rules.Version)
+				{
+					uIFixMarker.AppliedOnce.Clear();
+					uIFixMarker.RulesVersion = Rules.Version;
+					uIFixMarker.SetPath(text, go.transform);
+					uIFixMarker.HasOnTextChangeRule = false;
+				}
+				bool touchedLayout = false;
+				foreach (Rule item in list)
+				{
+					if (item.onTextChange)
+					{
+						uIFixMarker.HasOnTextChangeRule = true;
+					}
+					if ((fromTextChange && !item.onTextChange) || (!fromTextChange && !item.always && !item.onTextChange && uIFixMarker.AppliedOnce.Contains(item.Index)))
+					{
+						continue;
+					}
+					Apply(go, uIFixMarker, item, ref touchedLayout);
+					uIFixMarker.AppliedOnce.Add(item.Index);
+					Applications++;
+					if (Plugin.CfgVerbose.Value)
+					{
+						ManualLogSource log = Plugin.Log;
+						bool isEnabled;
+						BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(14, 2, out isEnabled);
+						if (isEnabled)
+						{
+							bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Applied [");
+							bepInExInfoLogInterpolatedStringHandler.AppendFormatted(item);
+							bepInExInfoLogInterpolatedStringHandler.AppendLiteral("] to ");
+							bepInExInfoLogInterpolatedStringHandler.AppendFormatted(text);
+						}
+						log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+					}
+				}
+				if (touchedLayout)
+				{
+					RectTransform rectTransform = go.transform as RectTransform;
+					if (rectTransform != null)
+					{
+						LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
+					}
+					RectTransform rectTransform2 = go.transform.parent as RectTransform;
+					if (rectTransform2 != null)
+					{
+						LayoutRebuilder.MarkLayoutForRebuild(rectTransform2);
+					}
+				}
+			}
+			finally
+			{
+				uIFixMarker.Reentrancy = false;
+			}
+		}
+
+		public static void ApplyToAll(bool includeInactive)
+		{
+			if (!Plugin.CfgEnabled.Value)
+			{
+				return;
+			}
+			int num = 0;
+			foreach (Transform item in PathUtil.AllSceneTransforms())
+			{
+				if (item is RectTransform && (includeInactive || item.gameObject.activeInHierarchy))
+				{
+					ProcessSingle(item.gameObject, fromTextChange: false);
+					num++;
+				}
+			}
+			if (Plugin.CfgVerbose.Value)
+			{
+				ManualLogSource log = Plugin.Log;
+				bool isEnabled;
+				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(35, 1, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral("ApplyToAll visited ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(num);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" rect transforms");
+				}
+				log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+			}
+		}
+
+		public static void ResetAllMarkers()
+		{
+			UIFixMarker[] array = Resources.FindObjectsOfTypeAll<UIFixMarker>();
+			foreach (UIFixMarker uIFixMarker in array)
+			{
+				if (!(uIFixMarker == null))
+				{
+					uIFixMarker.Restore();
+				}
+			}
+		}
+
+		private static void Apply(GameObject go, UIFixMarker m, Rule r, ref bool touchedLayout)
+		{
+			if (r.active.HasValue)
+			{
+				if (!m.HasActiveOriginal)
+				{
+					m.HasActiveOriginal = true;
+					m.OActive = go.activeSelf;
+				}
+				if (go.activeSelf != r.active.Value)
+				{
+					go.SetActive(r.active.Value);
+				}
+			}
+			if (r.rect != null)
+			{
+				RectTransform rectTransform = go.transform as RectTransform;
+				if (rectTransform != null)
+				{
+					m.CaptureRect(rectTransform);
+					ApplyRect(rectTransform, m, r.rect);
+					touchedLayout = true;
+				}
+			}
+			if (r.text != null)
+			{
+				Text component = go.GetComponent<Text>();
+				if (component != null)
+				{
+					m.CaptureText(component);
+					ApplyText(component, m, r.text);
+					touchedLayout = true;
+				}
+			}
+			if (r.tmp != null)
+			{
+				TMP_Text component2 = go.GetComponent<TMP_Text>();
+				if (component2 != null)
+				{
+					m.CaptureTmp(component2);
+					ApplyTmp(component2, m, r.tmp);
+					touchedLayout = true;
+				}
+			}
+			if (r.layout != null)
+			{
+				ApplyLayout(go, r.layout);
+				touchedLayout = true;
+			}
+			if (r.grid != null)
+			{
+				ApplyGrid(go, r.grid);
+				touchedLayout = true;
+			}
+			if (r.fitter != null)
+			{
+				ApplyFitter(go, r.fitter);
+				touchedLayout = true;
+			}
+			if (r.layoutElement != null)
+			{
+				ApplyLayoutElement(go, r.layoutElement);
+				touchedLayout = true;
+			}
+			if (r.image != null)
+			{
+				Image component3 = go.GetComponent<Image>();
+				if (component3 != null)
+				{
+					m.CaptureImage(component3);
+					ApplyImage(component3, m, r.image);
+				}
+			}
+			if (r.movePanel != null)
+			{
+				ApplyMovePanel(go, r.movePanel);
+			}
+			if (r.rebuildLayout == false)
+			{
+				touchedLayout = false;
+			}
+		}
+
+		private static void ApplyRect(RectTransform rt, UIFixMarker m, RectRule rr)
+		{
+			if (rr.anchorMin != null)
+			{
+				rt.anchorMin = V2(rr.anchorMin);
+			}
+			if (rr.anchorMax != null)
+			{
+				rt.anchorMax = V2(rr.anchorMax);
+			}
+			if (rr.pivot != null)
+			{
+				rt.pivot = V2(rr.pivot);
+			}
+			if (rr.offsetMin != null)
+			{
+				rt.offsetMin = V2(rr.offsetMin);
+			}
+			if (rr.offsetMax != null)
+			{
+				rt.offsetMax = V2(rr.offsetMax);
+			}
+			if (rr.anchoredPos != null)
+			{
+				rt.anchoredPosition = V2(rr.anchoredPos);
+			}
+			if (rr.sizeDelta != null)
+			{
+				rt.sizeDelta = V2(rr.sizeDelta);
+			}
+			Vector2 anchoredPosition = rt.anchoredPosition;
+			Vector2 sizeDelta = rt.sizeDelta;
+			if (rr.x.HasValue)
+			{
+				anchoredPosition.x = rr.x.Value;
+			}
+			if (rr.y.HasValue)
+			{
+				anchoredPosition.y = rr.y.Value;
+			}
+			if (rr.width.HasValue)
+			{
+				sizeDelta.x = rr.width.Value;
+			}
+			if (rr.height.HasValue)
+			{
+				sizeDelta.y = rr.height.Value;
+			}
+			if (rr.dx.HasValue)
+			{
+				anchoredPosition.x = m.OAnchoredPos.x + rr.dx.Value;
+			}
+			if (rr.dy.HasValue)
+			{
+				anchoredPosition.y = m.OAnchoredPos.y + rr.dy.Value;
+			}
+			if (rr.dw.HasValue)
+			{
+				sizeDelta.x = m.OSizeDelta.x + rr.dw.Value;
+			}
+			if (rr.dh.HasValue)
+			{
+				sizeDelta.y = m.OSizeDelta.y + rr.dh.Value;
+			}
+			rt.anchoredPosition = anchoredPosition;
+			rt.sizeDelta = sizeDelta;
+			if (rr.scale != null)
+			{
+				rt.localScale = new Vector3(rr.scale[0], (rr.scale.Length > 1) ? rr.scale[1] : rr.scale[0], 1f);
+			}
+			if (rr.rotationZ.HasValue)
+			{
+				rt.localRotation = Quaternion.Euler(0f, 0f, rr.rotationZ.Value);
+			}
+			SyncMovePanel(rt);
+		}
+
+		private static void SyncMovePanel(RectTransform rt)
+		{
+			MovePanel component = rt.GetComponent<MovePanel>();
+			if (component == null)
+			{
+				return;
+			}
+			try
+			{
+				Traverse traverse = Traverse.Create(component);
+				Traverse traverse2 = traverse.Field("_originAnchoredPosition");
+				Traverse traverse3 = traverse.Field("_standbyAhcoredPosition");
+				Vector3 value = traverse2.GetValue<Vector3>();
+				Vector3 vector = traverse3.GetValue<Vector3>() - value;
+				Vector3 vector2 = rt.anchoredPosition;
+				traverse2.SetValue(vector2);
+				traverse3.SetValue(vector2 + vector);
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("MovePanel sync failed on " + rt.name + ": " + ex.Message);
+			}
+		}
+
+		private static void ApplyMovePanel(GameObject go, MovePanelRule mr)
+		{
+			if (mr.standbyOffset == null || mr.standbyOffset.Length < 2)
+			{
+				return;
+			}
+			MovePanel component = go.GetComponent<MovePanel>();
+			if (component == null)
+			{
+				return;
+			}
+			try
+			{
+				Vector3 vector = new Vector3(mr.standbyOffset[0], mr.standbyOffset[1], 0f);
+				Traverse traverse = Traverse.Create(component);
+				traverse.Field("_standbyOffset").SetValue(vector);
+				Vector3 value = traverse.Field("_originAnchoredPosition").GetValue<Vector3>();
+				traverse.Field("_standbyAhcoredPosition").SetValue(value + vector);
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("MovePanel offset failed on " + go.name + ": " + ex.Message);
+			}
+		}
+
+		private static void ApplyText(Text t, UIFixMarker m, TextRule tr)
+		{
+			if (tr.outline.HasValue)
+			{
+				Outline component = t.GetComponent<Outline>();
+				if (component != null && component.enabled != tr.outline.Value)
+				{
+					component.enabled = tr.outline.Value;
+				}
+			}
+			if (tr.fontSize.HasValue)
+			{
+				t.fontSize = Mathf.RoundToInt(tr.fontSize.Value);
+			}
+			if (tr.fontScale.HasValue)
+			{
+				t.fontSize = Mathf.Max(1, Mathf.RoundToInt((float)m.OFontSize * tr.fontScale.Value));
+			}
+			if (tr.bestFit.HasValue)
+			{
+				t.resizeTextForBestFit = tr.bestFit.Value;
+			}
+			if (tr.minSize.HasValue)
+			{
+				t.resizeTextMinSize = tr.minSize.Value;
+			}
+			if (tr.maxSize.HasValue)
+			{
+				t.resizeTextMaxSize = tr.maxSize.Value;
+			}
+			if (!string.IsNullOrEmpty(tr.alignment) && TryEnum<TextAnchor>(tr.alignment, out var value))
+			{
+				t.alignment = value;
+			}
+			if (!string.IsNullOrEmpty(tr.hOverflow) && TryEnum<HorizontalWrapMode>(tr.hOverflow, out var value2))
+			{
+				t.horizontalOverflow = value2;
+			}
+			if (!string.IsNullOrEmpty(tr.vOverflow) && TryEnum<VerticalWrapMode>(tr.vOverflow, out var value3))
+			{
+				t.verticalOverflow = value3;
+			}
+			if (tr.lineSpacing.HasValue)
+			{
+				t.lineSpacing = tr.lineSpacing.Value;
+			}
+			if (tr.richText.HasValue)
+			{
+				t.supportRichText = tr.richText.Value;
+			}
+			if (!string.IsNullOrEmpty(tr.fontStyle) && TryEnum<FontStyle>(tr.fontStyle, out var value4))
+			{
+				t.fontStyle = value4;
+			}
+			if (tr.raycastTarget.HasValue)
+			{
+				t.raycastTarget = tr.raycastTarget.Value;
+			}
+			if (!string.IsNullOrEmpty(tr.color) && TryColor(tr.color, out var c))
+			{
+				t.color = c;
+			}
+			if (!string.IsNullOrEmpty(tr.font))
+			{
+				if (tr.font.Equals("default", StringComparison.OrdinalIgnoreCase))
+				{
+					if (m.OFont != null)
+					{
+						t.font = m.OFont;
+					}
+				}
+				else
+				{
+					Font osFont = GetOsFont(tr.font);
+					if (osFont != null)
+					{
+						t.font = osFont;
+					}
+				}
+			}
+			if (tr.text != null)
+			{
+				t.text = tr.text;
+			}
+		}
+
+		private static void ApplyTmp(TMP_Text t, UIFixMarker m, TmpRule tr)
+		{
+			if (tr.fontSize.HasValue)
+			{
+				t.fontSize = tr.fontSize.Value;
+			}
+			if (tr.fontScale.HasValue)
+			{
+				t.fontSize = Mathf.Max(1f, m.OTmpSize * tr.fontScale.Value);
+			}
+			if (tr.autoSize.HasValue)
+			{
+				t.enableAutoSizing = tr.autoSize.Value;
+			}
+			if (tr.minSize.HasValue)
+			{
+				t.fontSizeMin = tr.minSize.Value;
+			}
+			if (tr.maxSize.HasValue)
+			{
+				t.fontSizeMax = tr.maxSize.Value;
+			}
+			if (!string.IsNullOrEmpty(tr.alignment) && TryEnum<TextAlignmentOptions>(tr.alignment, out var value))
+			{
+				t.alignment = value;
+			}
+			if (!string.IsNullOrEmpty(tr.overflow) && TryEnum<TextOverflowModes>(tr.overflow, out var value2))
+			{
+				t.overflowMode = value2;
+			}
+			if (tr.wordWrap.HasValue)
+			{
+				t.enableWordWrapping = tr.wordWrap.Value;
+			}
+			if (tr.margin != null && tr.margin.Length == 4)
+			{
+				t.margin = new Vector4(tr.margin[0], tr.margin[1], tr.margin[2], tr.margin[3]);
+			}
+			if (tr.charSpacing.HasValue)
+			{
+				t.characterSpacing = tr.charSpacing.Value;
+			}
+			if (tr.wordSpacing.HasValue)
+			{
+				t.wordSpacing = tr.wordSpacing.Value;
+			}
+			if (tr.lineSpacing.HasValue)
+			{
+				t.lineSpacing = tr.lineSpacing.Value;
+			}
+			if (tr.paragraphSpacing.HasValue)
+			{
+				t.paragraphSpacing = tr.paragraphSpacing.Value;
+			}
+			if (tr.richText.HasValue)
+			{
+				t.richText = tr.richText.Value;
+			}
+			if (tr.raycastTarget.HasValue)
+			{
+				t.raycastTarget = tr.raycastTarget.Value;
+			}
+			if (!string.IsNullOrEmpty(tr.color) && TryColor(tr.color, out var c))
+			{
+				t.color = c;
+			}
+			if (!string.IsNullOrEmpty(tr.font))
+			{
+				if (tr.font.Equals("default", StringComparison.OrdinalIgnoreCase))
+				{
+					if (m.OTmpFont != null)
+					{
+						t.font = m.OTmpFont;
+					}
+				}
+				else
+				{
+					TMP_FontAsset tmpFont = GetTmpFont(tr.font);
+					if (tmpFont != null)
+					{
+						t.font = tmpFont;
+					}
+				}
+			}
+			if (string.IsNullOrEmpty(tr.style))
+			{
+				return;
+			}
+			if (tr.style.Equals("default", StringComparison.OrdinalIgnoreCase))
+			{
+				if (m.OTmpStyle != null)
+				{
+					t.textStyle = m.OTmpStyle;
+				}
+			}
+			else if (tr.style.Equals("normal", StringComparison.OrdinalIgnoreCase) || tr.style.Equals("none", StringComparison.OrdinalIgnoreCase))
+			{
+				t.textStyle = TMP_Style.NormalStyle;
+			}
+			else
+			{
+				TMP_StyleSheet defaultStyleSheet = TMP_Settings.defaultStyleSheet;
+				TMP_Style tMP_Style = ((defaultStyleSheet != null) ? defaultStyleSheet.GetStyle(tr.style) : null);
+				if (tMP_Style != null)
+				{
+					t.textStyle = tMP_Style;
+				}
+				else
+				{
+					Plugin.Log.LogWarning("TMP style not found: " + tr.style);
+				}
+			}
+			t.SetAllDirty();
+		}
+
+		public static TMP_FontAsset GetTmpFont(string fontName)
+		{
+			if (_tmpFonts.TryGetValue(fontName, out var value) && value != null)
+			{
+				return value;
+			}
+			if (_tmpFontUnbuildable.Contains(fontName))
+			{
+				return null;
+			}
+			bool isEnabled;
+			try
+			{
+				TMP_FontAsset[] array = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+				foreach (TMP_FontAsset tMP_FontAsset in array)
+				{
+					if (tMP_FontAsset != null && tMP_FontAsset.name == fontName)
+					{
+						_tmpFonts[fontName] = tMP_FontAsset;
+						return tMP_FontAsset;
+					}
+				}
+				MethodInfo methodInfo = AccessTools.Method(typeof(TMP_FontAsset), "CreateFontAsset", new Type[1] { typeof(Font) });
+				if (methodInfo == null)
+				{
+					Plugin.Log.LogWarning("TMP_FontAsset.CreateFontAsset(Font) not available in this TMP version");
+					return null;
+				}
+				Font font = null;
+				Font[] array2 = Resources.FindObjectsOfTypeAll<Font>();
+				foreach (Font font2 in array2)
+				{
+					if (font2 != null && font2.name == fontName && !_osFonts.ContainsValue(font2))
+					{
+						font = font2;
+						break;
+					}
+				}
+				string text = "game font";
+				if (font == null)
+				{
+					font = GetOsFont(fontName);
+					text = "OS font";
+				}
+				if (font == null)
+				{
+					Plugin.Log.LogWarning("TMP font: no font named " + fontName);
+					return null;
+				}
+				value = methodInfo.Invoke(null, new object[1] { font }) as TMP_FontAsset;
+				if (value != null)
+				{
+					value.name = "LOM_UI_EN " + fontName + " SDF";
+					value.hideFlags = HideFlags.HideAndDontSave;
+					_tmpFonts[fontName] = value;
+					ManualLogSource log = Plugin.Log;
+					BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(24, 2, out isEnabled);
+					if (isEnabled)
+					{
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral("TMP font created from ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(text);
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral(": ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(fontName);
+					}
+					log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+				}
+				else
+				{
+					if (text == "OS font")
+					{
+						_tmpFontUnbuildable.Add(fontName);
+					}
+					ManualLogSource log2 = Plugin.Log;
+					BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(114, 2, out isEnabled);
+					if (isEnabled)
+					{
+						bepInExWarningLogInterpolatedStringHandler.AppendLiteral("TMP font: CreateFontAsset returned null for ");
+						bepInExWarningLogInterpolatedStringHandler.AppendFormatted(fontName);
+						bepInExWarningLogInterpolatedStringHandler.AppendLiteral(" (");
+						bepInExWarningLogInterpolatedStringHandler.AppendFormatted(text);
+						bepInExWarningLogInterpolatedStringHandler.AppendLiteral("; OS fonts have no font data for TMP 3.0) - not retried this session");
+					}
+					log2.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+				}
+			}
+			catch (Exception ex)
+			{
+				ManualLogSource log3 = Plugin.Log;
+				BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(20, 2, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("TMP font '");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(fontName);
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("' failed: ");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(ex.Message);
+				}
+				log3.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+			}
+			return value;
+		}
+
+		private static void ApplyLayout(GameObject go, LayoutRule lr)
+		{
+			HorizontalOrVerticalLayoutGroup horizontalOrVerticalLayoutGroup = go.GetComponent<HorizontalOrVerticalLayoutGroup>();
+			if (!string.IsNullOrEmpty(lr.type))
+			{
+				string text = lr.type.Trim().ToLowerInvariant();
+				if (text == "none")
+				{
+					if (horizontalOrVerticalLayoutGroup != null)
+					{
+						HorizontalOrVerticalLayoutGroup e = horizontalOrVerticalLayoutGroup;
+						Plugin.Defer(delegate
+						{
+							if (e != null)
+							{
+								UnityEngine.Object.Destroy(e);
+							}
+						});
+						horizontalOrVerticalLayoutGroup = null;
+					}
+				}
+				else
+				{
+					bool flag = text.StartsWith("h");
+					bool flag2 = horizontalOrVerticalLayoutGroup is HorizontalLayoutGroup;
+					if (horizontalOrVerticalLayoutGroup == null || flag2 != flag)
+					{
+						HorizontalOrVerticalLayoutGroup old = horizontalOrVerticalLayoutGroup;
+						HorizontalOrVerticalLayoutGroup horizontalOrVerticalLayoutGroup2 = (flag ? ((HorizontalOrVerticalLayoutGroup)go.AddComponent<HorizontalLayoutGroup>()) : ((HorizontalOrVerticalLayoutGroup)go.AddComponent<VerticalLayoutGroup>()));
+						if (old != null)
+						{
+							horizontalOrVerticalLayoutGroup2.padding = new RectOffset(old.padding.left, old.padding.right, old.padding.top, old.padding.bottom);
+							horizontalOrVerticalLayoutGroup2.spacing = old.spacing;
+							horizontalOrVerticalLayoutGroup2.childAlignment = old.childAlignment;
+							horizontalOrVerticalLayoutGroup2.childControlWidth = old.childControlWidth;
+							horizontalOrVerticalLayoutGroup2.childControlHeight = old.childControlHeight;
+							horizontalOrVerticalLayoutGroup2.childForceExpandWidth = old.childForceExpandWidth;
+							horizontalOrVerticalLayoutGroup2.childForceExpandHeight = old.childForceExpandHeight;
+							horizontalOrVerticalLayoutGroup2.childScaleWidth = old.childScaleWidth;
+							horizontalOrVerticalLayoutGroup2.childScaleHeight = old.childScaleHeight;
+							horizontalOrVerticalLayoutGroup2.reverseArrangement = old.reverseArrangement;
+							old.enabled = false;
+							Plugin.Defer(delegate
+							{
+								if (old != null)
+								{
+									UnityEngine.Object.Destroy(old);
+								}
+							});
+						}
+						horizontalOrVerticalLayoutGroup = horizontalOrVerticalLayoutGroup2;
+					}
+				}
+			}
+			if (!(horizontalOrVerticalLayoutGroup == null))
+			{
+				if (lr.spacing.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.spacing = lr.spacing.Value;
+				}
+				if (lr.padding != null && lr.padding.Length == 4)
+				{
+					horizontalOrVerticalLayoutGroup.padding = new RectOffset((int)lr.padding[0], (int)lr.padding[1], (int)lr.padding[2], (int)lr.padding[3]);
+				}
+				if (!string.IsNullOrEmpty(lr.childAlignment) && TryEnum<TextAnchor>(lr.childAlignment, out var value))
+				{
+					horizontalOrVerticalLayoutGroup.childAlignment = value;
+				}
+				if (lr.childControlWidth.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.childControlWidth = lr.childControlWidth.Value;
+				}
+				if (lr.childControlHeight.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.childControlHeight = lr.childControlHeight.Value;
+				}
+				if (lr.childForceExpandWidth.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.childForceExpandWidth = lr.childForceExpandWidth.Value;
+				}
+				if (lr.childForceExpandHeight.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.childForceExpandHeight = lr.childForceExpandHeight.Value;
+				}
+				if (lr.childScaleWidth.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.childScaleWidth = lr.childScaleWidth.Value;
+				}
+				if (lr.childScaleHeight.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.childScaleHeight = lr.childScaleHeight.Value;
+				}
+				if (lr.reverseArrangement.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.reverseArrangement = lr.reverseArrangement.Value;
+				}
+				if (lr.enabled.HasValue)
+				{
+					horizontalOrVerticalLayoutGroup.enabled = lr.enabled.Value;
+				}
+			}
+		}
+
+		private static void ApplyGrid(GameObject go, GridRule gr)
+		{
+			GridLayoutGroup component = go.GetComponent<GridLayoutGroup>();
+			if (!(component == null))
+			{
+				if (gr.cellSize != null)
+				{
+					component.cellSize = V2(gr.cellSize);
+				}
+				if (gr.spacing != null)
+				{
+					component.spacing = V2(gr.spacing);
+				}
+				if (!string.IsNullOrEmpty(gr.startCorner) && TryEnum<GridLayoutGroup.Corner>(gr.startCorner, out var value))
+				{
+					component.startCorner = value;
+				}
+				if (!string.IsNullOrEmpty(gr.startAxis) && TryEnum<GridLayoutGroup.Axis>(gr.startAxis, out var value2))
+				{
+					component.startAxis = value2;
+				}
+				if (!string.IsNullOrEmpty(gr.childAlignment) && TryEnum<TextAnchor>(gr.childAlignment, out var value3))
+				{
+					component.childAlignment = value3;
+				}
+				if (!string.IsNullOrEmpty(gr.constraint) && TryEnum<GridLayoutGroup.Constraint>(gr.constraint, out var value4))
+				{
+					component.constraint = value4;
+				}
+				if (gr.constraintCount.HasValue)
+				{
+					component.constraintCount = gr.constraintCount.Value;
+				}
+				if (gr.padding != null && gr.padding.Length == 4)
+				{
+					component.padding = new RectOffset((int)gr.padding[0], (int)gr.padding[1], (int)gr.padding[2], (int)gr.padding[3]);
+				}
+				if (gr.enabled.HasValue)
+				{
+					component.enabled = gr.enabled.Value;
+				}
+			}
+		}
+
+		private static void ApplyFitter(GameObject go, FitterRule fr)
+		{
+			ContentSizeFitter contentSizeFitter = go.GetComponent<ContentSizeFitter>();
+			if (fr.remove == true)
+			{
+				if (!(contentSizeFitter != null))
+				{
+					return;
+				}
+				ContentSizeFitter ff = contentSizeFitter;
+				Plugin.Defer(delegate
+				{
+					if (ff != null)
+					{
+						UnityEngine.Object.Destroy(ff);
+					}
+				});
+				return;
+			}
+			if (contentSizeFitter == null)
+			{
+				contentSizeFitter = go.AddComponent<ContentSizeFitter>();
+			}
+			if (!string.IsNullOrEmpty(fr.horizontal) && TryEnum<ContentSizeFitter.FitMode>(fr.horizontal, out var value))
+			{
+				contentSizeFitter.horizontalFit = value;
+			}
+			if (!string.IsNullOrEmpty(fr.vertical) && TryEnum<ContentSizeFitter.FitMode>(fr.vertical, out var value2))
+			{
+				contentSizeFitter.verticalFit = value2;
+			}
+			if (fr.enabled.HasValue)
+			{
+				contentSizeFitter.enabled = fr.enabled.Value;
+			}
+		}
+
+		private static void ApplyLayoutElement(GameObject go, LayoutElementRule le)
+		{
+			LayoutElement layoutElement = go.GetComponent<LayoutElement>();
+			if (layoutElement == null)
+			{
+				if (le.add != true)
+				{
+					return;
+				}
+				layoutElement = go.AddComponent<LayoutElement>();
+			}
+			if (le.ignoreLayout.HasValue)
+			{
+				layoutElement.ignoreLayout = le.ignoreLayout.Value;
+			}
+			if (le.minWidth.HasValue)
+			{
+				layoutElement.minWidth = le.minWidth.Value;
+			}
+			if (le.minHeight.HasValue)
+			{
+				layoutElement.minHeight = le.minHeight.Value;
+			}
+			if (le.preferredWidth.HasValue)
+			{
+				layoutElement.preferredWidth = le.preferredWidth.Value;
+			}
+			if (le.preferredHeight.HasValue)
+			{
+				layoutElement.preferredHeight = le.preferredHeight.Value;
+			}
+			if (le.flexibleWidth.HasValue)
+			{
+				layoutElement.flexibleWidth = le.flexibleWidth.Value;
+			}
+			if (le.flexibleHeight.HasValue)
+			{
+				layoutElement.flexibleHeight = le.flexibleHeight.Value;
+			}
+			if (le.enabled.HasValue)
+			{
+				layoutElement.enabled = le.enabled.Value;
+			}
+		}
+
+		private static void ApplyImage(Image img, UIFixMarker m, ImageRule ir)
+		{
+			if (!string.IsNullOrEmpty(ir.sprite))
+			{
+				if (ir.sprite.Equals("none", StringComparison.OrdinalIgnoreCase))
+				{
+					img.sprite = null;
+				}
+				else if (ir.sprite.Equals("default", StringComparison.OrdinalIgnoreCase))
+				{
+					img.sprite = m.OSprite;
+				}
+				else
+				{
+					Sprite file = SpriteStore.GetFile(ir.sprite, img.sprite);
+					if (file != null)
+					{
+						img.sprite = file;
+					}
+					else
+					{
+						Plugin.Log.LogWarning("Sprite file not found: " + ir.sprite);
+					}
+				}
+			}
+			if (!string.IsNullOrEmpty(ir.color) && TryColor(ir.color, out var c))
+			{
+				img.color = c;
+			}
+			if (ir.preserveAspect.HasValue)
+			{
+				img.preserveAspect = ir.preserveAspect.Value;
+			}
+			if (!string.IsNullOrEmpty(ir.type) && TryEnum<Image.Type>(ir.type, out var value))
+			{
+				img.type = value;
+			}
+			if (ir.fillCenter.HasValue)
+			{
+				img.fillCenter = ir.fillCenter.Value;
+			}
+			if (ir.raycastTarget.HasValue)
+			{
+				img.raycastTarget = ir.raycastTarget.Value;
+			}
+			if (ir.nativeSize == true)
+			{
+				img.SetNativeSize();
+			}
+			if (ir.enabled.HasValue)
+			{
+				img.enabled = ir.enabled.Value;
+			}
+		}
+
+		public static Font GetOsFont(string name)
+		{
+			if (_osFonts.TryGetValue(name, out var value) && value != null)
+			{
+				return value;
+			}
+			try
+			{
+				value = Font.CreateDynamicFontFromOSFont(name, 24);
+				if (value != null)
+				{
+					value.hideFlags = HideFlags.HideAndDontSave;
+					_osFonts[name] = value;
+				}
+			}
+			catch (Exception ex)
+			{
+				ManualLogSource log = Plugin.Log;
+				bool isEnabled;
+				BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(19, 2, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("OS font '");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(name);
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("' failed: ");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(ex.Message);
+				}
+				log.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+			}
+			return value;
+		}
+
+		public static Vector2 V2(float[] a)
+		{
+			return new Vector2(a[0], (a.Length > 1) ? a[1] : a[0]);
+		}
+
+		public static bool TryEnum<T>(string s, out T value) where T : struct
+		{
+			try
+			{
+				value = (T)Enum.Parse(typeof(T), s.Trim(), ignoreCase: true);
+				return true;
+			}
+			catch
+			{
+				value = default(T);
+				ManualLogSource log = Plugin.Log;
+				bool isEnabled;
+				BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(17, 2, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("Unknown ");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(typeof(T).Name);
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral(" value '");
+					bepInExWarningLogInterpolatedStringHandler.AppendFormatted(s);
+					bepInExWarningLogInterpolatedStringHandler.AppendLiteral("'");
+				}
+				log.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+				return false;
+			}
+		}
+
+		public static bool TryColor(string s, out Color c)
+		{
+			if (ColorUtility.TryParseHtmlString(s, out c))
+			{
+				return true;
+			}
+			string[] array = s.Split(',');
+			if (array.Length >= 3)
+			{
+				try
+				{
+					c = new Color(float.Parse(array[0], CultureInfo.InvariantCulture), float.Parse(array[1], CultureInfo.InvariantCulture), float.Parse(array[2], CultureInfo.InvariantCulture), (array.Length > 3) ? float.Parse(array[3], CultureInfo.InvariantCulture) : 1f);
+					return true;
+				}
+				catch
+				{
+				}
+			}
+			return false;
+		}
+	}
+	public class RectRule
+	{
+		public float[] anchorMin;
+
+		public float[] anchorMax;
+
+		public float[] anchoredPos;
+
+		public float[] sizeDelta;
+
+		public float[] pivot;
+
+		public float[] offsetMin;
+
+		public float[] offsetMax;
+
+		public float[] scale;
+
+		public float? rotationZ;
+
+		public float? x;
+
+		public float? y;
+
+		public float? width;
+
+		public float? height;
+
+		public float? dx;
+
+		public float? dy;
+
+		public float? dw;
+
+		public float? dh;
+	}
+	public class TextRule
+	{
+		public float? fontSize;
+
+		public float? fontScale;
+
+		public bool? bestFit;
+
+		public int? minSize;
+
+		public int? maxSize;
+
+		public string alignment;
+
+		public string hOverflow;
+
+		public string vOverflow;
+
+		public float? lineSpacing;
+
+		public bool? richText;
+
+		public string fontStyle;
+
+		public string font;
+
+		public string color;
+
+		public bool? raycastTarget;
+
+		public string text;
+
+		public bool? outline;
+	}
+	public class TmpRule
+	{
+		public float? fontSize;
+
+		public float? fontScale;
+
+		public bool? autoSize;
+
+		public float? minSize;
+
+		public float? maxSize;
+
+		public string alignment;
+
+		public string overflow;
+
+		public bool? wordWrap;
+
+		public float[] margin;
+
+		public float? charSpacing;
+
+		public float? wordSpacing;
+
+		public float? lineSpacing;
+
+		public float? paragraphSpacing;
+
+		public string color;
+
+		public bool? richText;
+
+		public bool? raycastTarget;
+
+		public string font;
+
+		public string style;
+	}
+	public class LayoutRule
+	{
+		public string type;
+
+		public float? spacing;
+
+		public float[] padding;
+
+		public string childAlignment;
+
+		public bool? childControlWidth;
+
+		public bool? childControlHeight;
+
+		public bool? childForceExpandWidth;
+
+		public bool? childForceExpandHeight;
+
+		public bool? childScaleWidth;
+
+		public bool? childScaleHeight;
+
+		public bool? reverseArrangement;
+
+		public bool? enabled;
+	}
+	public class GridRule
+	{
+		public float[] cellSize;
+
+		public float[] spacing;
+
+		public string startCorner;
+
+		public string startAxis;
+
+		public string childAlignment;
+
+		public string constraint;
+
+		public int? constraintCount;
+
+		public float[] padding;
+
+		public bool? enabled;
+	}
+	public class FitterRule
+	{
+		public string horizontal;
+
+		public string vertical;
+
+		public bool? enabled;
+
+		public bool? remove;
+	}
+	public class LayoutElementRule
+	{
+		public bool? ignoreLayout;
+
+		public float? minWidth;
+
+		public float? minHeight;
+
+		public float? preferredWidth;
+
+		public float? preferredHeight;
+
+		public float? flexibleWidth;
+
+		public float? flexibleHeight;
+
+		public bool? add;
+
+		public bool? enabled;
+	}
+	public class MovePanelRule
+	{
+		public float[] standbyOffset;
+	}
+	public class ImageRule
+	{
+		public string sprite;
+
+		public string color;
+
+		public bool? preserveAspect;
+
+		public bool? nativeSize;
+
+		public bool? enabled;
+
+		public string type;
+
+		public bool? raycastTarget;
+
+		public bool? fillCenter;
+	}
+	public class Rule
+	{
+		public string id;
+
+		public string path;
+
+		public string[] paths;
+
+		public string comment;
+
+		public bool always;
+
+		public bool onTextChange;
+
+		public bool? active;
+
+		public bool? disabled;
+
+		public RectRule rect;
+
+		public TextRule text;
+
+		public TmpRule tmp;
+
+		public LayoutRule layout;
+
+		public GridRule grid;
+
+		public FitterRule fitter;
+
+		public LayoutElementRule layoutElement;
+
+		public ImageRule image;
+
+		public MovePanelRule movePanel;
+
+		public bool? rebuildLayout;
+
+		public bool? destroyChildrenLayout;
+
+		[JsonIgnore]
+		public Regex[] Regexes;
+
+		[JsonIgnore]
+		public string Source;
+
+		[JsonIgnore]
+		public int Index;
+
+		public bool Matches(string path)
+		{
+			if (disabled == true)
+			{
+				return false;
+			}
+			Regex[] regexes = Regexes;
+			if (regexes == null)
+			{
+				return false;
+			}
+			for (int i = 0; i < regexes.Length; i++)
+			{
+				if (regexes[i].IsMatch(path))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public override string ToString()
+		{
+			string obj = id;
+			if (obj == null)
+			{
+				obj = path;
+				if (obj == null)
+				{
+					if (paths == null)
+					{
+						return "?";
+					}
+					obj = string.Join("|", paths);
+				}
+			}
+			return obj;
+		}
+	}
+	public static class Rules
+	{
+		private static List<Rule> _rules = new List<Rule>();
+
+		private static Dictionary<string, List<Rule>> _byTail = new Dictionary<string, List<Rule>>(StringComparer.Ordinal);
+
+		private static List<Rule> _wildcardTail = new List<Rule>();
+
+		public static long MatchCalls;
+
+		public static long RegexTests;
+
+		public static IReadOnlyList<Rule> All => _rules;
+
+		public static int Count => _rules.Count;
+
+		public static int Version { get; private set; }
+
+		private static string TailOf(string pattern)
+		{
+			string text = pattern.Trim().TrimEnd('/');
+			int num = text.LastIndexOf('/');
+			string text2 = ((num >= 0) ? text.Substring(num + 1) : text);
+			if (text2.IndexOf('*') < 0)
+			{
+				return text2;
+			}
+			return null;
+		}
+
+		private static void BuildIndex(List<Rule> list)
+		{
+			Dictionary<string, List<Rule>> dictionary = new Dictionary<string, List<Rule>>(StringComparer.Ordinal);
+			List<Rule> list2 = new List<Rule>();
+			foreach (Rule item in list)
+			{
+				List<string> list3 = new List<string>();
+				if (!string.IsNullOrEmpty(item.path))
+				{
+					list3.Add(item.path);
+				}
+				if (item.paths != null)
+				{
+					string[] paths = item.paths;
+					foreach (string text in paths)
+					{
+						if (!string.IsNullOrEmpty(text))
+						{
+							list3.Add(text);
+						}
+					}
+				}
+				bool flag = false;
+				HashSet<string> hashSet = new HashSet<string>(StringComparer.Ordinal);
+				foreach (string item2 in list3)
+				{
+					string text2 = TailOf(item2);
+					if (text2 == null)
+					{
+						flag = true;
+					}
+					else
+					{
+						hashSet.Add(text2);
+					}
+				}
+				if (flag)
+				{
+					list2.Add(item);
+				}
+				foreach (string item3 in hashSet)
+				{
+					if (!dictionary.TryGetValue(item3, out var value))
+					{
+						value = (dictionary[item3] = new List<Rule>());
+					}
+					value.Add(item);
+				}
+			}
+			_byTail = dictionary;
+			_wildcardTail = list2;
+		}
+
+		public static Regex PatternToRegex(string pattern)
+		{
+			pattern = pattern.Trim();
+			bool flag = pattern.StartsWith("/");
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(flag ? "^" : "^(?:.*/)?");
+			int num = 0;
+			while (num < pattern.Length)
+			{
+				char c = pattern[num];
+				if (c == '*')
+				{
+					if (num + 1 < pattern.Length && pattern[num + 1] == '*')
+					{
+						stringBuilder.Append(".*");
+						num += 2;
+					}
+					else
+					{
+						stringBuilder.Append("[^/]*");
+						num++;
+					}
+				}
+				else
+				{
+					stringBuilder.Append(Regex.Escape(c.ToString()));
+					num++;
+				}
+			}
+			stringBuilder.Append("$");
+			return new Regex(stringBuilder.ToString(), RegexOptions.Compiled | RegexOptions.CultureInvariant);
+		}
+
+		public static void Load(string dir)
+		{
+			List<Rule> list = new List<Rule>();
+			if (Directory.Exists(dir))
+			{
+				string[] array = Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).OrderBy((string f) => f, StringComparer.OrdinalIgnoreCase).ToArray();
+				foreach (string text in array)
+				{
+					bool isEnabled;
+					try
+					{
+						JToken jToken = JToken.Parse(File.ReadAllText(text));
+						JArray jArray = jToken as JArray;
+						if (jArray == null && jToken is JObject jObject && jObject["rules"] is JArray jArray2)
+						{
+							jArray = jArray2;
+						}
+						if (jArray == null)
+						{
+							Plugin.Log.LogWarning("Rule file is not an array: " + text);
+							continue;
+						}
+						int num2 = 0;
+						foreach (JToken item in jArray)
+						{
+							Rule rule = item.ToObject<Rule>();
+							if (rule == null)
+							{
+								continue;
+							}
+							List<string> list2 = new List<string>();
+							if (!string.IsNullOrEmpty(rule.path))
+							{
+								list2.Add(rule.path);
+							}
+							if (rule.paths != null)
+							{
+								list2.AddRange(rule.paths.Where((string p) => !string.IsNullOrEmpty(p)));
+							}
+							if (list2.Count == 0)
+							{
+								ManualLogSource log = Plugin.Log;
+								BepInExWarningLogInterpolatedStringHandler bepInExWarningLogInterpolatedStringHandler = new BepInExWarningLogInterpolatedStringHandler(23, 2, out isEnabled);
+								if (isEnabled)
+								{
+									bepInExWarningLogInterpolatedStringHandler.AppendLiteral("Rule without path in ");
+									bepInExWarningLogInterpolatedStringHandler.AppendFormatted(Path.GetFileName(text));
+									bepInExWarningLogInterpolatedStringHandler.AppendLiteral(": ");
+									bepInExWarningLogInterpolatedStringHandler.AppendFormatted(rule.comment);
+								}
+								log.LogWarning(bepInExWarningLogInterpolatedStringHandler);
+							}
+							else
+							{
+								rule.Regexes = list2.Select(PatternToRegex).ToArray();
+								rule.Source = Path.GetFileName(text);
+								rule.Index = list.Count;
+								list.Add(rule);
+								num2++;
+							}
+						}
+						ManualLogSource log2 = Plugin.Log;
+						BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(19, 2, out isEnabled);
+						if (isEnabled)
+						{
+							bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Loaded ");
+							bepInExInfoLogInterpolatedStringHandler.AppendFormatted(num2);
+							bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" rules from ");
+							bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Path.GetFileName(text));
+						}
+						log2.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+					}
+					catch (Exception ex)
+					{
+						ManualLogSource log3 = Plugin.Log;
+						BepInExErrorLogInterpolatedStringHandler bepInExErrorLogInterpolatedStringHandler = new BepInExErrorLogInterpolatedStringHandler(28, 2, out isEnabled);
+						if (isEnabled)
+						{
+							bepInExErrorLogInterpolatedStringHandler.AppendLiteral("Failed to parse rule file ");
+							bepInExErrorLogInterpolatedStringHandler.AppendFormatted(text);
+							bepInExErrorLogInterpolatedStringHandler.AppendLiteral(": ");
+							bepInExErrorLogInterpolatedStringHandler.AppendFormatted(ex.Message);
+						}
+						log3.LogError(bepInExErrorLogInterpolatedStringHandler);
+					}
+				}
+			}
+			else
+			{
+				Plugin.Log.LogWarning("Rules directory missing: " + dir);
+			}
+			_rules = list;
+			BuildIndex(list);
+			Version++;
+		}
+
+		public static List<Rule> Match(string path)
+		{
+			if (path == null)
+			{
+				return null;
+			}
+			MatchCalls++;
+			int num = path.LastIndexOf('/');
+			string key = ((num >= 0) ? path.Substring(num + 1) : path);
+			List<Rule> list = null;
+			if (_byTail.TryGetValue(key, out var value))
+			{
+				RegexTests += value.Count;
+				for (int i = 0; i < value.Count; i++)
+				{
+					if (value[i].Matches(path))
+					{
+						if (list == null)
+						{
+							list = new List<Rule>(2);
+						}
+						list.Add(value[i]);
+					}
+				}
+			}
+			RegexTests += _wildcardTail.Count;
+			for (int j = 0; j < _wildcardTail.Count; j++)
+			{
+				Rule rule = _wildcardTail[j];
+				if (rule.Matches(path))
+				{
+					if (list == null)
+					{
+						list = new List<Rule>(2);
+					}
+					if (!list.Contains(rule))
+					{
+						list.Add(rule);
+					}
+				}
+			}
+			if (list != null && list.Count > 1)
+			{
+				list.Sort((Rule a, Rule b) => a.Index.CompareTo(b.Index));
+			}
+			return list;
+		}
+	}
+	public static class SpriteStore
+	{
+		private class SidecarMeta
+		{
+			public float[] border;
+
+			public float[] pivot;
+
+			public float? pixelsPerUnit;
+
+			public bool keepOriginalGeometry = true;
+		}
+
+		private static string _dir;
+
+		private static Dictionary<string, string> _map = new Dictionary<string, string>(StringComparer.Ordinal);
+
+		private static readonly Dictionary<string, Sprite> _cache = new Dictionary<string, Sprite>(StringComparer.OrdinalIgnoreCase);
+
+		private static readonly HashSet<int> _ourSprites = new HashSet<int>();
+
+		public static int Replacements;
+
+		public static int Count => _map.Count;
+
+		public static void Load(string dir)
+		{
+			_dir = dir;
+			foreach (Sprite value in _cache.Values)
+			{
+				if (value != null)
+				{
+					if (value.texture != null)
+					{
+						UnityEngine.Object.Destroy(value.texture);
+					}
+					UnityEngine.Object.Destroy(value);
+				}
+			}
+			_cache.Clear();
+			_ourSprites.Clear();
+			Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
+			string path = Path.Combine(dir, "spritemap.json");
+			if (File.Exists(path))
+			{
+				try
+				{
+					Dictionary<string, string> dictionary2 = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
+					if (dictionary2 != null)
+					{
+						foreach (KeyValuePair<string, string> item in dictionary2)
+						{
+							if (!string.IsNullOrEmpty(item.Key) && !string.IsNullOrEmpty(item.Value))
+							{
+								dictionary[item.Key] = item.Value;
+							}
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					Plugin.Log.LogError("spritemap.json parse failed: " + ex.Message);
+				}
+			}
+			_map = dictionary;
+		}
+
+		public static bool IsOurs(Sprite s)
+		{
+			if (s != null)
+			{
+				return _ourSprites.Contains(s.GetInstanceID());
+			}
+			return false;
+		}
+
+		public static void TryReplace(Image img)
+		{
+			if (!Plugin.CfgEnabled.Value || !Plugin.CfgSpriteReplace.Value || img == null)
+			{
+				return;
+			}
+			Sprite sprite = img.sprite;
+			if (sprite == null || _map.Count == 0 || _ourSprites.Contains(sprite.GetInstanceID()) || !_map.TryGetValue(sprite.name, out var value))
+			{
+				return;
+			}
+			Sprite file = GetFile(value, sprite);
+			if (file == null)
+			{
+				return;
+			}
+			UIFixMarker uIFixMarker = img.GetComponent<UIFixMarker>();
+			if (uIFixMarker == null)
+			{
+				uIFixMarker = img.gameObject.AddComponent<UIFixMarker>();
+				uIFixMarker.hideFlags = HideFlags.HideAndDontSave;
+			}
+			uIFixMarker.CaptureImage(img);
+			img.sprite = file;
+			Replacements++;
+			if (Plugin.CfgVerbose.Value)
+			{
+				ManualLogSource log = Plugin.Log;
+				bool isEnabled;
+				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(15, 3, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Sprite ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(sprite.name);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" -> ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(value);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" on ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(PathUtil.GetPath(img.gameObject));
+				}
+				log.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+			}
+		}
+
+		public static Sprite GetFile(string file, Sprite original)
+		{
+			if (string.IsNullOrEmpty(_dir))
+			{
+				return null;
+			}
+			if (!file.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+			{
+				file += ".png";
+			}
+			string key = file + "|" + ((original != null) ? original.name : "");
+			if (_cache.TryGetValue(key, out var value) && value != null)
+			{
+				return value;
+			}
+			string text = Path.Combine(_dir, file);
+			if (!File.Exists(text))
+			{
+				return null;
+			}
+			try
+			{
+				byte[] data = File.ReadAllBytes(text);
+				Texture2D texture2D = new Texture2D(2, 2, TextureFormat.RGBA32, mipChain: false);
+				if (!texture2D.LoadImage(data))
+				{
+					UnityEngine.Object.Destroy(texture2D);
+					return null;
+				}
+				texture2D.name = Path.GetFileNameWithoutExtension(file);
+				texture2D.filterMode = FilterMode.Bilinear;
+				texture2D.wrapMode = TextureWrapMode.Clamp;
+				texture2D.hideFlags = HideFlags.HideAndDontSave;
+				SidecarMeta sidecarMeta = null;
+				string text2 = text + ".json";
+				if (File.Exists(text2))
+				{
+					try
+					{
+						sidecarMeta = JsonConvert.DeserializeObject<SidecarMeta>(File.ReadAllText(text2));
+					}
+					catch (Exception ex)
+					{
+						Plugin.Log.LogWarning("sidecar parse failed " + text2 + ": " + ex.Message);
+					}
+				}
+				Vector2 vector = new Vector2(0.5f, 0.5f);
+				float pixelsPerUnit = 100f;
+				Vector4 border = Vector4.zero;
+				if (original != null && (sidecarMeta == null || sidecarMeta.keepOriginalGeometry))
+				{
+					Rect rect = original.rect;
+					vector = ((rect.width > 0f && rect.height > 0f) ? new Vector2(original.pivot.x / rect.width, original.pivot.y / rect.height) : vector);
+					pixelsPerUnit = original.pixelsPerUnit;
+					Vector4 border2 = original.border;
+					float num = ((rect.width > 0f) ? ((float)texture2D.width / rect.width) : 1f);
+					float num2 = ((rect.height > 0f) ? ((float)texture2D.height / rect.height) : 1f);
+					border = new Vector4(border2.x * num, border2.y * num2, border2.z * num, border2.w * num2);
+				}
+				if (sidecarMeta != null)
+				{
+					if (sidecarMeta.pivot != null && sidecarMeta.pivot.Length == 2)
+					{
+						vector = new Vector2(sidecarMeta.pivot[0], sidecarMeta.pivot[1]);
+					}
+					if (sidecarMeta.pixelsPerUnit.HasValue)
+					{
+						pixelsPerUnit = sidecarMeta.pixelsPerUnit.Value;
+					}
+					if (sidecarMeta.border != null && sidecarMeta.border.Length == 4)
+					{
+						border = new Vector4(sidecarMeta.border[0], sidecarMeta.border[1], sidecarMeta.border[2], sidecarMeta.border[3]);
+					}
+				}
+				Sprite sprite = Sprite.Create(texture2D, new Rect(0f, 0f, texture2D.width, texture2D.height), vector, pixelsPerUnit, 0u, SpriteMeshType.FullRect, border);
+				sprite.name = ((original != null) ? original.name : texture2D.name);
+				sprite.hideFlags = HideFlags.HideAndDontSave;
+				_cache[key] = sprite;
+				_ourSprites.Add(sprite.GetInstanceID());
+				return sprite;
+			}
+			catch (Exception ex2)
+			{
+				Plugin.Log.LogError("Sprite load failed " + text + ": " + ex2.Message);
+				return null;
+			}
+		}
+	}
+	[BepInPlugin("lom.strings.english", "LOM_Strings_EN", "0.1.0")]
+	public class StringsPlugin : BaseUnityPlugin
+	{
+		public const string GUID = "lom.strings.english";
+
+		public const string NAME = "LOM_Strings_EN";
+
+		public static ConfigEntry<bool> CfgEnabled;
+
+		public static ConfigEntry<bool> CfgNormalize;
+
+		public static ConfigEntry<bool> CfgNormalizeStory;
+
+		public static ConfigEntry<bool> CfgLog;
+
+		public static ConfigEntry<bool> CfgTrace;
+
+		public static ConfigEntry<KeyCode> CfgReloadKey;
+
+		public static StringsPlugin Instance { get; private set; }
+
+		public static ManualLogSource SLog { get; private set; }
+
+		private void Awake()
+		{
+			Instance = this;
+			SLog = base.Logger;
+			CfgEnabled = base.Config.Bind("General", "Enabled", defaultValue: true, "Apply the UI string overrides in strings/*.csv (independent of the LOM_UI_EN layout fixes).");
+			CfgNormalize = base.Config.Bind("General", "NormalizePunctuation", defaultValue: true, "Tidy punctuation and spacing of localized UI strings: full-width punctuation to ASCII, a space after commas/colons/sentence ends, no doubled spaces. Never touches rich-text tags or {0} placeholders.");
+			CfgNormalizeStory = base.Config.Bind("General", "NormalizeStoryText", defaultValue: false, "Also normalize story/dialogue text (keys starting with Story/). Off by default; the translation patch owns story prose.");
+			CfgLog = base.Config.Bind("Dev", "LogOverrides", defaultValue: false, "Log every applied override.");
+			CfgTrace = base.Config.Bind("Dev", "TraceKeys", defaultValue: false, "Append every looked-up key and its final text to BepInEx/plugins/LOM_UI_EN/harness/out/strings_trace.txt (for finding which key a screen uses).");
+			CfgReloadKey = base.Config.Bind("Dev", "ReloadKey", KeyCode.F12, "Hotkey: reload strings/*.csv.");
+			StringOverrides.Load();
+			try
+			{
+				Harmony harmony = new Harmony("lom.strings.english");
+				MethodInfo methodInfo = AccessTools.Method(typeof(LeanLocalizationResolver), "GetString", new Type[1] { typeof(string) });
+				if (methodInfo == null)
+				{
+					SLog.LogError("LeanLocalizationResolver.GetString(string) not found");
+				}
+				else
+				{
+					harmony.Patch(methodInfo, null, new HarmonyMethod(typeof(StringOverrides), "GetString_Postfix")
+					{
+						priority = 0
+					});
+				}
+				MethodInfo methodInfo2 = AccessTools.Method(typeof(LeanLocalizedText), "UpdateTranslation");
+				if (methodInfo2 != null)
+				{
+					harmony.Patch(methodInfo2, null, new HarmonyMethod(typeof(StringOverrides), "LeanText_Postfix")
+					{
+						priority = 0
+					});
+				}
+				MethodInfo methodInfo3 = AccessTools.Method(typeof(LeanLocalizedTextMeshProUGUI), "UpdateTranslation");
+				if (methodInfo3 != null)
+				{
+					harmony.Patch(methodInfo3, null, new HarmonyMethod(typeof(StringOverrides), "LeanTmp_Postfix")
+					{
+						priority = 0
+					});
+				}
+				ManualLogSource sLog = SLog;
+				bool isEnabled;
+				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(31, 3, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted("LOM_Strings_EN");
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" loaded: ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(StringOverrides.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" overrides, normalize=");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(CfgNormalize.Value ? "on" : "off");
+				}
+				sLog.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+			}
+			catch (Exception ex)
+			{
+				SLog.LogError("Harmony patch failed: " + ex);
+			}
+		}
+
+		private void Update()
+		{
+			if (Input.GetKeyDown(CfgReloadKey.Value))
+			{
+				StringOverrides.Load();
+				StringOverrides.Refresh();
+				ManualLogSource sLog = SLog;
+				bool isEnabled;
+				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(26, 1, out isEnabled);
+				if (isEnabled)
+				{
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Reloaded ");
+					bepInExInfoLogInterpolatedStringHandler.AppendFormatted(StringOverrides.Count);
+					bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" string overrides");
+				}
+				sLog.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+			}
+		}
+	}
+	public static class StringOverrides
+	{
+		private static Dictionary<string, string> _map = new Dictionary<string, string>(StringComparer.Ordinal);
+
+		private static Dictionary<string, string> _normalized = new Dictionary<string, string>(StringComparer.Ordinal);
+
+		private const int NormCacheCap = 8192;
+
+		private static Dictionary<string, string> _normCache = new Dictionary<string, string>(StringComparer.Ordinal);
+
+		private static readonly HashSet<string> _traced = new HashSet<string>();
+
+		public static int Applied;
+
+		private static readonly Regex DatePattern = new Regex("^\\s*(January|February|March|April|May|June|July|August|September|October|November|December)\\s*[‧·・•]\\s*(Early|Mid|Late)(\\s+Month)?\\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+		private static readonly Regex ScaffoldingPrefix = new Regex("^\\s*(?:Instructions?|Translations?|Outputs?|System|Prompt|Assistant)\\s*:[^\\n]{0,120}\\r?\\n+(?=\\S)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+		private static readonly Regex TagSplit = new Regex("(<[^<>]+>|\\{[^{}]+\\})", RegexOptions.Compiled);
+
+		private static readonly Regex MultiSpace = new Regex("[ \\t]{2,}", RegexOptions.Compiled);
+
+		private static readonly Regex SpaceBeforePunct = new Regex(" +([,.;:!?%)])", RegexOptions.Compiled);
+
+		private static readonly Regex SpaceAfterOpen = new Regex("\\( +", RegexOptions.Compiled);
+
+		private static readonly Regex MissingSpaceAfter = new Regex("([,;:!?])(?=[A-Za-z(\\[\"'])", RegexOptions.Compiled);
+
+		private static readonly Regex MissingSpaceAfterPeriod = new Regex("(?<=[a-z\\)])\\.(?=[A-Z])", RegexOptions.Compiled);
+
+		private static readonly Regex SpaceAroundNewline = new Regex(" *\\n *", RegexOptions.Compiled);
+
+		private static readonly (string from, string to)[] FullWidth = new(string, string)[25]
+		{
+			("，", ", "),
+			("。", ". "),
+			("！", "! "),
+			("？", "? "),
+			("：", ": "),
+			("；", "; "),
+			("、", ", "),
+			("（", " ("),
+			("）", ") "),
+			("「", "\""),
+			("」", "\""),
+			("『", "'"),
+			("』", "'"),
+			("【", "["),
+			("】", "]"),
+			("～", "~"),
+			("－", "-"),
+			("％", "%"),
+			("\u3000", " "),
+			("‧", "·"),
+			("．", "."),
+			("＋", "+"),
+			("／", "/"),
+			("‑", "-"),
+			("‐", "-")
+		};
+
+		public static int Count => _map.Count;
+
+		public static string Dir => Path.Combine(Plugin.PluginDir ?? Path.GetDirectoryName(typeof(StringOverrides).Assembly.Location), "strings");
+
+		public static string NormalizeCached(string s)
+		{
+			if (string.IsNullOrEmpty(s))
+			{
+				return s;
+			}
+			if (_normCache.TryGetValue(s, out var value))
+			{
+				return value;
+			}
+			string text = Normalize(s);
+			if (_normCache.Count >= 8192)
+			{
+				_normCache.Clear();
+			}
+			_normCache[s] = text;
+			return text;
+		}
+
+		public static void Load()
+		{
+			Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
+			string dir = Dir;
+			if (Directory.Exists(dir))
+			{
+				string[] files = Directory.GetFiles(dir, "*.csv", SearchOption.TopDirectoryOnly);
+				Array.Sort(files, StringComparer.OrdinalIgnoreCase);
+				string[] array = files;
+				foreach (string path in array)
+				{
+					int num = 0;
+					foreach (List<string> item in ParseCsv(File.ReadAllText(path)))
+					{
+						if (item.Count >= 2)
+						{
+							string text = item[0].Trim();
+							if (text.Length != 0 && !text.StartsWith("#") && !(text == "key"))
+							{
+								dictionary[text] = item[1].Replace("\\n", "\n");
+								num++;
+							}
+						}
+					}
+					ManualLogSource sLog = StringsPlugin.SLog;
+					if (sLog != null)
+					{
+						bool isEnabled;
+						BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(30, 2, out isEnabled);
+						if (isEnabled)
+						{
+							bepInExInfoLogInterpolatedStringHandler.AppendLiteral("Loaded ");
+							bepInExInfoLogInterpolatedStringHandler.AppendFormatted(num);
+							bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" string overrides from ");
+							bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Path.GetFileName(path));
+						}
+						sLog.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+					}
+				}
+			}
+			_map = dictionary;
+			Dictionary<string, string> dictionary2 = new Dictionary<string, string>(dictionary.Count, StringComparer.Ordinal);
+			foreach (KeyValuePair<string, string> item2 in dictionary)
+			{
+				dictionary2[item2.Key] = Normalize(item2.Value);
+			}
+			_normalized = dictionary2;
+			_normCache = new Dictionary<string, string>(StringComparer.Ordinal);
+		}
+
+		private static bool TryFinal(string key, out string text)
+		{
+			return ((StringsPlugin.CfgNormalize != null && StringsPlugin.CfgNormalize.Value) ? _normalized : _map).TryGetValue(key, out text);
+		}
+
+		public static bool TryGet(string key, out string text)
+		{
+			return _map.TryGetValue(key, out text);
+		}
+
+		public static void Refresh()
+		{
+			try
+			{
+				LeanLocalization.UpdateTranslations();
+			}
+			catch (Exception ex)
+			{
+				StringsPlugin.SLog?.LogWarning("LeanLocalization refresh failed: " + ex.Message);
+			}
+		}
+
+		public static void GetString_Postfix(string key, ref string __result)
+		{
+			try
+			{
+				if (key == null)
+				{
+					return;
+				}
+				if (StringsPlugin.CfgEnabled != null && StringsPlugin.CfgEnabled.Value)
+				{
+					if (TryFinal(key, out var text))
+					{
+						__result = text;
+						Applied++;
+						if (StringsPlugin.CfgLog.Value)
+						{
+							ManualLogSource sLog = StringsPlugin.SLog;
+							bool isEnabled;
+							BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(13, 2, out isEnabled);
+							if (isEnabled)
+							{
+								bepInExInfoLogInterpolatedStringHandler.AppendLiteral("override ");
+								bepInExInfoLogInterpolatedStringHandler.AppendFormatted(key);
+								bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" -> ");
+								bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Short(text));
+							}
+							sLog.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+						}
+					}
+					else if (StringsPlugin.CfgNormalize.Value && __result != null && (StringsPlugin.CfgNormalizeStory.Value || !key.StartsWith("Story/", StringComparison.Ordinal)))
+					{
+						__result = NormalizeCached(__result);
+					}
+				}
+				if (!StringsPlugin.CfgTrace.Value || __result == null || !_traced.Add(key))
+				{
+					return;
+				}
+				try
+				{
+					string path = Path.Combine(Plugin.PluginDir, "harness", "out", "strings_trace.txt");
+					Directory.CreateDirectory(Path.GetDirectoryName(path));
+					File.AppendAllText(path, key + "\t" + __result.Replace("\n", "\\n") + "\n", Encoding.UTF8);
+				}
+				catch
+				{
+				}
+			}
+			catch (Exception ex)
+			{
+				StringsPlugin.SLog.LogError("GetString postfix failed: " + ex);
+			}
+		}
+
+		public static void LeanText_Postfix(LeanLocalizedText __instance)
+		{
+			try
+			{
+				if (__instance == null || StringsPlugin.CfgEnabled == null || !StringsPlugin.CfgEnabled.Value)
+				{
+					return;
+				}
+				string translationName = __instance.TranslationName;
+				if (string.IsNullOrEmpty(translationName) || !TryFinal(translationName, out var text))
+				{
+					return;
+				}
+				Text component = __instance.GetComponent<Text>();
+				if (component == null || !(component.text != text))
+				{
+					return;
+				}
+				component.text = text;
+				Applied++;
+				if (StringsPlugin.CfgLog.Value)
+				{
+					ManualLogSource sLog = StringsPlugin.SLog;
+					bool isEnabled;
+					BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(19, 2, out isEnabled);
+					if (isEnabled)
+					{
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral("override(lean) ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(translationName);
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" -> ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Short(text));
+					}
+					sLog.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+				}
+			}
+			catch (Exception ex)
+			{
+				StringsPlugin.SLog.LogError("LeanLocalizedText postfix failed: " + ex);
+			}
+		}
+
+		public static void LeanTmp_Postfix(LeanLocalizedTextMeshProUGUI __instance)
+		{
+			try
+			{
+				if (__instance == null || StringsPlugin.CfgEnabled == null || !StringsPlugin.CfgEnabled.Value)
+				{
+					return;
+				}
+				string translationName = __instance.TranslationName;
+				if (string.IsNullOrEmpty(translationName) || !TryFinal(translationName, out var text))
+				{
+					return;
+				}
+				TMP_Text component = __instance.GetComponent<TMP_Text>();
+				if (component == null || !(component.text != text))
+				{
+					return;
+				}
+				component.text = text;
+				Applied++;
+				if (StringsPlugin.CfgLog.Value)
+				{
+					ManualLogSource sLog = StringsPlugin.SLog;
+					bool isEnabled;
+					BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(23, 2, out isEnabled);
+					if (isEnabled)
+					{
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral("override(lean-tmp) ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(translationName);
+						bepInExInfoLogInterpolatedStringHandler.AppendLiteral(" -> ");
+						bepInExInfoLogInterpolatedStringHandler.AppendFormatted(Short(text));
+					}
+					sLog.LogInfo(bepInExInfoLogInterpolatedStringHandler);
+				}
+			}
+			catch (Exception ex)
+			{
+				StringsPlugin.SLog.LogError("LeanLocalizedTextMeshProUGUI postfix failed: " + ex);
+			}
+		}
+
+		private static string Short(string s)
+		{
+			if (s != null)
+			{
+				return ((s.Length > 60) ? (s.Substring(0, 60) + "…") : s).Replace("\n", "\\n");
+			}
+			return "";
+		}
+
+		public static string PostProcessDynamic(string s)
+		{
+			if (string.IsNullOrEmpty(s) || StringsPlugin.CfgEnabled == null || !StringsPlugin.CfgEnabled.Value || !StringsPlugin.CfgNormalize.Value)
+			{
+				return s;
+			}
+			if (s.IndexOf(':') > 0 && s.IndexOf('\n') > 0)
+			{
+				string text = ScaffoldingPrefix.Replace(s, "");
+				if ((object)text != s && text.Length != s.Length)
+				{
+					if (StringsPlugin.CfgLog.Value)
+					{
+						StringsPlugin.SLog.LogInfo("stripped translation scaffolding: " + Short(s));
+					}
+					return text;
+				}
+			}
+			if (s.Length > 40)
+			{
+				return s;
+			}
+			Match match = DatePattern.Match(s);
+			if (match.Success)
+			{
+				return match.Groups[2].Value + " " + match.Groups[1].Value;
+			}
+			return s;
+		}
+
+		public static string Normalize(string s)
+		{
+			if (string.IsNullOrEmpty(s))
+			{
+				return s;
+			}
+			bool flag = false;
+			for (int i = 0; i < s.Length; i++)
+			{
+				if (flag)
+				{
+					break;
+				}
+				if (s[i] > '\u007f')
+				{
+					flag = true;
+				}
+			}
+			string[] array = TagSplit.Split(s);
+			StringBuilder stringBuilder = new StringBuilder(s.Length + 8);
+			for (int j = 0; j < array.Length; j++)
+			{
+				string text = array[j];
+				if (text.Length == 0)
+				{
+					continue;
+				}
+				if (j % 2 == 1)
+				{
+					stringBuilder.Append(text);
+					continue;
+				}
+				if (flag)
+				{
+					(string, string)[] fullWidth = FullWidth;
+					for (int k = 0; k < fullWidth.Length; k++)
+					{
+						var (text2, newValue) = fullWidth[k];
+						if (text.IndexOf(text2, StringComparison.Ordinal) >= 0)
+						{
+							text = text.Replace(text2, newValue);
+						}
+					}
+				}
+				text = MissingSpaceAfter.Replace(text, "$1 ");
+				text = MissingSpaceAfterPeriod.Replace(text, ". ");
+				text = SpaceBeforePunct.Replace(text, "$1");
+				text = SpaceAfterOpen.Replace(text, "(");
+				stringBuilder.Append(text);
+			}
+			string input = MultiSpace.Replace(stringBuilder.ToString(), " ");
+			input = SpaceAroundNewline.Replace(input, "\n");
+			return input.Trim();
+		}
+
+		private static List<List<string>> ParseCsv(string text)
+		{
+			List<List<string>> list = new List<List<string>>();
+			List<string> list2 = new List<string>();
+			StringBuilder stringBuilder = new StringBuilder();
+			bool flag = false;
+			for (int i = 0; i < text.Length; i++)
+			{
+				char c = text[i];
+				if (flag)
+				{
+					if (c == '"')
+					{
+						if (i + 1 < text.Length && text[i + 1] == '"')
+						{
+							stringBuilder.Append('"');
+							i++;
+						}
+						else
+						{
+							flag = false;
+						}
+					}
+					else
+					{
+						stringBuilder.Append(c);
+					}
+					continue;
+				}
+				switch (c)
+				{
+				case '"':
+					flag = true;
+					break;
+				case ',':
+					list2.Add(stringBuilder.ToString());
+					stringBuilder.Length = 0;
+					break;
+				case '\n':
+					list2.Add(stringBuilder.ToString());
+					stringBuilder.Length = 0;
+					if (list2.Count > 1 || list2[0].Length > 0)
+					{
+						list.Add(list2);
+					}
+					list2 = new List<string>();
+					break;
+				default:
+					stringBuilder.Append(c);
+					break;
+				case '\r':
+					break;
+				}
+			}
+			if (stringBuilder.Length > 0 || list2.Count > 0)
+			{
+				list2.Add(stringBuilder.ToString());
+				list.Add(list2);
+			}
+			if (text.Length > 0 && text[0] == '\ufeff' && list.Count > 0 && list[0].Count > 0)
+			{
+				list[0][0] = list[0][0].TrimStart('\ufeff');
+			}
+			return list;
+		}
+	}
+}

@@ -1,0 +1,111 @@
+[
+  // ---------------------------------------------------------------------------
+  // Pause menu (MenuPanel/Buttons) + in-game Save / Load panels.
+  // ---------------------------------------------------------------------------
+
+  {
+    "id": "menu-button-labels",
+    "comment": "Pause-menu labels (Continue Game / Save Game / Loading game / Settings / Return to Title) sit in a 300x70 box inside a 460-wide bar; 'Return to Title' wrapped and was clipped. Widen the box to 340 (104..444, still inside the bar). Size is pinned with bestFit 42..42: the global DFT_S5->Palatino substitution multiplies fontSize by 0.9 every time LeanLocalizedTextFont re-assigns the font (Normal/Hover toggles), so the labels were drifting 48->43->39->35 between captures; bestFit renders at min/max regardless of fontSize. 'Continue Game' at 42 is ~300px wide, inside 340.",
+    "paths": ["/[UI]/TopPanel/MenuPanel/Buttons/MenuButton_*/*/Text"],
+    "rect": { "width": 340 },
+    "text": { "bestFit": true, "minSize": 42, "maxSize": 42, "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "always": true
+  },
+
+  // ---- confirm dialogs (Save overwrite / Delete) ---------------------------
+  {
+    "id": "confirm-buttons",
+    "comment": "Confirm / Cancel buttons reuse the pause-menu button prefab (300x70 text box); widen the same way and pin the size (see menu-button-labels).",
+    "paths": ["**/SaveGamePanel/Container/ConfirmPanel/Panel/MenuButton_*/*/Text",
+              "**/LoadGamePanel/Container/DeletePanel/**/MenuButton_*/*/Text"],
+    "rect": { "width": 340 },
+    "text": { "bestFit": true, "minSize": 42, "maxSize": 42, "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "always": true
+  },
+  {
+    "id": "confirm-message",
+    "comment": "'Are you sure you want to cover the current record?' at 42px does not fit a 513x90 box; widen to 720, let it wrap onto two lines (bestFit 20..30, vOverflow Overflow so bestFit measures the real height) above the buttons at y=110.",
+    "paths": ["**/SaveGamePanel/Container/ConfirmPanel/Panel/Message",
+              "**/LoadGamePanel/Container/DeletePanel/**/Message"],
+    "rect": { "y": -12, "width": 720, "height": 96 },
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "UpperCenter" }
+  },
+
+  // ---- save / load slot rows ------------------------------------------------
+  {
+    "id": "slot-header-manual",
+    "comment": "Slot label 'Legendary 001' (SourceHanSerif 25px) in a 120x60 box wrapped mid-word ('Legendar'). Make it a single 140px-wide line (bestFit 13..18), vertically centred on the Title row; 'No data available' still fits at 13.",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/Scroll View/Viewport/Slots/*/Slot/Header",
+              "**/SaveGamePanel/Container/Scroll View/Viewport/Slots/*/Slot/Header"],
+    "rect": { "y": -21, "width": 140, "height": 50 },
+    "text": { "bestFit": true, "minSize": 13, "maxSize": 18, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "onTextChange": true
+  },
+  {
+    "id": "slot-header-auto",
+    "comment": "Same slot label inside the Recent/Auto-save header container (child 'Slot' text at ap4,0). The game also writes 'No data available' into this label for empty auto slots; a 50px-tall box let bestFit wrap it onto two lines that ran into the type label ('Plot') below, so use a 26px single-line box centred on the Title row. Width 132 (not 140): this box starts 5px further right than the manual-slot header, so cap it at 14px for 'No data available' (124px) to keep a visible gap before the Title text at x=166; 'Legendary 001' still fits at 18px (132px).",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/AutoSave/*/Slot/Header/Slot",
+              "/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/RecentSave/*/Slot/Header/Slot"],
+    "rect": { "y": -10, "width": 132, "height": 26 },
+    "text": { "bestFit": true, "minSize": 13, "maxSize": 18, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "onTextChange": true
+  },
+  {
+    "id": "slot-header-auto-type",
+    "comment": "Auto-save type label under the line ('Plot' / 'Nurturing' / 'Battle'): 'Nurturing' (131px) wrapped in a 124px box. Widen to 150 and use 22px so it ends before the Time column (x=152).",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/AutoSave/*/Slot/Header/Text"],
+    "rect": { "width": 150 },
+    "text": { "fontSize": 22, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+    "id": "slot-title",
+    "comment": "Save title (in-game date, e.g. 'Year One, AprilEarly Month'): move right of the widened header (x 145 -> 166, width 300 -> 289). bestFit does not shrink these font-remapped labels (still wrapped at 29-32px), so use a fixed 21px single line with horizontal Overflow: the longest date ('Year One, SeptemberEarly Month') stays under ~300px, i.e. left of the Delete button art. Pinned via bestFit 21..21 because the focused slot's label was re-scaled to 19 by the global font substitution when its font got re-assigned.",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/**/Slot/*/Title",
+              "**/SaveGamePanel/Container/Scroll View/Viewport/Slots/*/Slot/*/Title"],
+    "rect": { "dx": 21, "dw": -11 },
+    "text": { "fontSize": 21, "bestFit": true, "minSize": 21, "maxSize": 21, "hOverflow": "Overflow", "vOverflow": "Truncate", "alignment": "MiddleLeft" },
+    "always": true,
+    "onTextChange": true
+  },
+  {
+    "id": "slot-delete-label",
+    "comment": "'Delete' (DFT_S5 30px -> Palatino) in the 100x50 box on the slot's Delete button: pin at 26px so the font-substitution rescale on Normal/Hover toggles cannot shrink it further (it had drifted to 24).",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/**/Delete/*/Text (1)"],
+    "text": { "bestFit": true, "minSize": 26, "maxSize": 26, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter" },
+    "always": true
+  },
+  {
+    "id": "panel-headers",
+    "comment": "'Loading game' / 'Save Game' panel headers (DFXingShu 69px, 500x100 box): pin at 62px (=69*0.9, the intended substituted size) - they had drifted to 56 through repeated 0.9 rescales. 'Loading game' at 62 is ~395px wide.",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/Header",
+              "**/SaveGamePanel/Container/Header"],
+    "text": { "bestFit": true, "minSize": 62, "maxSize": 62, "hOverflow": "Overflow", "vOverflow": "Truncate" },
+    "always": true
+  },
+  {
+    "id": "load-section-labels",
+    "comment": "'Recently archived' / 'Auto Save' / 'Manual Save' section labels (DFT_S5 50px, 500x100 box): pin at 45px (=50*0.9); 'Recently archived' at 45 is ~360px wide, inside the 500 box.",
+    "paths": ["/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/Auto",
+              "/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/Manual",
+              "/[UI]/TopPanel/MenuPanel/LoadGamePanel/Container/Recent"],
+    "text": { "bestFit": true, "minSize": 45, "maxSize": 45, "hOverflow": "Overflow", "vOverflow": "Truncate" },
+    "always": true
+  },
+
+  // ---- title screen -------------------------------------------------------
+  {
+    "id": "title-community-link",
+    "comment": "Title-screen community link (bottom-right corner). 'Player Community' needs ~328px on one line but the box is 300 wide with Wrap+Truncate, so it wrapped and the second line was cut off below the screen edge - only 'player' was visible. The button is right-anchored with pivot.x=1, so widening grows it leftwards over empty background and the 15px right margin is preserved. Overflow stops it wrapping again if the string grows.",
+    "paths": ["/UI/Layer_1/CommunityLink"],
+    "rect": { "width": 360 },
+    "always": true
+  },
+  {
+    "id": "title-community-link-text",
+    "comment": "The label stretches to fill CommunityLink, so widening the button widens the text box too; this just stops the wrap and keeps it bottom-right aligned.",
+    "paths": ["/UI/Layer_1/CommunityLink/Text"],
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "LowerRight" },
+    "always": true,
+    "onTextChange": true
+  }
+]

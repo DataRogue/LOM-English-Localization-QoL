@@ -1,0 +1,15 @@
+[
+  {
+    "id": "legend-text-body",
+    "comment": "Legend/biography body (one Text per ~5000 chars, instantiated at runtime). Chinese design: 23px, line spacing 1.0 in a 1180px-wide layout-controlled box, i.e. ~120 Latin chars per line. Bump to 24px with 1.25 line spacing for a readable serif paragraph; bestFit off and onTextChange so the XUnity resizer (AutoResize 16-22) cannot shrink it after the game sets the text. Height is driven by the VerticalLayoutGroup/ContentSizeFitter so nothing is truncated.",
+    "paths": ["**/StatusPanel/Container/Panels/Legend/Mask/Scroll View/Viewport/Content/LegendText*"],
+    "onTextChange": true,
+    "text": { "fontSize": 24, "lineSpacing": 1.25, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" }
+  },
+  {
+    "id": "legend-content-measure",
+    "comment": "Scroll content: shorten the line measure from 1180px to ~1100px (about 100 chars at 24px) with a wider right padding, and add bottom padding so the last line is not flush against the mask edge when scrolled to the end. Left edge kept at the design position (x=489) beside the portrait.",
+    "paths": ["**/StatusPanel/Container/Panels/Legend/Mask/Scroll View/Viewport/Content"],
+    "layout": { "type": "Vertical", "padding": [0, 100, 0, 24], "spacing": 12, "childAlignment": "UpperLeft", "childControlWidth": true, "childControlHeight": true, "childForceExpandWidth": false, "childForceExpandHeight": false }
+  }
+]

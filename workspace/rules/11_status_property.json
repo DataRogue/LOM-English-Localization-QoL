@@ -1,0 +1,247 @@
+[
+  // ---------------------------------------------------------------------------
+  // StatusPanel > Attributes tab (/[UI]/TopPanel/StatusPanel/Container/Panels/Property/**)
+  // ---------------------------------------------------------------------------
+
+  // --- "Attributes" header inside the [ ] bracket art -----------------------
+  {
+    "id": "prop-header",
+    "comment": "Header 'Attributes' (110px box sized for 2 hanzi). Keep it centered, single line, overflow allowed; brackets are moved apart below.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/Header",
+    "onTextChange": true,
+    "text": { "fontSize": 36, "bestFit": false, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperCenter", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-header-bracket-left",
+    "comment": "'[' bracket art: move left so it no longer overlaps the 162px wide English header.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/Header (1)",
+    "rect": { "dx": -24 }
+  },
+  {
+    "id": "prop-header-bracket-right",
+    "comment": "']' bracket art: move right past the end of 'Attributes'.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/Header (2)",
+    "rect": { "dx": 36 }
+  },
+
+  // --- Radar chart vertex titles ---------------------------------------------
+  {
+    "id": "prop-radar-titles",
+    "comment": "Radar titles were 50x40 wrap+truncate boxes ('Qin', 'Bla', 'Inn'). Side vertices: 120px box, 18px, wrap to two lines instead of truncating (frame edge is only ~60px from the label center).",
+    "path": "**/Panels/Property/StatRadarChart/StatPanel_1_*/Title",
+    "onTextChange": true,
+    "rect": { "width": 120, "height": 56 },
+    "text": { "fontSize": 18, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "UpperCenter", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-radar-titles-top-bottom",
+    "comment": "Top ('Stamina') and bottom ('Hidden Weapon') vertices have room for a single 200px line.",
+    "paths": ["**/Panels/Property/StatRadarChart/StatPanel_1_Str/Title", "**/Panels/Property/StatRadarChart/StatPanel_1_Weapon/Title"],
+    "onTextChange": true,
+    "rect": { "width": 200, "height": 40 },
+    "text": { "fontSize": 20, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "UpperCenter", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-radar-values-two-line",
+    "comment": "Values under the two-line side titles ('Fist and palm', 'Inner strength', 'Blade and sword'): drop 22px so the second title line does not run into the number.",
+    "paths": ["**/Panels/Property/StatRadarChart/StatPanel_1_Fist/Value", "**/Panels/Property/StatRadarChart/StatPanel_1_Stamina/Value", "**/Panels/Property/StatRadarChart/StatPanel_1_Sword/Value"],
+    "rect": { "dy": -22 }
+  },
+
+  // --- Right column: progress rows (Knowledge / Mouth Power / Resist Poison / Resist Paralysis)
+  {
+    "id": "prop-rows-shift-left",
+    "comment": "Both stat row groups start 15px further left to gain room for the wider English titles.",
+    "paths": ["**/Panels/Property/Panels/PropertyPanel/StatPanel (1)", "**/Panels/Property/Panels/PropertyPanel/StatPanel (2)"],
+    "rect": { "dx": -15 }
+  },
+  {
+    "id": "prop-row-titles",
+    "comment": "Row titles were 40x30 wrap+truncate ('Kno','Res','Per'). 130px box, best fit 12-16 keeps 'Resist Paralysis' on one line; overrides resizer AutoResize(8,12)+ls0.8.",
+    "paths": ["**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/Title", "**/Panels/Property/Panels/PropertyPanel/StatPanel (2)/StatPanel_*/Title"],
+    "onTextChange": true,
+    "rect": { "width": 130, "height": 30 },
+    "text": { "bestFit": true, "minSize": 12, "maxSize": 16, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleLeft", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-progress-row-width",
+    "comment": "Progress rows: widen so the right-anchored value moves right (bar shifted +90 below).",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*",
+    "rect": { "dw": 92 }
+  },
+  {
+    "id": "prop-progress-bar",
+    "comment": "Progress bar: start after the 130px title instead of at 48.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/Bar",
+    "rect": { "dx": 90 }
+  },
+  {
+    "id": "prop-progress-value",
+    "comment": "Progress value ('3', '10'): plain 19px, no resizer best-fit.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/Value",
+    "onTextChange": true,
+    "text": { "fontSize": 19, "bestFit": false, "hOverflow": "Overflow", "alignment": "MiddleRight", "lineSpacing": 1.0 }
+  },
+
+  // --- Right column: two-form rows (Personality / Worldliness / Morality / Cultivation)
+  {
+    "id": "prop-twoform-row-width",
+    "comment": "Two-form rows: widen so the right-anchored level text starts just after the (shortened) slider.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (2)/StatPanel_*",
+    "rect": { "dw": 30 }
+  },
+  {
+    "id": "prop-twoform-slider",
+    "comment": "Slider: start after the title, shorten 141 -> 90 to leave room for level words like 'Pretentiousness'.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (2)/StatPanel_*/Slider",
+    "rect": { "dx": 88, "width": 90 }
+  },
+  {
+    "id": "prop-twoform-slider-parts",
+    "comment": "Slider background bar and handle track are fixed 140px images: match the 90px slider.",
+    "paths": ["**/Panels/Property/Panels/PropertyPanel/StatPanel (2)/StatPanel_*/Slider/Background", "**/Panels/Property/Panels/PropertyPanel/StatPanel (2)/StatPanel_*/Slider/Handle Slide Area"],
+    "rect": { "width": 90 }
+  },
+  {
+    "id": "prop-twoform-level",
+    "comment": "Level word ('Moderate', 'Pretentiousness'): 15px single line overflowing right (nothing sits to its right), no resizer best-fit / 0.8 line spacing.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (2)/StatPanel_*/Text",
+    "onTextChange": true,
+    "text": { "fontSize": 15, "bestFit": false, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft", "lineSpacing": 1.0 }
+  },
+
+  // --- Combat stat labels under the icons ------------------------------------
+  {
+    "id": "prop-combat-row1-names",
+    "comment": "Row 1 (Attack/Defense/Ultimate/Burst) fit at 19px; cancel the resizer best-fit (6-16) that shrank 'Ultimate'.",
+    "path": "**/Panels/Property/CombatStat (1)/StatPanel_Combat_*/Name",
+    "onTextChange": true,
+    "text": { "fontSize": 19, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "MiddleCenter", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-combat-row2-layout",
+    "comment": "Row 2 has only two items; spread them (spacing 100) and shift left so the pair stays centered under row 1, giving the long names room.",
+    "path": "**/Panels/Property/CombatStat (2)",
+    "rect": { "dx": -54 },
+    "layout": { "spacing": 100 }
+  },
+  {
+    "id": "prop-combat-row2-names",
+    "comment": "'Power of Hidden Weapons' / 'Hidden Weapon Burst': 160px box, 16px, two lines below the icon instead of 12px squeezed text.",
+    "path": "**/Panels/Property/CombatStat (2)/StatPanel_Combat_*/Name",
+    "onTextChange": true,
+    "rect": { "width": 160, "height": 50, "dy": -20 },
+    "text": { "fontSize": 16, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "UpperCenter", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-combat-row2-values",
+    "comment": "Row 2 values move down under the two-line names.",
+    "path": "**/Panels/Property/CombatStat (2)/StatPanel_Combat_*/Value",
+    "rect": { "dy": -24 }
+  },
+  {
+    "id": "prop-combat-tip-header",
+    "comment": "Combat stat tooltip header: plain 20px single line (resizer best-fit made it 12-16px).",
+    "path": "**/Panels/Property/CombatStat (*)/StatPanel_Combat_*/CombatStatTipPanel/Back/Header",
+    "onTextChange": true,
+    "text": { "fontSize": 20, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "MiddleLeft", "lineSpacing": 1.0 }
+  },
+
+  // --- Attributes / Skill toggle labels ---------------------------------------
+  {
+    "id": "prop-toggle-labels",
+    "comment": "Attributes/Skill toggle captions (98px TMP boxes with auto-size): 170px, single line, fixed 22px for both states.",
+    "path": "**/Panels/Property/Buttons/*/*/Text (TMP)",
+    "onTextChange": true,
+    "rect": { "width": 170, "height": 40 },
+    "tmp": { "autoSize": false, "fontSize": 22, "wordWrap": false, "alignment": "Center", "overflow": "Overflow" }
+  },
+
+  // --- Portrait hover popups (Fate / Mental / Internal / Lover) --------------
+  {
+    "id": "prop-hover-fate-label",
+    "comment": "'Destiny:' label: right-aligned box ending just left of centre so the number follows it on one line.",
+    "path": "**/Panels/Property/HoverPanel/Fate/Text (1)",
+    "onTextChange": true,
+    "rect": { "anchorMin": [0.5, 1], "anchorMax": [0.5, 1], "pivot": [1, 1], "anchoredPos": [-3, -70], "sizeDelta": [130, 26] },
+    "text": { "fontSize": 18, "bestFit": false, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperRight", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-hover-fate-value",
+    "comment": "Fate number: starts right of centre next to the label (was overlapping 'Destiny3').",
+    "path": "**/Panels/Property/HoverPanel/Fate/Value",
+    "onTextChange": true,
+    "rect": { "anchorMin": [0.5, 1], "anchorMax": [0.5, 1], "pivot": [0, 1], "anchoredPos": [3, -69], "sizeDelta": [80, 30] },
+    "text": { "fontSize": 22, "bestFit": false, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperLeft", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-hover-labels",
+    "comment": "Mental/Internal/Lover labels ('Affinity:', 'Yin Yang:', 'Heartbound:'): centred line under the icon, value goes on its own line below.",
+    "paths": ["**/Panels/Property/HoverPanel/Mental/Text (1)", "**/Panels/Property/HoverPanel/Internal/Text (1)", "**/Panels/Property/HoverPanel/Lover/Text (1)"],
+    "onTextChange": true,
+    "rect": { "anchorMin": [0.5, 1], "anchorMax": [0.5, 1], "pivot": [0.5, 1], "sizeDelta": [150, 24], "x": 0 },
+    "text": { "fontSize": 18, "bestFit": false, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperCenter", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-hover-values",
+    "comment": "Mental/Internal/Lover values ('Happiness', 'Harmony', 'Junior Martial Sister'): centred 150px box, wraps to two lines if needed.",
+    "paths": ["**/Panels/Property/HoverPanel/Mental/Value", "**/Panels/Property/HoverPanel/Internal/Value", "**/Panels/Property/HoverPanel/Lover/Value"],
+    "onTextChange": true,
+    "rect": { "anchorMin": [0.5, 1], "anchorMax": [0.5, 1], "pivot": [0.5, 1], "sizeDelta": [150, 56], "x": 0 },
+    "text": { "fontSize": 18, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "UpperCenter", "lineSpacing": 1.0 }
+  },
+  { "id": "prop-hover-mental-label-y", "comment": "Mental icon is 76px tall.", "path": "**/Panels/Property/HoverPanel/Mental/Text (1)", "rect": { "y": -78 } },
+  { "id": "prop-hover-mental-value-y", "path": "**/Panels/Property/HoverPanel/Mental/Value", "rect": { "y": -100 } },
+  { "id": "prop-hover-internal-label-y", "comment": "Internal icon is 60px tall.", "path": "**/Panels/Property/HoverPanel/Internal/Text (1)", "rect": { "y": -62 } },
+  { "id": "prop-hover-internal-value-y", "path": "**/Panels/Property/HoverPanel/Internal/Value", "rect": { "y": -84 } },
+  { "id": "prop-hover-lover-label-y", "comment": "Lover icon is 70px tall.", "path": "**/Panels/Property/HoverPanel/Lover/Text (1)", "rect": { "y": -72 } },
+  { "id": "prop-hover-lover-value-y", "path": "**/Panels/Property/HoverPanel/Lover/Value", "rect": { "y": -94 } },
+  {
+    "id": "prop-hover-blocks-spread",
+    "comment": "Mental block up 8px and Internal/Lover blocks 10px apart so the three centred text columns do not touch each other.",
+    "path": "**/Panels/Property/HoverPanel/Mental",
+    "rect": { "dy": 8 }
+  },
+  { "id": "prop-hover-internal-shift", "path": "**/Panels/Property/HoverPanel/Internal", "rect": { "dx": -10 } },
+  { "id": "prop-hover-lover-shift", "path": "**/Panels/Property/HoverPanel/Lover", "rect": { "dx": 10 } },
+
+  // --- Stat tooltips (StatTipPanel) ------------------------------------------
+  {
+    "id": "prop-tip-frame-grow-vertically",
+    "comment": "Tooltip frame: let it grow with wrapped text (was fixed 40px high, single line up to 980px wide).",
+    "paths": ["**/Panels/Property/StatRadarChart/StatPanel_1_*/StatTipPanel/Frame", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/StatTipPanel/Frame", "**/Panels/Property/Panels/PropertyPanel/PointPanel/*/StatTipPanel/Frame"],
+    "layout": { "childControlWidth": true, "childControlHeight": true, "padding": [35, 30, 8, 8] },
+    "fitter": { "horizontal": "PreferredSize", "vertical": "PreferredSize" }
+  },
+  {
+    "id": "prop-tip-text-wrap",
+    "comment": "Long stat descriptions (up to 116 chars): cap the line at 440px so they wrap to two lines inside the window.",
+    "paths": ["**/Panels/Property/StatRadarChart/StatPanel_1_Dex/StatTipPanel/Frame/Text", "**/Panels/Property/StatRadarChart/StatPanel_1_Stamina/StatTipPanel/Frame/Text", "**/Panels/Property/StatRadarChart/StatPanel_1_Fist/StatTipPanel/Frame/Text", "**/Panels/Property/StatRadarChart/StatPanel_1_Weapon/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_Talk/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_Poison/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_Paralysis/StatTipPanel/Frame/Text"],
+    "onTextChange": true,
+    "layoutElement": { "preferredWidth": 440 },
+    "text": { "fontSize": 20, "bestFit": false, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "MiddleLeft", "lineSpacing": 1.0 }
+  },
+  {
+    "id": "prop-tip-frame-right-anchored",
+    "comment": "Tooltips of the right column open to the right of the value and ran off screen: hang the frame from the panel's top-right corner so it grows leftwards.",
+    "paths": ["**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/StatTipPanel/Frame", "**/Panels/Property/Panels/PropertyPanel/PointPanel/*/StatTipPanel/Frame"],
+    "rect": { "anchorMin": [1, 1], "anchorMax": [1, 1], "pivot": [1, 1], "anchoredPos": [0, 0] }
+  },
+  {
+    "id": "prop-tip-rows-right-edge",
+    "comment": "Right-column row tooltips: right edge at ~1750px (inside the window) instead of 1925.",
+    "path": "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/StatTipPanel",
+    "rect": { "dx": -175 }
+  },
+  { "id": "prop-tip-learn-edge", "comment": "Learn/Forge/Alchemy point tooltips: right edge at ~1750px.", "path": "**/Panels/Property/Panels/PropertyPanel/PointPanel/Learn/StatTipPanel", "rect": { "dx": -9 } },
+  { "id": "prop-tip-forge-edge", "path": "**/Panels/Property/Panels/PropertyPanel/PointPanel/Forge/StatTipPanel", "rect": { "dx": -84 } },
+  { "id": "prop-tip-alchemy-edge", "path": "**/Panels/Property/Panels/PropertyPanel/PointPanel/Alchemy/StatTipPanel", "rect": { "dx": -159 } },
+  {
+    "id": "status-player-title",
+    "comment": "Player title under the portrait: 'Tang Clan Underling' (pref 303x78 at 32px) wrapped in a 300x57 Truncate box, so the second line vanished and the player saw only 'Tang Clan'. Taller box with best-fit keeps two-word ranks whole; raised 42px so the second line clears the name plate below.",
+    "paths": ["**/StatusPanel/Container/Panels/*/Character/Title", "**/StatusPanel/Container/Panels/*/Title"],
+    "onTextChange": true,
+    "rect": { "height": 84, "dy": 42 },
+    "text": { "bestFit": true, "minSize": 18, "maxSize": 32, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "MiddleCenter" }
+  }
+]

@@ -1,0 +1,104 @@
+[
+  // ---------------------------------------------------------------------------
+  // Combat HUD around the action stack: the "[ Command ]" caption and the
+  // Speed / Status / Menu buttons. Loads after 71_combat_stack.json, which turns
+  // the action buttons into a bottom-aligned vertical stack at screen x1500-1800,
+  // y498-1050. All screen coordinates below are 1920x1080, origin top-left, read
+  // from a live capture (captures/after_battle_main.txt).
+  // ---------------------------------------------------------------------------
+
+  // ---- "[ Command ]" caption ----------------------------------------------
+  // ActionText is a MovePanel holding three Texts: "[", the word, and a second
+  // "[" rotated 180 to serve as "]". It sat at screen x832-1002, y873-943, which
+  // was beside the old horizontal card row but is marooned mid-screen now that the
+  // cards are a column on the right. Move the group to the left of the stack,
+  // vertically centred on it.
+  //
+  // Arithmetic. ActionText is anchored to ActionButtonPanel's top-left corner
+  // (panel top y=737, left x=873), so screen_x = 873 + ap.x and screen_y = 737 - ap.y.
+  // Only the parent needs a rule: the three children ride along on the offsets that
+  // 50_battle.json already gives them (battle-command-word / -bracket-left / -bracket-right,
+  // which turned the vertical CJK tag into a horizontal "[ Command ]"). Do NOT "fix" the
+  // 5px stagger between the brackets and the word - it is a deliberate optical correction
+  // for the glyph's baseline, which draws "[" low and the 180-rotated "]" high. Levelling
+  // the boxes makes the brackets sit visibly high against the word.
+  // Relative to ActionText the group spans x-81 .. x+89 (centre = ActionText_x + 4)
+  // and y+83 .. y+153 (centre = ActionText_y + 118).
+  //
+  // Target: the stack now sits in the bottom-right corner at x1600-1900, y508-1060, so its
+  // vertical centre is (508+1060)/2 = 784 and the caption follows it right by the same 100px.
+  // The right edge goes at 1520. Not 1580 (which would only clear the resting cards):
+  // hovering a card slides it 60px LEFT to x1540, so the caption has to sit clear of THAT,
+  // or the middle card slides over the closing bracket. 1520 leaves a 20px gap.
+  //   ActionText_x = 1520 - 89  = 1431 -> ap.x = 1431 - 873 = 558
+  //   ActionText_y = 784 - 118  = 666  -> ap.y = 737 - 666  = 71
+  // The caption's left edge (1250) crosses the ActionInfo panel (x970-1290), but that is
+  // harmless: CombatManager hides the menu panel immediately before showing ActionInfo
+  // (ShowMenuPanel(false) then ShowActionInfoPanel(true)), and the caption lives inside
+  // ActionButtonPanel's CanvasGroup, so it has already faded out by then.
+  // Checked against the dump: the only thing overlapping that band is
+  // ActionButtonPanel itself, which is a bare CanvasGroup with no Image. Above the
+  // stack was tried first and rejected - EnemyDialog (x1006-1862, y209-481), the
+  // enemy BuffContainer (x1071-1671, y293-553) and SupportContainer (x1395-1900,
+  // y217-491) all claim that space when they appear.
+  {
+    "id": "combat-command-caption",
+    "comment": "Move the '[ Command ]' caption from mid-screen to the left of the action stack, vertically centred on it. See the arithmetic above.",
+    "paths": ["/[UI]/MainUI/Layer_3/ActionButtonPanel/ActionText"],
+    "always": true,
+    "rect": { "anchoredPos": [558, 71] }
+  },
+
+  // ---- Speed / Status / Menu buttons --------------------------------------
+  // These three were a vertical column pinned to the bottom-right corner
+  // (anchor 1,0 - pivot 1,0 - so rect_right = 1920 + ap.x, rect_bottom = 1080 - ap.y).
+  // Re-anchor to bottom centre (0.5,0), where rect_right = 960 + ap.x, and lay them
+  // out left to right in the order they used to read top to bottom: Speed, Status, Menu.
+  //
+  // Each button's box is 100x111 but the visible diamond is only a 90x90 child, and
+  // it does not sit the same way in every box: Speed and Menu carry theirs at the top
+  // (offset 0), Status 16px down. The row is therefore aligned by the DIAMONDS, not
+  // the boxes, or Status would ride 16px high.
+  //
+  // Diamonds: 3 x 90 wide with 20px gaps = 310, centred on x=960 -> lefts at 805, 915, 1025.
+  // (The game's own column had the diamonds 5-12px apart, so 20 keeps that density while
+  // reading clearly as three separate targets. Status lands dead centre, 915-1005.)
+  // Box left = diamond left (all three), box right = box left + 100:
+  //   Speed  box 805-905   -> ap.x =  905 - 960 =  -55
+  //   Status box 915-1015  -> ap.x = 1015 - 960 =   55
+  //   Menu   box 1025-1125 -> ap.x = 1125 - 960 =  165
+  // Diamond tops at y=928 (bottom 1018, clearing the Tip strip at y1028-1080 by 10px;
+  // the buttons are on Layer_3 and the Tip on Layer_2, so they would otherwise cover it):
+  //   Speed  box top 928      -> bottom 1039 -> ap.y = 1080 - 1039 = 41
+  //   Status box top 928-16=912 -> bottom 1023 -> ap.y = 1080 - 1023 = 57
+  //   Menu   box top 928      -> bottom 1039 -> ap.y = 41
+  //
+  // standbyOffset: all three ship with (+200, 0) - they slid in from the right screen
+  // edge, verified in game via "invoke <path> MovePanel.get_StandByAnchoredPosition"
+  // (origin x -12.8, standby x 187.2). At the bottom centre that would drag them across
+  // the middle of the screen, so they now rise from below it instead.
+  {
+    "id": "combat-hud-speed-button",
+    "comment": "Fast-forward button: first in the bottom-centre row.",
+    "paths": ["/[UI]/MainUI/Layer_3/SpeedButton"],
+    "always": true,
+    "rect": { "anchorMin": [0.5, 0], "anchorMax": [0.5, 0], "anchoredPos": [-55, 41] },
+    "movePanel": { "standbyOffset": [0, -180] }
+  },
+  {
+    "id": "combat-hud-status-button",
+    "comment": "Status button: middle of the row. Its 90x90 diamond sits 16px down inside the 111-tall box, so the box goes 16px higher than its neighbours' to line the diamonds up.",
+    "paths": ["/[UI]/MainUI/Layer_3/StatusButton"],
+    "always": true,
+    "rect": { "anchorMin": [0.5, 0], "anchorMax": [0.5, 0], "anchoredPos": [55, 57] },
+    "movePanel": { "standbyOffset": [0, -180] }
+  },
+  {
+    "id": "combat-hud-menu-button",
+    "comment": "Menu button: last in the row.",
+    "paths": ["/[UI]/MainUI/Layer_3/MenuButton"],
+    "always": true,
+    "rect": { "anchorMin": [0.5, 0], "anchorMax": [0.5, 0], "anchoredPos": [165, 41] },
+    "movePanel": { "standbyOffset": [0, -180] }
+  }
+]

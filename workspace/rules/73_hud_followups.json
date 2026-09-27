@@ -1,0 +1,344 @@
+[
+  // ---------------------------------------------------------------------------
+  // Follow-ups from a play session. Loads last, so anything here wins.
+  // All screen coordinates are 1920x1080, origin top-left, read from live captures.
+  // ---------------------------------------------------------------------------
+
+  // ---- 1. "Controls" hint, bottom-right of the story/free HUD -------------
+  // The Info group (a "?" icon plus the word) is pinned to the bottom-right corner:
+  // rect_right = 1920 + ap.x with the icon at 1809-1839 and the label at 1843-1920.
+  // The label's box therefore ENDS on the screen edge, and "Controls" at 18px needs
+  // about 72 of its 77px, so the final letter sits 2px from the bezel and clips on
+  // any overscan. Pull the whole group 40px left; nothing else lives in that band
+  // (the gamepad badge above it is at y693-793).
+  {
+    "id": "hud-controls-hint-inset",
+    "comment": "Bottom-right 'Controls' hint sat flush against the screen edge and lost its last letter. ap.x -81 -> -121 moves the icon and the word together, leaving a 40px margin.",
+    "paths": ["/[UI]/MainUI/*/Info"],
+    "always": true,
+    "rect": { "anchoredPos": [-121, 238] }
+  },
+
+  // ---- 2. Mood gauge in the free-roam top bar -----------------------------
+  // Header box 110,42-220,67 and Bar box 226,44-340,65 share a centre line at y54.5,
+  // so on paper they are aligned - but the bar SPRITE only inks y45-56 inside its
+  // 21px box, so its visible centre is y50.5 while the label's glyphs centre on y54.5.
+  // The label reads 4px low against the gauge. Lift it by 4 (ap.y 2 -> 6).
+  {
+    "id": "hud-mood-header-align",
+    "comment": "The gauge label sat 4px below the bar it labels: the bar sprite has transparent padding at the bottom, so its visible centre is 4px above its box centre. Measured from the rendered pixels, not the rects.",
+    "paths": ["/[UI]/MainUI/*/ActionInfo/MentalBar/Header"],
+    "always": true,
+    "onTextChange": true,
+    "rect": { "anchoredPos": [0, 6] }
+  },
+
+  // ---- 3. Map location tooltips (free roam) -------------------------------
+  // Each marker has a Tooltip_* plate. NOTE the real path is /MainMap/<Location>/Tooltip_<Location>/Back
+  // - there is a per-location node between the map root and the tooltip, so a
+  // "/MainMap/Tooltip_*" pattern matches nothing. Structure: Back 200x103 holding a 70px icon, a Title at
+  // ap(60,-20) in a 160x45 box at 27px, and a Desc ("Action Cost: N") under it.
+  // 160px fits Chinese (正心堂 = 81px, 大門 = 54px) but not English. Measured
+  // preferred widths at 27px: Sermon Hall 152, Back Mountain 185, Alchemy Room 188,
+  // Kitchen Steward 202, Training Grounds 219, Blacksmith's Forge 227, Male
+  // Disciple's Quarters 295. Six of the ten overflow, and because the box is
+  // Wrap+Truncate they wrap and lose the second line - "Men's Quarters" showed as
+  // "Men's". Widen the plate and let long names WRAP at word boundaries at full size
+  // rather than shrinking to fit - a two-line plate reads better than a smaller one.
+  // Wrapping needs vertical room, so the plate grows too, and the three children are
+  // re-stacked inside it (plate-relative y): icon 31..101, title 16..90 (two lines of
+  // 27px at 0.85 line spacing = 62), desc 94..124. The title box starts at x95 so it
+  // clears the 70px icon at x12..82 instead of running over its right edge.
+  // vOverflow must be Overflow, not Truncate: Truncate is what cut the second line off
+  // in the first place.
+  {
+    "id": "map-tooltip-plate",
+    "comment": "Location tooltip plate: 200x103 -> 340x132, wide enough for one-line English names and tall enough for the longest to take two.",
+    "paths": ["**/Tooltip_*/Back"],
+    "always": true,
+    "rect": { "width": 340, "height": 132 }
+  },
+  {
+    "id": "map-tooltip-title",
+    "comment": "Location name: kept at its full 27px and allowed to wrap onto a second line at a word boundary. The box is 230 wide (x95..325, clear of the icon) and 74 tall, which holds two 27px lines at 0.85 spacing.",
+    "paths": ["**/Tooltip_*/Back/Title"],
+    "always": true,
+    "onTextChange": true,
+    "rect": { "width": 230, "height": 74, "anchoredPos": [95, -16] },
+    "text": { "bestFit": false, "fontSize": 27, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Overflow", "lineSpacing": 0.85 }
+  },
+  {
+    "id": "map-tooltip-icon",
+    "comment": "Location icon re-centred in the taller plate (70px tall in 132: y31..101).",
+    "paths": ["**/Tooltip_*/Back/Icon"],
+    "always": true,
+    "rect": { "anchoredPos": [12, -31] }
+  },
+  {
+    "id": "map-tooltip-desc",
+    "comment": "'Action Cost: N' sits below the name, clear of a two-line title.",
+    "paths": ["**/Tooltip_*/Back/Desc"],
+    "always": true,
+    "onTextChange": true,
+    "rect": { "width": 230, "height": 30, "anchoredPos": [95, -94] },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow" }
+  },
+
+  // ---- 4. Development panel scrim -----------------------------------------
+  // UpgradeInfoPanel is a full-screen modal over the status screen, and its root
+  // Image (a tinted whiteSquare) is the only thing separating the two. The game's
+  // tint is far too light: the sect description, the tab list, the facility cards,
+  // the ledger total and the player name all read straight through the development
+  // grid. This is the game's own behaviour, not something the mod introduced - it
+  // reproduces with every layer disabled - but English makes it much worse, because
+  // the text behind is now wide horizontal prose instead of narrow vertical CJK
+  // columns, so far more of it lands under the panel's own labels.
+  // Darkening the root Image only affects what is BEHIND: the panel's own content
+  // are children and draw after it.
+  {
+    "id": "upgrade-panel-scrim",
+    "comment": "Development panel let the whole status screen read through it. Darken the modal scrim to near-opaque so the development grid is legible; the panel's own contents are children and are unaffected.",
+    "paths": ["**/UpgradeInfoPanel"],
+    "always": true,
+    "image": { "color": "#0A0A0CF2" }
+  },
+
+  // ---- 5. Stat-change popup (GoodEvilStat / NegativePositiveStat) ---------
+  // Spawned as a clone whenever a stat moves: a label, a slider showing the new
+  // position, the resulting tier, and an up/down arrow. Read out of the prefab in
+  // sharedassets2.assets, because the per-panel inventory only records nodes with a
+  // Text or an Image and so omits the Slider entirely. Design-time layout, x ranges,
+  // root 272.4x28 with every child anchored top-left except the arrow, which is
+  // centre-anchored:
+  //     Title    7.0 .. 47.0     (40 wide, or 43 on NegativePositiveStat)
+  //     Slider  60.3 .. 200.3    (140 wide; bars 85.5 .. 184.5 inside it)
+  //     Value  203.4 .. 253.4    (50 wide)
+  //     Sign   243.1 .. 293.1    (50 wide, same slot as Value - they alternate)
+  //     arrow  240.9 .. 290.9    (centre-anchored, ap.x 129.7 on a 272.4 root)
+  // 40px holds the two Chinese glyphs it was built for (道德, 處世) and nothing else,
+  // so "Worldliness" clipped to "Wor" and "Personality" to "Pers"; the 50px value box
+  // wrapped "Moderate" onto two lines. Neither can wrap usefully - they are single
+  // words - so the row is widened and re-spaced instead:
+  //     Title    7 .. 127        (120 wide; "Worldliness" is ~105 at 19px)
+  //     Slider 140 .. 280        (bars 165 .. 264, keeping their offset inside it)
+  //     Value  285 .. 375        (90 wide; "Moderate" is ~78 at 18px, one line)
+  //     arrow  centred on 390    (root 430 -> centre 215, so ap.x 175)
+  // The root and its backing bar grow to match. bestFit is a floor, not the mechanism:
+  // at these sizes it never triggers for the real stat names.
+  {
+    "id": "statchange-row",
+    "comment": "Stat-change popup row widened from 272 to 430 so English stat names fit. The LayoutElement is insurance: these rows are spawned into a container at runtime, and if that container drives width through a layout group then setting sizeDelta alone would be overridden on the next rebuild.",
+    "paths": ["**/GoodEvilStat*", "**/NegativePositiveStat*"],
+    "always": true,
+    "rect": { "width": 430 },
+    "layoutElement": { "add": true, "preferredWidth": 430, "minWidth": 430 }
+  },
+  {
+   "id": "statchange-backdrop",
+   "comment": "Its backing bar, 250 -> 422. It ends 9px inside the arrow's box (arrow box 413..463), as the prefab's did (bar end 250, arrow box from 240.9), so the arrow still straddles the end of the bar.",
+   "paths": [
+    "**/GoodEvilStat*/Background",
+    "**/NegativePositiveStat*/Background"
+   ],
+   "always": true,
+   "rect": {
+    "width": 422
+   }
+  },
+  {
+   "id": "statchange-title",
+   "comment": "Stat name as a one-line shrink-to-fit box: 124x28, Wrap + Truncate (two lines never fit 28 at 13-19px). The old 120 box with vOverflow wrapped 'Yin and Yang' (PlayerStat/internal, 128px at 19) onto a second line hanging below the 30px bar, because best fit only shrinks a word that cannot fit the width, never for height when vOverflow is Overflow. At 19px: Personality 111, Worldliness 119, Cultivation 108, Morality 84 keep full size; Yin and Yang fits at 18 (123). MiddleLeft puts the line on the row's centre line (-14), shared with the tier and the arrow; its ink ends by x 131, 7px clear of the slider needle's leftmost reach (137.7).",
+   "paths": [
+    "**/GoodEvilStat*/Title",
+    "**/NegativePositiveStat*/Title"
+   ],
+   "always": true,
+   "onTextChange": true,
+   "rect": {
+    "width": 124,
+    "height": 28,
+    "anchoredPos": [
+     7,
+     0
+    ]
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 13,
+    "maxSize": 19,
+    "alignment": "MiddleLeft",
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+    "id": "statchange-slider",
+    "comment": "Slider track moved right of the widened label (60.3 -> 140). Its children are positioned relative to it and follow.",
+    "paths": ["**/GoodEvilStat*/Slider", "**/NegativePositiveStat*/Slider"],
+    "always": true,
+    "rect": { "anchoredPos": [140, -8.2] }
+  },
+  {
+   "id": "statchange-value",
+   "comment": "Resulting tier as a one-line shrink-to-fit box: 124x28 at x 288, Wrap + Truncate, centred on -14 (an 18px line is 26px tall in Unity's layout, so one line fits 28 and two never do at 12-18px). The old 90x55 box with vOverflow put every two-word tier on two 26px lines spilling above and below the 30px bar (at 18px: Greater Yang 122, Good Person 116, Lesser Yang 111, Greater Yin 106, Bad Person 104, Lesser Yin 95), shrank single words to 15-16px (Pretentious 105, Gentleman 100, Composed 96, Courteous 94), and on the old arrow (centre 390) any tier wider than 72px, 'Moderate' included (ink to 374), ran under the Up3 burst frames (ink from x 366). 124 holds the widest tier, Greater Yang, at the full 18px (ink 289..411); the slider needle's visible ink reaches at most x 282.7, 6px short of it.",
+   "paths": [
+    "**/GoodEvilStat*/Value",
+    "**/NegativePositiveStat*/Value"
+   ],
+   "always": true,
+   "onTextChange": true,
+   "rect": {
+    "width": 124,
+    "height": 28,
+    "anchoredPos": [
+     288,
+     0
+    ]
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 12,
+    "maxSize": 18,
+    "alignment": "MiddleCenter",
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "statchange-arrow",
+   "comment": "Up/down arrow. Its Animator (StatModify_Animator, clips Up1-3/Down1-3) only swaps Image.m_Sprite, so this position holds. Centre-anchored: centre = row width / 2 + ap.x = 215 + 223 = 438, box 413..463. Each frame is a 100x100 sprite cell drawn at half size with its trimmed art at its offset: only Up3 frames 8-10 ink within 1-3.5px of the box's left edge, 3px clear of the widest tier's ink (Greater Yang, ends at 411); Down3 inks from 8.5px in and every other frame from 10px or more, so the gap there is at least 10px.",
+   "paths": [
+    "**/GoodEvilStat*/StatModifyIcon",
+    "**/NegativePositiveStat*/StatModifyIcon"
+   ],
+   "always": true,
+   "rect": {
+    "anchoredPos": [
+     223,
+     0
+    ]
+   }
+  },
+  {
+   "id": "relmod-placeholder-shift",
+   "comment": "Relationship (Affinity) popups spawn in a column at x=324, just right of the stat-change rows, whose arrow ended at 317 in the prefab. Widened, the stat rows' arrow box ends at x=489 on screen (container 26 + 463; the Up3 burst ink ends at 488), so a relationship popup shown alongside a stat change drew its portrait frame and 'Affinity' over the tier and the arrow (490 story command groups do both). Moved right by 176 to x=500: the frame's ink starts 0.8px left of the column origin, 10px clear of the arrow box. Later columns still step 250 to the right.",
+   "path": "/[UI]/MainUI/Layer_5/RelationshipModPlaceholder",
+   "rect": {
+    "dx": 176
+   }
+  },
+  {
+   "id": "statchange-normal-title",
+   "comment": "NormalStat, the row spawned for every ordinary and martial stat (Mouth Power, Martial Points, Reputation, Cohesion, the weapon categories, resistances), had no rule. Its prefab title is 40x30, Wrap + Truncate, 19px, no best fit, so names break after a few letters ('Mo', 'Mar', 'Bla', 'Par'). This makes it 150 wide and a one-line shrink-to-fit box, 13-19px (two lines never fit 30). Most names keep 19px; Hidden Weapon and Leg Techniques drop to 18, Blade and Sword 17, Poison Resistance 16, Paralysis Resistance 14 (146px). The English patch's status.resizer.txt gives this label AutoResize(6,10) + Overflow on the MainUI path; onTextChange keeps these values over it.",
+   "paths": [
+    "**/StatModPlaceholder/NormalStat*/Title"
+   ],
+   "always": true,
+   "onTextChange": true,
+   "rect": {
+    "width": 150,
+    "height": 30,
+    "anchoredPos": [
+     7,
+     0
+    ]
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 13,
+    "maxSize": 19,
+    "alignment": "MiddleLeft",
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "statchange-normal-shift",
+   "comment": "Everything to the right of the NormalStat title moves by the 110 the title grew, keeping the prefab's spacing: the bar goes from 57.2 to 167.2 (it draws 144 wide at scale 1.2 and ends at 311.2), the value box from 209.5 to 319.5, and the arrow's ap.x from 132.2 to 242.2. The arrow is centre-anchored on the unchanged 272.4 root, so its centre moves from 268.4 to 378.4. Anchored under StatModPlaceholder because the dev TestPanel has its own 'NormalStats' node.",
+   "paths": [
+    "**/StatModPlaceholder/NormalStat*/Bar",
+    "**/StatModPlaceholder/NormalStat*/Value",
+    "**/StatModPlaceholder/NormalStat*/Icon"
+   ],
+   "always": true,
+   "rect": {
+    "dx": 110
+   }
+  },
+  {
+   "id": "statchange-normal-backdrop",
+   "comment": "NormalStat backing bar 250 -> 360, ending 6.6px inside the arrow's box as in the prefab.",
+   "paths": [
+    "**/StatModPlaceholder/NormalStat*/Background"
+   ],
+   "always": true,
+   "rect": {
+    "dw": 110
+   }
+  },
+  {
+   "id": "map-name-008-two-lines",
+   "comment": "Travel map: 'Six Paths Gorge' (008, 119px at 15pt from x967) ran into 'Nanyang' (012, starts x1085) on the same line (text bands y350-371 vs y352-374 local, 1px overlap), reading as 'Six Paths GorgeNanyang'; the Chinese labels were 20px columns 118px apart. An 80px box wraps it at its own anchor as 'Six Paths' (69px) / 'Gorge' (46px): 49px clear of Nanyang, and the second line ends 24px short of Xiangyang (011, x1037) below it. Widths from measure.py (shs 15, identical to the dump prefs).",
+   "paths": [
+    "**/Map/Background/[Name]/008"
+   ],
+   "onTextChange": true,
+   "rect": {
+    "width": 80,
+    "height": 42
+   },
+   "text": {
+    "hOverflow": "Wrap",
+    "vOverflow": "Overflow",
+    "alignment": "MiddleLeft"
+   }
+  },
+  {
+   "id": "map-name-017-clear-kongtong",
+   "comment": "Travel map: 'Flame Mountain Sword Pass' (017, 216px at 15pt from x536, text band y175-196 local) covered 'Kongtong' (006, x656-730, band y186-207) by 74px x 10px: the Chinese columns were 120px apart, the horizontal labels start only 11px apart vertically. Raised 24px (ap y -170 -> -146): its band becomes y151-172, 14px above Kongtong. No other label sits above 017 (006 at ap y -181 is the next highest).",
+   "paths": [
+    "**/Map/Background/[Name]/017"
+   ],
+   "rect": {
+    "dy": 24
+   }
+  },
+  {
+   "id": "library-legend-text-body",
+   "comment": "Records > legend reader (LibraryPanel/LegendStoryPanel) shows the same biography as Status > Legend through the same LegendText prefab (23pt, line spacing 1.0) in the same 1200px-wide scroll view (mask x373-1573 in library_all_title_library_legend.txt), but legend-text-body only covers the status copy and no XUnity resizer targets this path. Same treatment: 24pt, 1.25 spacing, height from the layout.",
+   "paths": [
+    "**/LibraryPanel/LegendStoryPanel/Mask/Scroll View/Viewport/Content/LegendText*"
+   ],
+   "onTextChange": true,
+   "text": {
+    "fontSize": 24,
+    "lineSpacing": 1.25,
+    "bestFit": false,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "UpperLeft"
+   }
+  },
+  {
+   "id": "library-legend-content-measure",
+   "comment": "Its content (VerticalLayoutGroup ctrl=11, prefab padding right 20): the same 1100px measure as legend-content-measure, split 50/50 because this reader is centred on a full-screen scrim with no portrait beside it; bottom padding so the last line clears the mask.",
+   "paths": [
+    "**/LibraryPanel/LegendStoryPanel/Mask/Scroll View/Viewport/Content"
+   ],
+   "layout": {
+    "type": "Vertical",
+    "padding": [
+     50,
+     50,
+     0,
+     24
+    ],
+    "spacing": 12,
+    "childAlignment": "UpperLeft",
+    "childControlWidth": true,
+    "childControlHeight": true,
+    "childForceExpandWidth": false,
+    "childForceExpandHeight": false
+   }
+  }
+]

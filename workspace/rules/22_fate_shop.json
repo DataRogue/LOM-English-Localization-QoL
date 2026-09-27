@@ -1,0 +1,612 @@
+[
+ {
+  "id": "fate-tab-strip-left",
+  "comment": "Tab strip (Attributes/Relationships/Sect) is a 200px VerticalLayoutGroup with the icons centred; left-align the icons so a horizontal label fits to their right before the cards start at x=420.",
+  "path": "**/FateBonusPanel/Container/Buttons",
+  "layout": {
+   "childAlignment": "UpperLeft"
+  }
+ },
+ {
+  "id": "fate-tab-labels",
+  "comment": "Tab labels were 20x50 one-glyph-per-line boxes left of the icon (letters of the three tabs overlapped). Make them horizontal, anchored to the right edge of the icon, single line, auto-size 14-22.",
+  "paths": [
+   "**/FateBonusPanel/Container/Buttons/StatusButton_*/*/Text (TMP)"
+  ],
+  "rect": {
+   "anchorMin": [
+    1,
+    0.5
+   ],
+   "anchorMax": [
+    1,
+    0.5
+   ],
+   "pivot": [
+    0,
+    0.5
+   ],
+   "anchoredPos": [
+    8,
+    0
+   ],
+   "sizeDelta": [
+    160,
+    40
+   ]
+  },
+  "tmp": {
+   "wordWrap": false,
+   "alignment": "MidlineLeft",
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 22,
+   "overflow": "Overflow"
+  }
+ },
+ {
+  "id": "fate-prop-grid",
+  "comment": "Attribute grid: 2 columns of 500px cells with 10px spacing in a 1082px viewport. Use 525px cells / 20px spacing (still 2 columns) so the name column gets 20px more.",
+  "path": "**/FateBonusPanel/Container/Panels/Property/Scroll View/Viewport/Container",
+  "grid": {
+   "cellSize": [
+    525,
+    100
+   ],
+   "spacing": [
+    20,
+    10
+   ]
+  }
+ },
+ {
+  "id": "fate-prop-name",
+  "comment": "Stat name 160x53 UpperRight wrapped two-word names into 2 lines and clipped the 2nd ('Inner', 'Blade and'). Widen to 206 (bar moved right to 220), best-fit 16-28 so every name is a single line, vertically centred on the bar.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusProperty_*(Clone)/Name"
+  ],
+  "rect": {
+   "anchoredPos": [
+    4,
+    -25
+   ],
+   "sizeDelta": [
+    206,
+    53
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 28,
+   "alignment": "MiddleRight",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "fate-prop-bar",
+  "comment": "Shrink the fill bar 200->160 and move it right (181->220) to give the name and the value columns room.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusProperty_*(Clone)/Bar"
+  ],
+  "rect": {
+   "anchoredPos": [
+    220,
+    -44
+   ],
+   "sizeDelta": [
+    160,
+    14
+   ]
+  }
+ },
+ {
+  "id": "fate-prop-buttons",
+  "comment": "Keep +/- buttons and the '+5' add-value label centred over the shortened bar.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusProperty_*(Clone)/AddButton",
+   "**/FateBonusPanel/**/BonusProperty_*(Clone)/SubButton",
+   "**/FateBonusPanel/**/BonusProperty_*(Clone)/AddValue"
+  ],
+  "rect": {
+   "dx": 19
+  }
+ },
+ {
+  "id": "fate-prop-value",
+  "comment": "Value box started at 394 and was 174 wide (ran past the 500px card): 'Moderate' overlapped the next column's name. Put it at 388, 134 wide inside the 525px card, best-fit 15-28 so long level names (Pretentiousness) still fit on one line.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusProperty_*(Clone)/Value"
+  ],
+  "rect": {
+   "anchoredPos": [
+    388,
+    -26
+   ],
+   "sizeDelta": [
+    134,
+    47
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 15,
+   "maxSize": 28,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "fate-rel-grid",
+  "comment": "Relationship grid: 500px cells / 30px spacing -> 525px cells / 20px spacing (still 2 columns in the 1082px viewport) to give the character name more room.",
+  "path": "**/FateBonusPanel/Container/Panels/Social/Scroll View/Viewport/Content",
+  "grid": {
+   "cellSize": [
+    525,
+    90
+   ],
+   "spacing": [
+    20,
+    10
+   ]
+  }
+ },
+ {
+  "id": "fate-rel-name",
+  "comment": "Character name box 160 wide starting at 42 overlapped the 60px portrait icon (14-74) with long names. Start it after the icon (78-258, bar shortened and moved to 268), best-fit 14-28 so 'Tang Zhongling' / 'Shangguan Ying' stay on one line at ~22px.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusRelationship_*(Clone)/Name"
+  ],
+  "rect": {
+   "anchoredPos": [
+    78,
+    -25
+   ],
+   "sizeDelta": [
+    180,
+    53
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 28,
+   "alignment": "MiddleRight",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "fate-rel-bar",
+  "comment": "Bar 200->140, moved right (218->268) behind the wider name column; still ends at 408, left of the value column.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusRelationship_*(Clone)/Bar"
+  ],
+  "rect": {
+   "anchoredPos": [
+    268,
+    -44
+   ],
+   "sizeDelta": [
+    140,
+    14
+   ]
+  }
+ },
+ {
+  "id": "fate-rel-buttons",
+  "comment": "Keep the + button at the same offset from the centre of the moved bar (bar centre 338, button 285-345).",
+  "paths": [
+   "**/FateBonusPanel/**/BonusRelationship_*(Clone)/AddButton"
+  ],
+  "rect": {
+   "dx": 20
+  }
+ },
+ {
+  "id": "fate-rel-addvalue",
+  "comment": "The '10' add-value label (112 wide, centred) touched the right edge of the + diamond; centre it at 370 so its text (355-385) has a 10px gap from the button (ends 345) and stays over the bar (ends 408).",
+  "paths": [
+   "**/FateBonusPanel/**/BonusRelationship_*(Clone)/AddValue"
+  ],
+  "rect": {
+   "dx": 37
+  }
+ },
+ {
+  "id": "fate-rel-value",
+  "comment": "Value box (432, 100 wide) ran 32px past the card edge; keep it inside the 525px card (416-522).",
+  "paths": [
+   "**/FateBonusPanel/**/BonusRelationship_*(Clone)/Value"
+  ],
+  "rect": {
+   "anchoredPos": [
+    416,
+    -26
+   ],
+   "sizeDelta": [
+    106,
+    47
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 28,
+   "alignment": "MiddleLeft"
+  }
+ },
+ {
+  "id": "fate-flag-grid",
+  "comment": "Sect grid: 500px cells / 80px spacing in a 1111px container -> 540px cells / 20px spacing (still 2 columns) so long affinity names get 280px.",
+  "path": "**/FateBonusPanel/Container/Panels/Home/Container",
+  "grid": {
+   "cellSize": [
+    540,
+    80
+   ],
+   "spacing": [
+    20,
+    10
+   ]
+  }
+ },
+ {
+  "id": "fate-flag-name",
+  "comment": "Sect stat names ('Number of disciples', 'Disciple's health points') in a 230x53 box: widen to 280 (bar moved to 300), best-fit 16-28 with wrap so they fit on one or two lines instead of being clipped.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusFlag(Clone)/Name"
+  ],
+  "rect": {
+   "anchoredPos": [
+    4,
+    -25
+   ],
+   "sizeDelta": [
+    280,
+    53
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 28,
+   "alignment": "MiddleRight",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "fate-flag-bar",
+  "comment": "Shorten the bar 200->150 and move it right (260->300) so the value fits inside the 500px card.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusFlag(Clone)/Bar"
+  ],
+  "rect": {
+   "anchoredPos": [
+    300,
+    -44
+   ],
+   "sizeDelta": [
+    150,
+    14
+   ]
+  }
+ },
+ {
+  "id": "fate-flag-buttons",
+  "comment": "Re-centre the + button over the shortened bar.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusFlag(Clone)/AddButton"
+  ],
+  "rect": {
+   "dx": 15
+  }
+ },
+ {
+  "id": "fate-flag-addvalue",
+  "comment": "Add-value label ('2') sat right against the + diamond; 10px more to the right gives it a visible gap while staying over the bar (ends at 450).",
+  "paths": [
+   "**/FateBonusPanel/**/BonusFlag(Clone)/AddValue"
+  ],
+  "rect": {
+   "dx": 25
+  }
+ },
+ {
+  "id": "fate-flag-value",
+  "comment": "Value box started at 474 (174 wide) and crossed the card border into the next column; place it at 460-538 inside the 540px card.",
+  "paths": [
+   "**/FateBonusPanel/**/BonusFlag(Clone)/Value"
+  ],
+  "rect": {
+   "anchoredPos": [
+    460,
+    -26
+   ],
+   "sizeDelta": [
+    78,
+    47
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 28,
+   "alignment": "MiddleLeft"
+  }
+ },
+ {
+  "id": "fate-confirm-text",
+  "comment": "'This page has allocated points that haven't been finalized' is 1160px at the 40px maximum, wider than the 1000px box, and the black panel is only 172px tall. Best-fit 24-40 with wrap+truncate makes Unity pick the largest size that fits on one line (~34px) instead of a 2-line 40px block that ran past the box.",
+  "path": "**/FateBonusPanel/ConfirmPanel/Panel/Text",
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    0,
+    0
+   ],
+   "sizeDelta": [
+    1000,
+    80
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 24,
+   "maxSize": 40,
+   "alignment": "MiddleCenter",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "shop-tab-labels",
+  "comment": "Buy/Sell tab labels were 20x50 vertical one-glyph-per-line boxes left of the icons. Make them horizontal, right-aligned against the left edge of their icon.",
+  "paths": [
+   "**/ShopPanel/Buttons/StatusButton_*/*/Text (TMP)"
+  ],
+  "rect": {
+   "anchorMin": [
+    0,
+    0.5
+   ],
+   "anchorMax": [
+    0,
+    0.5
+   ],
+   "pivot": [
+    1,
+    0.5
+   ],
+   "anchoredPos": [
+    -6,
+    0
+   ],
+   "sizeDelta": [
+    130,
+    40
+   ]
+  },
+  "tmp": {
+   "wordWrap": false,
+   "alignment": "MidlineRight",
+   "fontSize": 22,
+   "overflow": "Overflow"
+  }
+ },
+ {
+  "id": "shop-tab-sell-shift",
+  "comment": "Move the Sell tab (and its gamepad hint) 80px right so the horizontal 'Sell' label no longer sits on top of the Buy icon.",
+  "paths": [
+   "**/ShopPanel/Buttons/StatusButton_Sell",
+   "**/ShopPanel/GamepadIcon"
+  ],
+  "rect": {
+   "dx": 80
+  }
+ },
+ {
+  "id": "shop-item-name",
+  "comment": "Item name in a shop row. Real stock rows are ShopItem(Clone): ShopPanel.Init/AddBuyPanel call Instantiate(prefab) with no parent and only then SetParent them into the list, so the label's first OnEnable happens at the scene root as '/ShopItem(Clone)/Name'. Its font is DFT_S5, so FontMap puts a UIFixMarker on it in that OnEnable and RuleApplier settles the lookup on the root path; without the root-time pattern this rule never reaches a real row (the rows in the shop captures are the scene's placeholder rows, which ShopListPanel.ClearList destroys). Box 226x60 (row-local x130..356; the money icon starts at 361.8), Wrap + Truncate so best fit really works: with vOverflow Overflow Unity ignores the height and always renders maxSize, which let 3- and 4-line names spill out of the row. Measured all 112 shop-listable names (79 ShopDatabase buy entries + 33 more Misc items the sell list can show): 41 fit one line at 24px, the rest two lines at 18-24px (longest 'Treatise on Cold Damage and Miscellaneous Diseases', 574px at 24 -> 18px).",
+  "paths": [
+   "**/ShopPanel/**/ShopItem*/Name",
+   "/ShopItem(Clone)/Name"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "sizeDelta": [
+    226,
+    60
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 24,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleLeft"
+  }
+ },
+ {
+  "id": "shop-item-price",
+  "comment": "Price value box 66px wide truncates 5-digit prices; widen to 100 (still left of the - button at 515). The '/ShopItem(Clone)/...' pattern catches real rows at the moment they are instantiated at the scene root: rows rebuilt by ShopPanel.Init() after a purchase or sale are re-parented into an already-active list and get no further OnEnable, so the list-path pattern alone misses them.",
+  "paths": [
+   "**/ShopPanel/**/ShopItem*/Money/Value",
+   "/ShopItem(Clone)/Money/Value"
+  ],
+  "rect": {
+   "sizeDelta": [
+    100,
+    35
+   ]
+  },
+  "text": {
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "shop-item-sold",
+  "comment": "'Sold out' 100px box (pref 132 at fs30): widen to 140 centred on the same spot and best-fit 16-26. Root-time pattern '/ShopItem(Clone)/SoldText' as for shop-item-price: the row that just sold out is rebuilt by Init() inside the visible list, gets no OnEnable there, and would otherwise show the prefab box, where 'Sold Out' wraps and is truncated to 'Sold'.",
+  "paths": [
+   "**/ShopPanel/**/ShopItem*/SoldText",
+   "/ShopItem(Clone)/SoldText"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "dx": -20,
+   "sizeDelta": [
+    140,
+    59
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 26,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "shop-total-group",
+  "comment": "Shift the 'Total  9999  Money' row 50px left so the 'Money' label (ends ~1450) keeps clear of the Buy button frame (sliced image starts at 1455, visible frame ~1500).",
+  "paths": [
+   "**/ShopPanel/Container/Panels/*/*List/Total"
+  ],
+  "rect": {
+   "dx": -50
+  }
+ },
+ {
+  "id": "shop-header",
+  "comment": "'Shop' header is TMP in a 100x200 box sized for two vertical hanzi (XUnity auto-size 18-58 shrank it to 45 to fit 100px). Give it a 300px single-line box so the word renders at the full 58px like the other panel headers; nothing sits to its right (item list starts at 959).",
+  "path": "**/ShopPanel/Header/Text",
+  "onTextChange": true,
+  "rect": {
+   "sizeDelta": [
+    300,
+    200
+   ]
+  },
+  "tmp": {
+   "wordWrap": false,
+   "overflow": "Overflow",
+   "alignment": "TopLeft"
+  }
+ },
+ {
+  "id": "shop-total-label",
+  "comment": "'Total amount' label: 110x80 UpperLeft fs50 (XUnity best-fit 10-22) sat at the top while the value is vertically centred. Same height/offset as the value, MiddleLeft, best-fit 14-28 with wrap (2 lines allowed).",
+  "paths": [
+   "**/ShopPanel/Container/Panels/*/*List/Total/Text (1)"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    0,
+    -8
+   ],
+   "sizeDelta": [
+    104,
+    63
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 28,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "shop-total-unit",
+  "comment": "'Money' unit label started exactly where the right-aligned number ends ('9999Money'). Add a 10px gap, centre vertically, best-fit 14-28.",
+  "paths": [
+   "**/ShopPanel/Container/Panels/*/*List/Total/Text (2)"
+  ],
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    250,
+    -8
+   ],
+   "sizeDelta": [
+    110,
+    63
+   ]
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 28,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "shop-buy-sell-button-text",
+  "comment": "Big Buy/Sell button (230x180 frame) label was a single 65px hanzi; XUnity shrinks the English to 22px. Best-fit 24-48 so the word fills the frame.",
+  "paths": [
+   "**/ShopPanel/Container/Panels/*/BuyButton/*/Text",
+   "**/ShopPanel/Container/Panels/*/SellButton/*/Text"
+  ],
+  "onTextChange": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 24,
+   "maxSize": 48,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate",
+   "alignment": "MiddleCenter"
+  }
+ },
+ {
+  "id": "shop-sell-empty",
+  "comment": "'There are no items at all' (800x100, XUnity best-fit 10-22): allow 20-36 so the empty-list message is readable.",
+  "path": "**/ShopPanel/Container/Panels/Sell/EmptyText",
+  "onTextChange": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 20,
+   "maxSize": 36,
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "fate-confirm-reset-labels",
+  "comment": "'Confirm' (pref 201x113 at 54px) wrapped in the 200x80 button label and the second line was truncated, so the button read 'Confir'. Single line with best-fit; also covers the Reset/Disable/Normal/Hover copies.",
+  "paths": [
+   "**/FateBonusPanel/**/SaveButton/*/Text(1)",
+   "**/FateBonusPanel/**/ResetButton/*/Text(1)"
+  ],
+  "onTextChange": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 30,
+   "maxSize": 54,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "alignment": "MiddleCenter"
+  }
+ },
+ {
+  "id": "shop-dialog-desc",
+  "comment": "Merchant speech bubble on item hover (Avatar/Dialog: VerticalLayoutGroup pad 75/0/30/30 + ContentSizeFitter, pivot bottom-left, bottom fixed at screen y737, so it grows UPWARD with its text). Source Han Serif lines are 1.437em here (the game's font asset: line spacing 22.992 per 16px); that reproduces the live placeholder bubble (title one 22px line = 31.6, text three 18px lines at ls 1.1 = 82.8, bubble 174.4 vs 450x175 in the dump). At the prefab's 18px / ls 1.1 four stocked books push the bubble above the screen: Book 2002 'Surging Wave Blade Technique' (28 lines, stocked from Y2-M10) is 911px tall, top y=-174; Book 8007 'War God's Sayings' (default stock) y=-120; Book 4030 y=-32; Book 7007 y=-3. 17px at line spacing 0.9: the tallest (Book 2002, 26 lines under a two-line title) is 691px, top y=46 (y=34 if XUnity has not shrunk the title to 22px); 17px at 1.0 would still leave it at y=-15. Best fit off because the layout sizes the box from fontSize.",
+  "path": "**/ShopPanel/Avatar/Dialog/Text",
+  "onTextChange": true,
+  "text": {
+   "bestFit": false,
+   "fontSize": 17,
+   "lineSpacing": 0.9
+  }
+ }
+]

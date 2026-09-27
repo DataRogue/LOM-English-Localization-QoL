@@ -1,0 +1,43 @@
+[
+  // ---------------------------------------------------------------------------
+  // Duel (Combat scene) start splash and story dialog text.
+  // Written offline from the level6 / level2 dumps (UnityPy); see each comment.
+  // ---------------------------------------------------------------------------
+  {
+    "id": "duel-splash-horizontal",
+    "comment": "Combat scene start splash '/[UI]/MainUI/Layer_1/ReadyText/{Left,Right,Center}' (System/CombatStartText, was the joke 戰‧你‧娘‧親): three 50x500 TMP strips that stack the text one glyph per line. CombatUIManager.InitReadyText flies Left and Right (60pt) in with MovePanel.MoveToOrigin, hides them, then shows Center (100pt) and shakes it with DOShakeAnchorPos. English 'Duel Start' in a 50px-wide strip broke into a vertical column of letters. Make all three a 1000x160 horizontal box with no wrapping and auto-size 40-100 so the same fly-in and shake play with a single horizontal word pair; the anchors and anchored positions are untouched so the animation targets still line up.",
+    "paths": [
+      "/[UI]/MainUI/Layer_1/ReadyText/Center",
+      "/[UI]/MainUI/Layer_1/ReadyText/Left",
+      "/[UI]/MainUI/Layer_1/ReadyText/Right"
+    ],
+    "always": true,
+    "onTextChange": true,
+    "rect": { "sizeDelta": [1000, 160] },
+    "tmp": { "autoSize": true, "minSize": 40, "maxSize": 100, "wordWrap": false, "overflow": "Overflow", "alignment": "Center" }
+  },
+  {
+    "id": "story-text-top-left",
+    "comment": "Story dialog text (/StoryCore/SayDialogs/{Character,Narrative,Think}SayDialog/Panel/Background/StoryText, 1050x200 legacy Text, anchor/pivot (0,0.5) at ap (400,-20), prefab alignment UpperLeft, best fit 20-28). The box is lifted 26.9px (ap.y 6.9), so its top sits 19px below the frame top instead of 46px and three lines of English fit, and the text starts at the top-left corner like a book page. The original English patch's LOM_UI_Plugin_KR made the same lift on every SetActive but also set MiddleLeft, which floated one- and two-line English in the middle of the box; if it is installed, our OnEnable pass runs after its prefix. 'always' re-applies on every activation and onTextChange after each DoSay. The centred narration dialog (CenterNarrativeSayDialog, MiddleCenter by design) is not matched.",
+    "paths": [
+      "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/StoryText",
+      "/StoryCore/SayDialogs/NarrativeSayDialog/Panel/Background/StoryText",
+      "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Background/StoryText"
+    ],
+    "always": true,
+    "onTextChange": true,
+    "rect": { "y": 6.9 },
+    "text": { "alignment": "UpperLeft" }
+  },
+  {
+    "id": "story-continue-arrow",
+    "comment": "The continue arrow inside the story text box (Continue on the Character and Think dialogs, ContinueDialogButton on the Narrative one; anchor (1,0), ap (0,25)) goes to ap.y 7, 18px lower, so it stays in the bottom-right corner below three lines of text after the box lift above. Same placement as the original patch's KR plugin gave it.",
+    "paths": [
+      "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/StoryText/Continue",
+      "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Background/StoryText/Continue",
+      "/StoryCore/SayDialogs/NarrativeSayDialog/Panel/Background/StoryText/ContinueDialogButton"
+    ],
+    "always": true,
+    "rect": { "y": 7 }
+  }
+]

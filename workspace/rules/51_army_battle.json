@@ -1,0 +1,218 @@
+[
+  // ---------------------------------------------------------------------------
+  // Army battle ("Battle" scene) HUD: timer, top status, pre-battle card, key-binding rows and gamepad
+  // hints. Written offline from the level prefabs (UnityPy) and measured strings; see each comment.
+  // ---------------------------------------------------------------------------
+  {
+   "id": "army-timer",
+   "comment": "Army battle countdown (Level_1/Time/Text, 116x80.5 UpperCenter, Source Han Serif 45). Battles without a time limit show System/Infinity = 'Infinite' for the whole fight (TopTime.SetText(-1)): 175px at 45, broken to 'Infin' / 'ite' and truncated in the prefab box. Best fit 20-45 in a 66px-tall box: one 45px line is 64.7px (font asset line height 22.992 per 16px = 1.437em), so the countdown digits keep 45px and move under 1px; two lines would only fit at 22px or less, while 'Infinite' fits one line at 29-30px (116px at 30), so the word is never split. MiddleCenter puts the ink of 'Infinite' at panel y29 and below, clear of the 'Time' caption (UpperRight 20px, ink ends at y21.5, x103..155). A 60px box would shrink the digits to 41px.",
+   "path": "/[UI]/MainUI/Level_1/Time/Text",
+   "onTextChange": true,
+   "rect": {
+    "height": 66
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 20,
+    "maxSize": 45,
+    "alignment": "MiddleCenter",
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-top-status-name",
+   "comment": "Army battle (Battle.unity) top-left health frame: side labels 'I' / 'Enemy' (System/BattleFriend, System/BattleEnemy) in 110x60 UpperRight boxes at 35px, right edge at x108 just left of the 500px bar. 'Enemy' is 122px at 35, so Unity breaks the word ('Enem' / 'y') and truncates the second line: the HUD reads 'Enem' for the whole battle. Best fit 20-28 puts it on one line at 28px (98px, x10..108).",
+   "paths": [
+    "/[UI]/MainUI/Level_1/TopStatus/*/Name"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 20,
+    "maxSize": 28,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-title",
+   "comment": "Pre-battle card header (ReadyPanel/StartPanel/Title, System/BattleHeader 'Final Clash'): 236x100 MiddleLeft, DFXingShu 70 -> Palatino 63. At 63 it wraps to two lines and only 'Final' shows. In game (2026-09-26, levels 0000 and 1615_03) best fit 30-63 chose two lines at about 48px: Palatino's line height is only about 1.03em (preferred 324x130 at 63), so 'Final' / 'Clash' fit the 100px box, and the second line ran into EnemyName below. One line needs 44px or less (5.14px per point: 226px at 44, 231 at 45, 237 at 46), so best fit is capped at 44: one line, x93..319, clear of EnemyName (card y 114..174) and of the start button's ink at x334.",
+   "path": "/[UI]/MainUI/Level_3/ReadyPanel/Container/StartPanel/Title",
+   "text": {
+    "bestFit": true,
+    "minSize": 30,
+    "maxSize": 44,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-enemy-name",
+   "comment": "Opponent on the pre-battle card (EnemyTeam/<key>, 250x60 MiddleLeft, Palatino 36, no best fit): 7 of the 21 team names are wider than 250 and lose their last word ('Guangzhou Tang', 'Heavenly Martial', 'Flying Stone', 'White Shark', 'Mountain', 'Imperial', 'Nangong'). 200 wide keeps the text left of the start button's ink (card x334) and best fit 18-36 fits all 21: 16 on one line at 26-36px, 5 on two lines at 26px.",
+   "path": "/[UI]/MainUI/Level_3/ReadyPanel/Container/StartPanel/EnemyName",
+   "onTextChange": true,
+   "rect": {
+    "width": 200
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 18,
+    "maxSize": 36,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-start-label",
+   "comment": "Start button 'To Battle' (System/BattleStartText): 180x100 at Palatino 54 wraps to 'To' / 'Battle' (122px) and shows only 'To'. In a 70px-tall box two lines only fit at 31px or less, while one line already fits at 45px (179px), so best fit settles on one line at 45px, inside the button ink (224px wide).",
+   "paths": [
+    "/[UI]/MainUI/Level_3/ReadyPanel/Container/StartPanel/MenuButton_StartGame/*/Text (1)"
+   ],
+   "rect": {
+    "height": 70
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 24,
+    "maxSize": 54,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-keyboard-label",
+   "comment": "'Keyboard Settings' (System/Menu/KeyboardSetting) button label: 300x100 at 40px needs two lines = 102px and shows only 'Keyboard'. In a 60px-tall box two lines only fit at 23px or less, so best fit 24-40 settles on one line at 32px (299px).",
+   "paths": [
+    "/[UI]/MainUI/Level_3/ReadyPanel/Container/Info/MenuButton_Keyboard/*/Text"
+   ],
+   "rect": {
+    "height": 60
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 24,
+    "maxSize": 40,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-empty-skill",
+   "comment": "'No Friends' (System/EmptyBattleSkill) at 58px in the 200x200 UpperLeft box: 'Friends' alone is 227px, so it is split 'Friend' / 's' and the third line is truncated. 380 wide (x75..455, inside the 541px skill column) holds it on one line at the full 58px (325px).",
+   "path": "/[UI]/MainUI/Level_3/ReadyPanel/Container/SkillPanel/EmptyText",
+   "rect": {
+    "width": 380
+   }
+  },
+  {
+   "id": "army-ready-skill-setting-title",
+   "comment": "'Skill Settings' (System/BattleSkillSetting) is a 56x250 vertical column left of the four skill slots (screen x41..97, y783..1033), DFT_S5 45 -> Palatino 40: English is chopped into 'Ski/ll/Set/tin/gs'. There is no horizontal room (the skill info text ends at y787 above, the slots start at x121), so turn the label into a book-spine: rotated -90 (reads top to bottom), 225x56.3 with the pivot moved to the column's right edge (ap.x 34.8 -> 91.1) so it covers the same x41..97 strip, text starting at the top and ending by y1008, clear of the 70px bottom mask at y1010. Best fit 20-40 -> 39px (223px).",
+   "path": "/[UI]/MainUI/Level_3/ReadyPanel/Container/SkillSetting/Title",
+   "rect": {
+    "anchoredPos": [
+     91.1,
+     0
+    ],
+    "sizeDelta": [
+     225,
+     56.3
+    ],
+    "rotationZ": -90
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 20,
+    "maxSize": 40,
+    "alignment": "MiddleLeft",
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-skill-info-title",
+   "comment": "Selected ally skill name '[<BattleSkill/Name>]' in a 421x52 UpperLeft box at 28px (one 36px line fits): 3 of the 10 skills are truncated ('[Breakthrough of Cloud Pass · Thunder Shakes the Nine Heavens]' 926px, '[Hidden Weapon General Principles]' 523px, '[Heaven and Earth Silent Power]' 460px). Best fit 16-28: those land at 20px on two lines, 22px and 25px on one; the other 7 stay at 28.",
+   "path": "/[UI]/MainUI/Level_3/ReadyPanel/Container/SkillPanel/Info/Title",
+   "text": {
+    "bestFit": true,
+    "minSize": 16,
+    "maxSize": 28,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-ready-skill-info-desc",
+   "comment": "Skill description under the name (404x92 at 21px, no best fit, three 27px lines fit): BattleSkill/Desc/brother1 needs four and loses its end. Moved 7px down (ap.y -45 -> -52) so a two-line skill name (51px) cannot touch it, 85 tall (same bottom, y787), best fit 16-21: brother1 fits three lines at 18px, the other nine stay at 21.",
+   "path": "/[UI]/MainUI/Level_3/ReadyPanel/Container/SkillPanel/Info/Desc",
+   "rect": {
+    "anchoredPos": [
+     0,
+     -52
+    ],
+    "height": 85
+   },
+   "text": {
+    "bestFit": true,
+    "minSize": 16,
+    "maxSize": 21,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-keybind-current",
+   "comment": "Key-binding rows (ReadyPanel/KeyboardSetting and TopPanel/PausePanel/KeyboardSetting, both only in Battle.unity): the current key is the Input System display string in a 150x60 MiddleRight box at 30px. 'Down Arrow' (195px at 30), 'Right Arrow' (189), 'Page Down' (171), 'Left Arrow' and 'Right Shift' (165), 'Numpad 0' (158) wrap and keep only their first word; 'Up Arrow' is exactly 150px. Best fit 18-30 -> 23-30px on one line.",
+   "paths": [
+    "**/KeyboardSetting/Container/*/Current"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 18,
+    "maxSize": 30,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-keybind-prompt",
+   "comment": "Rebind prompt 'Press a new key... or ESC to cancel' (System/ListenKeyRebind) in the ReadyPanel copy of KeyboardSetting: 600x100 UpperCenter at 50px needs two lines = 128px and loses 'cancel'. Same fix as pause-keybind-prompt (which only matches the PausePanel copy): best fit 28-50 -> two lines at 39px (100px).",
+   "path": "**/ReadyPanel/KeyboardSetting/Panel/Text",
+   "onTextChange": true,
+   "text": {
+    "bestFit": true,
+    "minSize": 28,
+    "maxSize": 50,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "UpperCenter"
+   }
+  },
+  {
+   "id": "army-gamepad-tip",
+   "comment": "Controller hint labels under the button icons (90x50 at 25px): 'Verbal Attack' (BattleKey/Name/Curse) needs two lines = 64px and loses 'Attack'. Best fit 14-25 -> 19px on two lines; 'Dodge' and 'Melee' stay at 25.",
+   "paths": [
+    "/[UI]/MainUI/Level_1/GamepadTip/Dodge/Display/Text",
+    "/[UI]/MainUI/Level_1/GamepadTip/Curse/Display/Text",
+    "/[UI]/MainUI/Level_1/GamepadTip/Attack1/Display/Text"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 14,
+    "maxSize": 25,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  },
+  {
+   "id": "army-gamepad-tip-attack2",
+   "comment": "'Direct Fire (Hold: Projectile)' (BattleKey/Name/Attack2) in the 193x50 label at 22px wraps to three lines and shows only 'Direct Fire'. Best fit capped at 18: two lines, first line 161px, which leaves a 6px gap to the neighbouring 'Melee' label (at 19px the lines would touch).",
+   "path": "/[UI]/MainUI/Level_1/GamepadTip/Attack2/Display/Text",
+   "text": {
+    "bestFit": true,
+    "minSize": 14,
+    "maxSize": 18,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   }
+  }
+]

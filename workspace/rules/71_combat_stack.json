@@ -1,0 +1,375 @@
+[
+ {
+  "id": "combat-card-sprite-wide",
+  "comment": "Player action buttons are stacked vertically now, so each card is a wide row: swap the tall banner art for the rotated wide plate (hotkey square at the left, ink band behind the action name).",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*"
+  ],
+  "always": true,
+  "rect": {
+   "width": 300,
+   "height": 104
+  },
+  "image": {
+   "sprite": "button_action_1.png"
+  }
+ },
+ {
+  "id": "combat-card-pos-curse",
+  "comment": "Curse card: in the vertical stack, tucked into the bottom-right corner (20px from the right and bottom edges, in the space the Speed/Status/Menu buttons vacated). MovePanel's stored origin/standby positions are re-synced by the plugin so the slide animation still works.",
+  "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_Curse",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    727,
+    229
+   ]
+  }
+ },
+ {
+  "id": "combat-card-pos-attack",
+  "comment": "Attack card: in the vertical stack, tucked into the bottom-right corner (20px from the right and bottom edges, in the space the Speed/Status/Menu buttons vacated). MovePanel's stored origin/standby positions are re-synced by the plugin so the slide animation still works.",
+  "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_Attack",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    727,
+    117
+   ]
+  }
+ },
+ {
+  "id": "combat-card-pos-block",
+  "comment": "Block card: in the vertical stack, tucked into the bottom-right corner (20px from the right and bottom edges, in the space the Speed/Status/Menu buttons vacated). MovePanel's stored origin/standby positions are re-synced by the plugin so the slide animation still works.",
+  "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_Block",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    727,
+    5
+   ]
+  }
+ },
+ {
+  "id": "combat-card-pos-weapon",
+  "comment": "Weapon card: in the vertical stack, tucked into the bottom-right corner (20px from the right and bottom edges, in the space the Speed/Status/Menu buttons vacated). MovePanel's stored origin/standby positions are re-synced by the plugin so the slide animation still works.",
+  "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_Weapon",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    727,
+    -107
+   ]
+  }
+ },
+ {
+  "id": "combat-card-pos-ultimate",
+  "comment": "Ultimate card: in the vertical stack, tucked into the bottom-right corner (20px from the right and bottom edges, in the space the Speed/Status/Menu buttons vacated). MovePanel's stored origin/standby positions are re-synced by the plugin so the slide animation still works.",
+  "path": "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_Ultimate",
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    727,
+    -219
+   ]
+  }
+ },
+ {
+  "id": "combat-card-hotkey",
+  "comment": "Hotkey badge sits on the orange square at the card's left edge.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/HotKey"
+  ],
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    6,
+    -16
+   ],
+   "width": 44,
+   "height": 44
+  },
+  "text": {
+   "fontSize": 22,
+   "alignment": "MiddleCenter",
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "combat-card-name",
+  "comment": "Action name on the ink band, left of the cost. 136 wide (x56-192): the longest one-line names are 'Ultimate Skill' 134px and 'Verbal Attack' 133px at 19pt, so both stay on one line; 'Hidden Weapon' (159px) wraps to two lines as it always has. Was 140 wide from x58, which left the cost too little room once its text grew.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Name"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    56,
+    -15
+   ],
+   "width": 136,
+   "height": 44
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 15,
+   "maxSize": 19,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  }
+ },
+ {
+  "id": "combat-card-cost",
+  "comment": "Cost at the right end of the ink band (x194-285). The game builds this from one of two strings: 'Qi Cost: N' (CombatInfo/costMp, 81px at worst) and, when an action gives Qi back, 'Restores Qi: N' (CombatInfo/restoreMp, 105px) - Verbal Attack's is the second, which is why only that card collided. At a fixed 15pt with Overflow the long one spilled left into the name. Now it shrinks to fit instead: the box is exactly one line tall (Unity's Source Han Serif line is 1.4375 x size, so a 15pt line needs 21.6px: 22 tall at y 26-48, inside the ink band's rows 16-59), so with Wrap+Truncate best-fit cannot wrap onto a second line and has to reduce the size. At 20 tall the 15pt line did not fit and every cost dropped to 13pt. 'Qi Cost' keeps its 15pt; 'Restores Qi: 2' drops to 13pt (89px in 91). It can never leave its box, so it can never reach the name, whatever the value.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Cost"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    194,
+    -26
+   ],
+   "width": 91,
+   "height": 22
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 11,
+   "maxSize": 15,
+   "alignment": "MiddleRight",
+   "hOverflow": "Wrap",
+   "vOverflow": "Truncate"
+  }
+ },
+ {
+  "id": "combat-card-info",
+  "comment": "Hit rate line. On the redrawn card the ink band ends 60px down and the cream ends at 82, so a 26px box at -74 centred the text at 87 - below the card entirely, leaving bright orange sitting on the pale stone of the battlefield. A 22px box at -60 centres it at 71, inside the cream strip between the ink band and the card's bottom edge, and the colour is darkened from the prefab's bright orange to a burnt brown that reads against cream (the game only ever assigns this label's text, never its colour, so nothing is overridden by doing this). The Outline has to go with it: the prefab outlines this label because it was light text on a dark plate, but a DARK outline around dark text at 14px fills in the counters and the word renders as a blur. Without it the glyphs are clean, and 16px fits the 22px box.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Info"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    58,
+    -60
+   ],
+   "width": 190,
+   "height": 22
+  },
+  "text": {
+   "bestFit": false,
+   "fontSize": 16,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "color": "#7A3A0A",
+   "outline": false
+  }
+ },
+ {
+  "id": "combat-card-infobutton",
+  "comment": "'?' button, on the cream strip below the ink band and level with the hit-rate line. At 30px it did not fit that 24px strip and hung off the bottom of the card onto the battlefield; 22px sits inside it, and stays comfortably clickable.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/InfoButton"
+  ],
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    266,
+    -59
+   ],
+   "width": 22,
+   "height": 22
+  }
+ },
+ {
+  "id": "combat-actioninfo-card",
+  "comment": "The chosen-action card (shown while a turn resolves) uses the same plate, so give it the wide shape too.",
+  "paths": [
+   "/[UI]/MainUI/Layer_2/*Status/ActionInfo/Back"
+  ],
+  "always": true,
+  "rect": {
+   "width": 300,
+   "height": 104
+  },
+  "image": {
+   "sprite": "button_action_1.png"
+  }
+ },
+ {
+  "id": "combat-actioninfo-name-wide",
+  "comment": "Player's chosen-action name on the wide plate's ink band. Player side only: the enemy card is anchored at the top of the screen with its plate offset 180px below that anchor, so the same offset put the enemy's name at the very top of the screen, by the enemy's name plate, leaving its plate's ink band empty. The enemy has its own rules below.",
+  "paths": [
+   "/[UI]/MainUI/Layer_2/PlayerStatus/ActionInfo/NormalName",
+   "/[UI]/MainUI/Layer_2/PlayerStatus/ActionInfo/HoverName"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    58,
+    -18
+   ],
+   "width": 190,
+   "height": 46
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 15,
+   "maxSize": 22,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "combat-card-disable-overlay",
+  "comment": "The 'locked' dim overlay kept the old tall card shape (136x472) and hung far outside the row; fit it to the wide card.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Disable"
+  ],
+  "always": true,
+  "rect": {
+   "width": 300,
+   "height": 104,
+   "anchoredPos": [
+    0,
+    0
+   ]
+  }
+ },
+ {
+  "id": "combat-card-lock-icon",
+  "comment": "Padlock icon centred on the wide card instead of 152px above it.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Disable/Icon"
+  ],
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    -118,
+    0
+   ],
+   "width": 34,
+   "height": 40
+  }
+ },
+ {
+  "id": "combat-card-tip-anchor",
+  "comment": "The '?' tooltip hung 257px below its card, which pushed the bottom card's tooltip off-screen once the cards were stacked; anchor it beside the card instead (it still opens leftwards).",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/Action_*/Tip"
+  ],
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    104,
+    -30
+   ]
+  }
+ },
+ {
+  "id": "combat-actioninfo-info",
+  "comment": "Player's chosen-action info line - 'Hit Rate 74%' for Hidden Weapon, 'Mouth Power 30' for Verbal Attack, empty otherwise (CombatActionController.UpdateCurrentActionInfoText). It kept the tall card's 80x80 box at 25pt, which sat on top of the name and wrapped 'Hit Rate 74%' into 'Hit / Rate', truncating the number. Moved to the cream strip under the ink band, the same spot and style as the hit-rate line on the action buttons: one line at 16pt (longest, 'Mouth Power 999', is 144px in 190), burnt brown with the outline off, which is what reads on cream.",
+  "paths": [
+   "/[UI]/MainUI/Layer_2/PlayerStatus/ActionInfo/Info"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    58,
+    -60
+   ],
+   "width": 190,
+   "height": 22
+  },
+  "text": {
+   "bestFit": false,
+   "fontSize": 16,
+   "alignment": "MiddleLeft",
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "color": "#7A3A0A",
+   "outline": false
+  }
+ },
+ {
+  "id": "combat-actioninfo-enemy-back",
+  "comment": "Enemy's chosen-action plate. The prefab flips it both ways (scale -1,-1) because it was a tall banner hanging DOWN from the top of the screen. On the wide plate that flip turns it upside down: hotkey square bottom-right and the ink band along the bottom. Flip it horizontally only (scale -1,1) so it mirrors the player's card - hotkey square on the right, facing the player, ink band on top. The plate's pivot is its top-left, so dropping the vertical flip would move it 104px down; ap.y -284 -> -180 puts it back on exactly the same screen rect (x646-946 y180-284 at standby, 300px further right once it has slid in).",
+  "paths": [
+   "/[UI]/MainUI/Layer_2/EnemyStatus/ActionInfo/Back"
+  ],
+  "always": true,
+  "rect": {
+   "anchoredPos": [
+    136,
+    -180
+   ],
+   "scale": [
+    -1,
+    1
+   ]
+  }
+ },
+ {
+  "id": "combat-actioninfo-enemy-name",
+  "comment": "Enemy's chosen-action name, now ON its plate instead of floating at the top of the screen. The plate sits at root-relative (-164, 180); the name box is the player's box mirrored across the 300px plate (x52-242 instead of 58-248), right-aligned so it reads toward the hotkey square the way the player's reads away from its own. Root-relative: (-164+52, -(180+18)) = (-112, -198).",
+  "paths": [
+   "/[UI]/MainUI/Layer_2/EnemyStatus/ActionInfo/NormalName",
+   "/[UI]/MainUI/Layer_2/EnemyStatus/ActionInfo/HoverName"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    -112,
+    -198
+   ],
+   "width": 190,
+   "height": 46
+  },
+  "text": {
+   "bestFit": true,
+   "minSize": 15,
+   "maxSize": 22,
+   "alignment": "MiddleRight",
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "combat-actioninfo-enemy-info",
+  "comment": "Enemy's chosen-action info line, mirrored like the name: cream strip under its ink band, right-aligned. Root-relative (-164+52, -(180+60)) = (-112, -240). Same text and styling as the player's - this is the line that read 'Hit / Rate' in orange over the plate.",
+  "paths": [
+   "/[UI]/MainUI/Layer_2/EnemyStatus/ActionInfo/Info"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "anchoredPos": [
+    -112,
+    -240
+   ],
+   "width": 190,
+   "height": 22
+  },
+  "text": {
+   "bestFit": false,
+   "fontSize": 16,
+   "alignment": "MiddleRight",
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "color": "#7A3A0A",
+   "outline": false
+  }
+ }
+]

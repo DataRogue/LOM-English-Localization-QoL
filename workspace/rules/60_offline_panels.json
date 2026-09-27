@@ -1,0 +1,373 @@
+[
+  // ---------------------------------------------------------------------------
+  // Offline panels (cannot be opened by capture.py): battle GameOverPanel
+  // (win / dead), story-mode GameOver desc, EndGamePanel + SaveLegendPanel,
+  // battle PausePanel, skill cut-ins. Written from inventory/*.txt + decompiled
+  // code only - every rule here is either (a) an unambiguous vertical /
+  // rotated box, or (b) shrink-only (bestFit inside the existing box), so it
+  // cannot overlap neighbours even if the live layout differs from the
+  // serialized one. Nothing here changes strings.
+  // ---------------------------------------------------------------------------
+
+  // ---- battle GameOverPanel: Dead ("You are dead") ---------------------------
+  {
+    "id": "go-dead-vertical-fallback",
+    "comment": "Dead/Container has a Vertical and a Horizontal copy of the two death lines, toggled by LocalizationDisplayPanel on SystemSettings.IsChineseLanguage. With the plugin's ForceHorizontalLanguageBranches the Horizontal copy (1192x66 / 971x94 at 40px) is active and needs nothing. The Vertical copy is a 56px-wide one-glyph-per-line column (56x297 / 56x882); if a user turns the language patch off, English would stack letter by letter. Mirror the Horizontal geometry onto it so it reads as normal lines in that case (no-op while inactive).",
+    "path": "**/GameOverPanel/Dead/Container/Vertical/Text (1)",
+    "rect": { "anchoredPos": [250, -129], "sizeDelta": [1192, 66] },
+    "text": { "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" }
+  },
+  {
+    "id": "go-dead-vertical-fallback-2",
+    "comment": "Second line of the Vertical fallback, see go-dead-vertical-fallback.",
+    "path": "**/GameOverPanel/Dead/Container/Vertical/Text (2)",
+    "rect": { "anchoredPos": [250, -192], "sizeDelta": [971, 94] },
+    "text": { "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" }
+  },
+  {
+   "id": "go-dead-buttons",
+   "comment": "Restart / Main Menu buttons on the battle dead screen: 300x70 LowerCenter labels at 40px. They are LeanLocalizedText labels (System/Restart, System/GoMenu), so the resolver - and the patch's own 'Go back to the main menu' - never reaches them. With LOM_Strings_EN they read 'Restart' (148px) and 'Main Menu' (231px) and fit at 40; with the strings plugin off XUnity gives 'New Game' (217px) and 'Return to Main Menu' (435px), which would wrap and lose its second line. The buttons have no background sprite, so shrink rather than widen: bestFit 22..40 is a no-op for the short labels and puts the long one on one line at 27px.",
+   "paths": [
+    "**/GameOverPanel/Dead/Container/MenuButton_*/*/Text"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 22,
+    "maxSize": 40,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   },
+   "onTextChange": true
+  },
+
+  // ---- battle GameOverPanel: WinPanel (big 勝 / 敗 stamp) ----------------------
+  {
+   "id": "go-win-stamp",
+   "comment": "VictoryText / DefeatText are TextMeshPro 800x800 boxes at fontSize 550 (Center/Middle) holding one calligraphic glyph (勝 / 敗) in DFT_S5_SDF_Battle_001/002 (39 / 45 glyphs, no Latin, no per-asset fallbacks). They are LeanLocalizedTextMeshProUGUI labels (System/BattleVictory / System/BattleLose), which bypass the resolver, so the patch's 'Victory' / 'Defeat' never reach them: XUnity gives 'Win' / 'Defeated', drawn from the plugin's global Source Han Serif TMP fallback - 1169px / 2500px at 550, over the whole result column. autoSize 100..550 with wordWrap off is a no-op for the untouched glyph and shrinks the word to the box: 'Win' ~348px, 'Defeated' ~163px. Width 800->740 so the word ends at x=1158, left of the HeaderText/ResultItem column at x=1185. No font swap (it would break the glyph when the text is not translated).",
+   "paths": [
+    "**/GameOverPanel/WinPanel/VictoryText",
+    "**/GameOverPanel/WinPanel/DefeatText"
+   ],
+   "rect": {
+    "dw": -60
+   },
+   "tmp": {
+    "autoSize": true,
+    "minSize": 100,
+    "maxSize": 550,
+    "wordWrap": false,
+    "alignment": "Center",
+    "overflow": "Overflow"
+   },
+   "onTextChange": true
+  },
+
+  // ---- story-mode GameOver (GameOverController) -------------------------------
+  {
+   "id": "go-story-desc-horizontal",
+   "comment": "Story game over description. The previous path (**/HorizontalDesc/GameOverDescText(Clone)) never matched: in level4 the non-Chinese container is /Canvas/Horizontal/DescText (1370x266, VerticalLayoutGroup with childControlWidth/Height), so the GameOverDescText clone already gets min(preferred, 1370) wide and needs no width. What is left is the prefab's lineSpacing 0.8: at 35px English lines are 40.3px apart for 40px of Latin ink (ascender top to descender bottom), so descenders touch the next line's ascenders. 1.0 gives 50.4px; the longest death text (5 lines at 1370) is 252px, inside the 266px container.",
+   "path": "/Canvas/Horizontal/DescText/GameOverDescText(Clone)",
+   "text": {
+    "lineSpacing": 1.0
+   }
+  },
+
+  // ---- EndGamePanel (ending book) + SaveLegendPanel ---------------------------
+  // The SaveLegendPanel Empty/Text spines, Detail/Name, ConfirmPanel Message and buttons are covered by
+  // the ** rules in 41_library.json (lib-legend-*).
+  {
+   "id": "endgame-desc-fit",
+   "comment": "Ending description (EndGamePanel/Desc, 25px UpperLeft, Wrap, vOverflow Overflow, no best fit, with a TextSizePanel that only reacts in OnEnable). English endings run to ~411 characters and overflowed the page. Give the box 300px and best fit 18-28 with Truncate, so short endings stay large and the longest one shrinks to fit. onTextChange because EndGamePanel.Open sets the text on a panel that is already active. Both copies (Library on the title screen, the end-of-game panel) are matched.",
+   "paths": ["**/EndGamePanel/Desc"],
+   "onTextChange": true,
+   "rect": { "height": 300 },
+   "text": { "bestFit": true, "minSize": 18, "maxSize": 28, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+  },
+  {
+   "id": "endgame-savelegend-title",
+   "comment": "SaveLegendPanel heading (System/SaveLegnedText, 789x103 UpperCenter box, 50px; both copies: story TopPanel and the title-library EndGamePanel). The text is now 'Recording Your Legend of Mortal Story' (LOM_Strings_EN), 1001px at 50, which wraps and loses its second line to the 103px box. bestFit 32..50 settles on one line at 39px (781px): two lines need 2 x 1.44 x size <= 103, i.e. 35px or less, so the one-line fit at 39 wins.",
+   "paths": [
+    "**/EndGamePanel/SaveLegendPanel/Title"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 32,
+    "maxSize": 50,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "UpperCenter"
+   },
+   "onTextChange": true
+  },
+  {
+    "id": "endgame-close-tmp-label",
+    "comment": "SaveLegendPanel/CloseButton_02 carries the same 9x50 vertical TMP label ('Leave', one glyph per line) as the library close buttons (41_library lib-close-tmp-label covers only **/LibraryPanel/**). It is normally inactive; if the game turns it on, make it a horizontal 90x26 line centred under the 90x90 button.",
+    "paths": ["**/EndGamePanel/**/CloseButton_02/*/Text (TMP)"],
+    "rect": { "x": 0, "y": -92, "width": 90, "height": 26 },
+    "tmp": { "wordWrap": false, "alignment": "Center", "overflow": "Overflow", "fontSize": 20 }
+  },
+
+  // ---- battle skill cut-ins (Friend/EnemySkillCutPanel) ------------------------
+  {
+   "id": "skillcut-title",
+   "comment": "Skill name on the tilted friend/enemy cut-in banner (rot +10 / -10, 500x100 box, 60px DFXingShu -> Palatino 54, hOverflow Overflow in the prefab). BattleSkillCutPanel shows BattleSkill/Name/<key> (resolver) only for skills with _enableCutInUI (girl9, player_1, player_shield_1, player_block, brother2, brother4, sister1_1, special3, girl4 - not brother1). The longest, 'Breakthrough of Cloud Pass · Thunder Shakes the Nine Heavens' (special3), is 1547px at 54 and ran far past the 580px banner art. Keep the tilt (it is the banner's design) and let the name wrap inside the box with bestFit 26..54: special3 two lines at 32px, 'Heaven and Earth Silent Power' (sister1_1) two lines at ~48px, the other seven one line at 54. Alignment stays UpperLeft / UpperRight from the prefab.",
+   "paths": [
+    "**/FriendSkillCutPanel*/Title",
+    "**/EnemySkillCutPanel*/Title"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 26,
+    "maxSize": 54,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   },
+   "onTextChange": true
+  },
+
+  // ---- battle PausePanel ------------------------------------------------------
+  // LoadGamePanel / SystemSettingPanel copies inside PausePanel are covered by the ** rules in
+  // 40_settings.json / 42_loadgame.json. KeyboardSetting/Container rows share the prefab with
+  // Level_3/ReadyPanel (battle HUD area) and are not touched here.
+  {
+   "id": "pause-border-buttons",
+   "comment": "Battle pause menu strip (Border/MenuButton_Continue/Load/Keyboard/Setting/Title/Giveup): 300x50 MiddleCenter labels at 30px. They are LeanLocalizedText labels (System/Menu/*), so the patch's resolver strings (e.g. 'Read the game instructions', 422px) never reach them. With LOM_Strings_EN every label fits at 30 (widest 'Keyboard Settings', 280px; 'Surrender' via XUnity), and so do XUnity's own labels with the strings plugin off (widest also 'Keyboard Settings'). Kept as a safety net: bestFit 20..30 only shrinks a label that would otherwise wrap.",
+   "paths": [
+    "**/PausePanel/Border/MenuButton_*/*/Text"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 20,
+    "maxSize": 30,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "MiddleCenter"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "pause-info-header",
+   "comment": "'Controls' (System/BattleInfoHeader) in the 124x62 UpperLeft header box at 30px is 133px wide, so UGUI would break the word and clip the second line. bestFit 20..30 keeps it on one line at 28px.",
+   "paths": [
+    "**/PausePanel/Info/Text"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 20,
+    "maxSize": 30,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "pause-info-tooltips",
+   "comment": "Three key-hint columns (Tootip/Text (1..3): 200x127, 200x168, 163x168 at 25px). System/BattleInfoText_02 ('Melee - [Z] / Direct Fire - [X] / Projectile - [Hold X] / Verbal Attack - [C]') wraps both 'Projectile - [Hold X]' and 'Verbal Attack - [C]' and needs 6 lines = 216px at 25 in the 168px box, losing its last lines. bestFit 16..25 fits it at 21px (5 lines, 151px); Text (1) settles at 22px (4 lines, 126px), Text (3) stays at 25.",
+   "paths": [
+    "**/PausePanel/Info/Tootip/Text (*)"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 16,
+    "maxSize": 25,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "UpperLeft"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "pause-victory-condition",
+   "comment": "Victory-condition lines (unkeyed rich text, XUnity: 'Victory condition [Annihilate the enemy]' / '[Time's up]') in 500x50 UpperRight boxes at 32px over the 394px VictoryBack strip. PausePanel.Setup deactivates both objects unconditionally, so in the shipped game they never show; kept as a safety net: bestFit 18..32 would put the 669px line on one line at 24px.",
+   "paths": [
+    "**/PausePanel/VictoryDefeat",
+    "**/PausePanel/VictoryTimeout"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 18,
+    "maxSize": 32,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "richText": true
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "pause-keybind-prompt",
+   "comment": "Rebind prompt (System/ListenKeyRebind, now 'Press a new key... or ESC to cancel', 878px at 50) in the 600x100 UpperCenter box: it wraps to two lines = 144px and the second is truncated. bestFit 28..50 gives one line at 34px (597px).",
+   "paths": [
+    "**/PausePanel/KeyboardSetting/Panel/Text"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 28,
+    "maxSize": 50,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "UpperCenter"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "pause-keybind-save-stamp",
+   "comment": "MenuButton_SaveSetting/*/Text (2) is an 80x80 single-glyph stamp (70px DFT_S5 -> Palatino 63, System/SaveText_02 '存', XUnity 'Save'). Both copies (Normal, Hover) are inactive in the prefab, so this only matters if the game turns them on: 'Save' is 131px at 63 and UGUI would break it mid-word; bestFit 20..63 fits it at 38px (78px). Text (1) (System/Save, 180x80) reads 'Save' at 54px and fits.",
+   "paths": [
+    "**/PausePanel/KeyboardSetting/MenuButton_SaveSetting/*/Text (2)"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 20,
+    "maxSize": 63,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate",
+    "alignment": "MiddleCenter"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "skillcut-name-words",
+   "comment": "Tang Clan support cut-in (SkillCut_Brother1, cloned into /[UI]/MainUI/Level_2/CutInPanels; it plays only for the brother1 skill, the one BattleSkillController with _cutIn=1). Name/Char (1..6) are six 250x250 boxes, anchored and pivoted at their centre, holding one calligraphic glyph each (唐 門 暗 器 總 綱, LeanLocalizedText keys BattleSkill/Brother1/Skill_1_1..6, DFT_S5 180 -> Palatino 162, Wrap/Truncate). In English each box gets a word - Tang (XUnity), Clan / Hidden / Weapon / General / Principles (LOM_Strings_EN); with the strings plugin off XUnity gives Tang / Gate / Darkness. / Vessel / Total / Reign - 336-713px wide at 162, so UGUI breaks every word and Truncate keeps only its first line: 'Ta' 'Cla' 'Hi' 'We' 'Ge' 'Pri'. The Name Animator (Brother1_Skill1_Intro, 1 s) writes every Char's anchoredPosition, localScale, rotation and colour each frame (glyphs fly in 1/6 s apart in 1..6 order and land on their serialized spots), so no rule can move them; sizeDelta and alignment are not animated. skillcut-name-word-1..6 size each box so its UpperLeft corner lands on a flush-left stack at x=60, 80px pitch from y=40: the words read top to bottom in key order at 64px (Principles 282px; a 64px Palatino word is ~64px of ink from ascender to descender, under the 80px pitch), on the dark field left of the art, and still arrive one by one - the fly-in scale and rotation now pivot on the far-off box centre, so each word swings in along an arc instead of spinning in place. onTextChange re-asserts 64 after FontMap's one-off 0.9 rescale and after Lean/XUnity set the text.",
+   "paths": [
+    "**/SkillCut*/Name/Char (*)"
+   ],
+   "text": {
+    "bestFit": false,
+    "fontSize": 64,
+    "hOverflow": "Overflow",
+    "vOverflow": "Overflow",
+    "alignment": "UpperLeft"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "skillcut-name-word-1",
+   "comment": "Char (1) lands centred at screen (279,135) (Name centre 250,540 + its animated end position); 438x190 puts its UpperLeft corner at (60,40), line 1 of the skillcut-name-words stack.",
+   "path": "**/SkillCut*/Name/Char (1)",
+   "rect": {
+    "width": 438,
+    "height": 190
+   }
+  },
+  {
+   "id": "skillcut-name-word-2",
+   "comment": "Char (2) lands centred at screen (294,346) (Name centre 250,540 + its animated end position); 468x452 puts its UpperLeft corner at (60,120), line 2 of the skillcut-name-words stack.",
+   "path": "**/SkillCut*/Name/Char (2)",
+   "rect": {
+    "width": 468,
+    "height": 452
+   }
+  },
+  {
+   "id": "skillcut-name-word-3",
+   "comment": "Char (3) lands centred at screen (464,208) (Name centre 250,540 + its animated end position); 808x16 puts its UpperLeft corner at (60,200), line 3 of the skillcut-name-words stack.",
+   "path": "**/SkillCut*/Name/Char (3)",
+   "rect": {
+    "width": 808,
+    "height": 16
+   }
+  },
+  {
+   "id": "skillcut-name-word-4",
+   "comment": "Char (4) lands centred at screen (464,420) (Name centre 250,540 + its animated end position); 808x280 puts its UpperLeft corner at (60,280), line 4 of the skillcut-name-words stack.",
+   "path": "**/SkillCut*/Name/Char (4)",
+   "rect": {
+    "width": 808,
+    "height": 280
+   }
+  },
+  {
+   "id": "skillcut-name-word-5",
+   "comment": "Char (5) lands centred at screen (464,638) (Name centre 250,540 + its animated end position); 808x556 puts its UpperLeft corner at (60,360), line 5 of the skillcut-name-words stack.",
+   "path": "**/SkillCut*/Name/Char (5)",
+   "rect": {
+    "width": 808,
+    "height": 556
+   }
+  },
+  {
+   "id": "skillcut-name-word-6",
+   "comment": "Char (6) lands centred at screen (464,856) (Name centre 250,540 + its animated end position); 808x832 puts its UpperLeft corner at (60,440), line 6 of the skillcut-name-words stack.",
+   "path": "**/SkillCut*/Name/Char (6)",
+   "rect": {
+    "width": 808,
+    "height": 832
+   }
+  },
+  {
+   "id": "skillcut-dialog-line",
+   "comment": "Speech line on the Tang Clan cut-in: SkillDialogPanel (on Dialog/Content, _dialogs2 = BattleSkill/Brother1/Dialog_1_1) instantiates SkillDialogText - a 0x20 box, 24px, horizontal Wrap, vertical Overflow, lineSpacing 0.7 - into Dialog/Content (HorizontalLayoutGroup, no size control) and types the line into it. A 0-wide Wrap box is the vertical-Chinese trick: 'Who dares to touch my Junior Brother!' becomes 31 one-letter lines (34px + 30 x 24.1px = ~760px) from y=525, past the 168x420 scroll (ends y=930) and ~200px below the bottom of the screen. 150px wide (the group centres it, 9px in from each scroll edge) and lineSpacing 1.0, since at 0.7 the lines are 24.1px apart for ~27px of Latin ink: 4 lines ('Who dares / to touch my / Junior / Brother!') = 138px.",
+   "paths": [
+    "**/SkillCut*/Dialog/Content/SkillDialogText(Clone)"
+   ],
+   "rect": {
+    "width": 150
+   },
+   "text": {
+    "lineSpacing": 1.0,
+    "hOverflow": "Wrap",
+    "vOverflow": "Overflow",
+    "alignment": "UpperCenter"
+   }
+  },
+  {
+   "id": "skillcut-support-title",
+   "comment": "Caption on the Tang Clan cut-in's bottom-left plate (SkillCut*/Title/Text: 400x100 on the 464x112 skill_back plate, 60px SourceHanSerif, MiddleLeft, Wrap/Truncate, no best fit). '-Tactical Support-' (System/BattleSkill, LOM_Strings_EN) is 553px at 60: it wraps to '-Tactical' / 'Support-' (172px tall) and the second line is truncated. bestFit 30..60 keeps one line at 43px (397px); XUnity's '– Tactical Support –' (strings plugin off, 611px at 60) fits on one line at 39.",
+   "paths": [
+    "**/SkillCut*/Title/Text"
+   ],
+   "text": {
+    "bestFit": true,
+    "minSize": 30,
+    "maxSize": 60,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "story-gameover-title",
+   "comment": "Story-mode game over scene (level4, GameOverController; in inventory/Canvas.txt, never captured): /Canvas/Horizontal/TitleText is 1274x107 at 70px, UpperLeft, Wrap/Truncate, lineSpacing 0.8 - room for one line. It shows Library/Title/<death key>; 7 of the 105 death titles are wider than 1274px at 70 (longest 'I Detest the World, Just as the World Detests Me', 1712px) and lose their last words to the truncated second line. The desc container starts 5px below (y=155), so the box cannot grow: bestFit 40..70 keeps every title on one line (smallest 52px for that one; 98 titles stay at 70). Two lines (1.44 x size x (1 + 0.8)) fit the 107px box only at 41px or less, below every one-line fit.",
+   "path": "/Canvas/Horizontal/TitleText",
+   "text": {
+    "bestFit": true,
+    "minSize": 40,
+    "maxSize": 70,
+    "hOverflow": "Wrap",
+    "vOverflow": "Truncate"
+   },
+   "onTextChange": true
+  },
+  {
+   "id": "credits-section-titles",
+   "comment": "Credits roll (CreditPanel/Container, a VerticalLayoutGroup that sizes heights only): the section headings are 400px-wide right-aligned Texts whose right edge (x=910) lines up with the job-title column. 'Development Team' (Credit/Header/Credit, XUnity) is 697px at 70 and 'Development' alone is 478px, so UGUI breaks it mid-word ('Developm' / 'ent Team'); 'Korean Translation & QA' (638px at 50) wraps to three lines, 'External collaboration.', 'Nine Six Fú Painting Studio', 'External Testing' and 'External Resources' to two. Overflow keeps each on one line growing left from x=910 (the widest reaches x=213); each heading still gets its LayoutElement min height (60-200px). Rows named like a heading (Music, External Test, SpecialThx) are layout groups without a Text and are not affected.",
+   "paths": [
+    "**/CreditPanel/Container/Credit",
+    "**/CreditPanel/Container/Reinforcement",
+    "**/CreditPanel/Container/External",
+    "**/CreditPanel/Container/External (2)",
+    "**/CreditPanel/Container/Music",
+    "**/CreditPanel/Container/Localization_KR",
+    "**/CreditPanel/Container/External Test",
+    "**/CreditPanel/Container/External Resource",
+    "**/CreditPanel/Container/SpecialThx"
+   ],
+   "text": {
+    "hOverflow": "Overflow"
+   }
+  },
+  {
+   "id": "credits-specialthx-long-line",
+   "comment": "Special Thanks, first entry: the unkeyed '經濟部工業局' comes through XUnity as 'Ministry of Economic Affairs, Industrial Development Bureau', 947px at 30 in a 606x50 box. It wraps to two lines (pref 947x87 in the story --all dump), and at runtime the label's vertical overflow is Overflow (serialized Truncate), so 'Industrial Development Bureau' is drawn over the next entry, 'Taipei Computer Association', 50px below. 900px wide (x 960-1860; the staff column does not control child width) at a fixed 28px keeps it on one line (877px) whatever the vertical mode - best fit would not help while that axis is Overflow.",
+   "path": "**/CreditPanel/Container/SpecialThx/Staff/P (1)",
+   "rect": {
+    "width": 900
+   },
+   "text": {
+    "fontSize": 28,
+    "bestFit": false,
+    "hOverflow": "Wrap"
+   },
+   "onTextChange": true
+  }
+]

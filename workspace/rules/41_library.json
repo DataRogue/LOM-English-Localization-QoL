@@ -1,0 +1,152 @@
+[
+  // ---------------------------------------------------------------------------
+  // Sermon Hall / Library (title scene: /UI/Layer_3/LibraryPanel).
+  // Tabs: EndGame (Azure Script grid), Dead (Book of Life and Death list),
+  // Achievement (Chronicles list), Legend (book-spine slots + detail),
+  // plus BackupPanel / ExportPanel / SaveLegendPanel / LegendStoryPanel overlays.
+  // ---------------------------------------------------------------------------
+
+  // ---- left tab strip -------------------------------------------------------
+  {
+    "id": "lib-tab-labels",
+    "comment": "Tab labels ('Tales of the Martial Heroes' etc.) live in a 300x70 box (x104) inside a 460-wide button whose left 48px are off-screen; XUnity sets AutoResize(12,30)+overflow so the 27-char label spilled past both box edges (!H-OVERFLOW) and drifted 35<->39px through the DFT_S5->Palatino re-scale. Widen the box to 400 (x54 -> screen 6..406, same centre 206) and pin bestFit 20..30 with Wrap so a longer label wraps inside the button art instead of running off-screen. onTextChange so the rule wins after XUnity re-applies its resizer.",
+    "paths": ["**/LibraryPanel/Buttons/MenuButton_Library_*/*/Text"],
+    "rect": { "x": 54, "width": 400 },
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "LowerCenter" },
+    "always": true,
+    "onTextChange": true
+  },
+
+  // ---- tab headers ('---- Azure Script ----') --------------------------------
+  {
+    "id": "lib-panel-header",
+    "comment": "Panel header text sits in a 240x63 box between two 306px rule lines sized for 3 hanzi; 'Book of Life and Death' / 'Chronicles of the Tempest' / 'Tales of the Martial Heroes' wrapped and lost their second line (!V-CLIPPED) and the lines ran through the words. Widen to 420 (x170 -> screen 815..1235, centre unchanged) with bestFit 24..35 so the longest title (481px at 35) drops to ~30px on one line.",
+    "paths": ["**/LibraryPanel/Panels/*/Title/Text"],
+    "rect": { "x": 170, "width": 420 },
+    "text": { "bestFit": true, "minSize": 24, "maxSize": 35, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperCenter" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-panel-header-line1",
+    "comment": "Left rule line of the header: shorten 306 -> 160 so it ends (screen 805) before the widened text box (815).",
+    "paths": ["**/LibraryPanel/Panels/*/Title/Line1"],
+    "rect": { "width": 160 }
+  },
+  {
+    "id": "lib-panel-header-line2",
+    "comment": "Right rule line: start at x600 (screen 1245, just after the text box ends at 1235) and keep the original right end (~1405).",
+    "paths": ["**/LibraryPanel/Panels/*/Title/Line2"],
+    "rect": { "x": 600, "width": 160 }
+  },
+
+  // ---- EndGame tab: outcome cards -------------------------------------------
+  {
+    "id": "lib-end-card-index",
+    "comment": "'Outcome N' under each 200x260 card sat in a 180x60 box; two-digit numbers (183px at 30) wrapped and the number line was truncated (!V-CLIPPED). Use the full 200px card width (x0) and bestFit 20..30 with Wrap so any format stays on one line; lift 4px so the descenders clear the card border.",
+    "paths": ["**/LibraryPanel/Panels/EndGame/**/LibraryEndItem(Clone)/Index"],
+    "rect": { "x": 0, "width": 200, "dy": 4 },
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter" },
+    "onTextChange": true
+  },
+
+  // ---- Dead tab: Book of Life and Death list --------------------------------
+  {
+    "id": "lib-dead-title",
+    "comment": "Death titles ('12. The world is desolate, especially when I am apart from you.' ~930px at 30) wrap in the 720x47 single-line box and lose the second line. bestFit 20..30 keeps them on one line (713px at 23).",
+    "paths": ["**/LibraryDeadItem(Clone)/*/Title"],
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleLeft" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-dead-count",
+    "comment": "'{0} times' counter (116x80, right-aligned at x642): '99 times' is ~125px at 30 so it wrapped into two lines and the second was clipped. Widen to 160 (x600..760) and bestFit 20..30.",
+    "paths": ["**/LibraryDeadItem(Clone)/Visible/Count"],
+    "rect": { "x": 600, "width": 160 },
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleRight" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-dead-desc",
+    "comment": "Death description (629x180 at 25px, TextSizePanel picks the size from the Chinese length): the longest English entries are ~414 chars = 9 lines at 25px, more than the 180px box / 230px row. Trim the width to 555 so it stays left of the widened counter (x600) and bestFit 16..25 so long entries shrink to fit instead of being truncated.",
+    "paths": ["**/LibraryDeadItem(Clone)/Visible/Desc", "**/LibraryDeadItem(Clone)/Unknown/Desc"],
+    "rect": { "width": 555 },
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 25, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" },
+    "onTextChange": true
+  },
+
+  // ---- Achievement tab: Chronicles list -------------------------------------
+  {
+    "id": "lib-ach-title",
+    "comment": "Achievement title (400x54, hOverflow Overflow at 35px): 'Pillar of the Master's Sect' already spills past the box (!H-OVERFLOW) and 'Evil people will always encounter evil people' (~816px) would run over the Award column and out of the scroll view. Widen to 630 (screen 853..1483, inside the viewport) and bestFit 22..35 on one line.",
+    "paths": ["**/LibraryAchievementItem(Clone)/Title"],
+    "rect": { "width": 630 },
+    "text": { "bestFit": true, "minSize": 22, "maxSize": 35, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-ach-desc",
+    "comment": "Achievement description (337x150): TextSizePanel sets 20px by Chinese length; the longest English text (161 chars) is 5 lines = 136px, so cap at 20 and let bestFit fall back to 16 for anything longer instead of truncating.",
+    "paths": ["**/LibraryAchievementItem(Clone)/Desc"],
+    "text": { "bestFit": true, "minSize": 16, "maxSize": 20, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-ach-award",
+    "comment": "Award column (264x130 at 30px): 'Unlocking the second chapter elements: Early +1 Fate +2.' needs 4 lines at 30 (168px) and was clipped. bestFit 18..30 (3 lines at 22 = ~90px).",
+    "paths": ["**/LibraryAchievementItem(Clone)/Award"],
+    "text": { "bestFit": true, "minSize": 18, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" },
+    "onTextChange": true
+  },
+
+  // ---- Legend tab / SaveLegendPanel: book-spine slots -----------------------
+  {
+    "id": "lib-legend-empty-spine",
+    "comment": "'No record' on each empty book spine (pic_book_back_01_empty, 56x500) was a 55x210 vertical CJK box, so English broke into 'No/re/co/rd'. The spine art is only 56px wide, so keep the label on the spine but rotate it -90 (clockwise: reads top-to-bottom like a book spine) as one horizontal line: pivot centre, 210x55 box centred where the old box was (28,-190), bestFit 18..32 with Wrap so any longer string still fits the spine.",
+    "paths": ["**/LoadLegendSlot (*)/Empty/Text", "**/SaveLegendSlot (*)/Normal/Empty/Text"],
+    "rect": { "pivot": [0.5, 0.5], "anchoredPos": [28, -190], "sizeDelta": [210, 55], "rotationZ": -90 },
+    "text": { "bestFit": true, "minSize": 18, "maxSize": 32, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-legend-detail-name",
+    "comment": "Selected-record title in the Detail block (191x103 at 30px, next to the cover picture): ending titles run to 80 chars ('Interfering with others' romantic relationships can lead to dire consequences.') = 5+ lines at 30 and were clipped. Widen to 215 (ends at screen x1915) and bestFit 15..30 in a 95px box (4 lines at 16) - ends above the Read button (Legend tab) / the date line (EndGame variant).",
+    "paths": ["**/SaveLegendPanel/Detail/Name"],
+    "rect": { "width": 215, "height": 95 },
+    "text": { "bestFit": true, "minSize": 15, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "UpperLeft" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-legend-confirm-message",
+    "comment": "'Are you sure you want to overwrite the current record?' at 42px in a 513x90 UpperLeft box with vertical Overflow ran three lines down over the Confirm/Cancel buttons. Same fix as the pause-menu confirm dialogs: 720 wide, bestFit 20..30, two centred lines above the buttons.",
+    "paths": ["**/SaveLegendPanel/ConfirmPanel/Panel/Message"],
+    "rect": { "y": -12, "width": 720, "height": 96 },
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "UpperCenter" },
+    "onTextChange": true
+  },
+  {
+    "id": "lib-legend-confirm-buttons",
+    "comment": "Confirm / Cancel reuse the 300x70 menu-button label; widen to 340 and pin 42px so the DFT_S5->Palatino re-scale on Normal/Hover toggles cannot drift the size (see 31_menus menu-button-labels).",
+    "paths": ["**/SaveLegendPanel/ConfirmPanel/Panel/MenuButton_*/*/Text"],
+    "rect": { "width": 340 },
+    "text": { "bestFit": true, "minSize": 42, "maxSize": 42, "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "always": true
+  },
+
+  // ---- ExportPanel -----------------------------------------------------------
+  {
+    "id": "lib-export-filename",
+    "comment": "'Export successful: LOM_Legend_20240626223237.txt' (814px at 30) wrapped mid-filename in the 700x100 box. bestFit 20..30 keeps the whole file name on one line (~680px at 25), vertically centred in the message strip.",
+    "paths": ["**/LibraryPanel/ExportPanel/Info/FileName"],
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 30, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleLeft" },
+    "onTextChange": true
+  },
+
+  // ---- CloseButton_02 TMP labels ---------------------------------------------
+  {
+    "id": "lib-close-tmp-label",
+    "comment": "Every CloseButton_02 in the library carries a 9x50 vertical TMP label ('離開', one glyph per line) under Normal/Enable. It is inactive in every state we captured (the game never turns it on), but if it ever is, make it a horizontal 90x26 line centred under the 90x90 button instead of a glyph column over the icon.",
+    "paths": ["**/LibraryPanel/**/CloseButton_02/*/Text (TMP)"],
+    "rect": { "x": 0, "y": -92, "width": 90, "height": 26 },
+    "tmp": { "wordWrap": false, "alignment": "Center", "overflow": "Overflow", "fontSize": 20 }
+  }
+]

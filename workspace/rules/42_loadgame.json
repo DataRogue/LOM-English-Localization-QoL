@@ -1,0 +1,68 @@
+[
+  // ---------------------------------------------------------------------------
+  // LoadGamePanel (title screen /UI/Layer_2/LoadGamePanel and the pause-menu copy
+  // /[UI]/TopPanel/MenuPanel/LoadGamePanel share one prefab). 31_menus.json already
+  // fixes the pause-menu copy with absolute /[UI]/... paths; the rules below use
+  // "**/LoadGamePanel/..." so the title-screen copy gets the same layout. Values are
+  // kept identical to 31_menus.json so re-applying them to the in-game copy is a no-op.
+  // ---------------------------------------------------------------------------
+
+  {
+    "id": "loadgame-slot-header-manual",
+    "comment": "Manual-save slot label 'Legendary 001' (SourceHanSerif 25px, 120x60 box, wrap) wrapped mid-word ('Legendar') and was clipped (!V-CLIPPED). Single 140px line, bestFit 13..18, vertically centred on the Title row (y -21 = same row as Title).",
+    "paths": ["**/LoadGamePanel/Container/Scroll View/Viewport/Slots/*/Slot/Header"],
+    "rect": { "y": -21, "width": 140, "height": 50 },
+    "text": { "bestFit": true, "minSize": 13, "maxSize": 18, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "onTextChange": true
+  },
+  {
+    "id": "loadgame-slot-header-auto",
+    "comment": "Same slot label inside the Recent/Auto-save header container (child text 'Slot' at ap4,0). XUnity's mainmenu.resizer gives the AutoSave subtree AutoResize(12,18)+horizontal Overflow, which made 'Legendary 001' run into the Title (!H-OVERFLOW); the game also writes 'No data available' here for empty auto slots, which clipped in the 120x60 box. Use a 132x26 single-line box on the Title row (starts 5px right of the manual header, so 132 keeps a gap before the Title text at x=484); 'No data available' fits at 14, 'Legendary 001' at 18. onTextChange so it wins over XUnity's re-applied AutoResize.",
+    "paths": ["**/LoadGamePanel/Container/AutoSave/*/Slot/Header/Slot",
+              "**/LoadGamePanel/Container/RecentSave/*/Slot/Header/Slot"],
+    "rect": { "y": -10, "width": 132, "height": 26 },
+    "text": { "bestFit": true, "minSize": 13, "maxSize": 18, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "onTextChange": true
+  },
+  {
+    "id": "loadgame-slot-header-auto-type",
+    "comment": "Auto-save type label under the line ('Plot' / 'Nurturing' / 'Battle'): 'Nurturing' (131px at 25) overflowed the 124px box (!H-OVERFLOW). Widen to 150 and pin 20px via bestFit 20..20 (XUnity's AutoResize(12,18) on the AutoSave subtree is re-applied on every text set, so a plain fontSize is capped at 18; onTextChange re-applies ours after it). 'Nurturing' at 20 is ~105px, ending before the Time column (x=152 inside the slot).",
+    "paths": ["**/LoadGamePanel/Container/AutoSave/*/Slot/Header/Text"],
+    "rect": { "width": 150 },
+    "text": { "bestFit": true, "minSize": 20, "maxSize": 20, "hOverflow": "Wrap", "vOverflow": "Truncate" },
+    "onTextChange": true
+  },
+  {
+    "id": "loadgame-slot-title",
+    "comment": "Save title (in-game date 'Year One, AprilEarly Month', DFT_S5 40 bestFit -> Palatino 29-32px) wrapped onto two lines in its 300x50 box and the second line overlapped the Time text. Move it right of the widened header (x 145 -> 166, width 300 -> 289) and use a fixed 21px single line with horizontal Overflow: the longest date ('Year One, SeptemberEarly Month') stays under ~300px, i.e. left of the Delete button art. Pinned via bestFit 21..21 + always/onTextChange because the focused slot's label gets re-scaled by the global font substitution when LeanLocalizedTextFont re-assigns the font.",
+    "paths": ["**/LoadGamePanel/Container/**/Slot/*/Title"],
+    "rect": { "dx": 21, "dw": -11 },
+    "text": { "fontSize": 21, "bestFit": true, "minSize": 21, "maxSize": 21, "hOverflow": "Overflow", "vOverflow": "Truncate", "alignment": "MiddleLeft" },
+    "always": true,
+    "onTextChange": true
+  },
+  {
+    "id": "loadgame-slot-delete-label",
+    "comment": "'Delete' (DFT_S5 30px -> Palatino, XUnity AutoResize 12..24) in the 100x50 box on the slot's Delete button: pin at 26px so the font-substitution rescale on Normal/Hover toggles cannot shrink it further (title copy rendered at 24, in-game copy had drifted lower). onTextChange because XUnity re-applies its AutoResize(12,24) whenever the label text is set, which left bf=12-24 after the first pass.",
+    "paths": ["**/LoadGamePanel/Container/**/Delete/*/Text (1)"],
+    "text": { "bestFit": true, "minSize": 26, "maxSize": 26, "hOverflow": "Wrap", "vOverflow": "Truncate", "alignment": "MiddleCenter" },
+    "always": true,
+    "onTextChange": true
+  },
+  {
+    "id": "loadgame-panel-header",
+    "comment": "'Loading game' panel header (DFXingShu/DFT_S5 69px, 500x100 box): pin at 62px (=69*0.9, the intended substituted size) - it drifts down (56 on the title copy) through repeated 0.9 rescales. 'Loading game' at 62 is ~395px wide, inside the 500 box.",
+    "paths": ["**/LoadGamePanel/Container/Header"],
+    "text": { "bestFit": true, "minSize": 62, "maxSize": 62, "hOverflow": "Overflow", "vOverflow": "Truncate" },
+    "always": true
+  },
+  {
+    "id": "loadgame-section-labels",
+    "comment": "'Recently archived' / 'Auto Save' / 'Manual Save' section labels (DFT_S5 50px, 500x100 box): pin at 45px (=50*0.9); they had drifted to 40 on the title copy. 'Recently archived' at 45 is ~360px wide, inside the 500 box.",
+    "paths": ["**/LoadGamePanel/Container/Auto",
+              "**/LoadGamePanel/Container/Manual",
+              "**/LoadGamePanel/Container/Recent"],
+    "text": { "bestFit": true, "minSize": 45, "maxSize": 45, "hOverflow": "Overflow", "vOverflow": "Truncate" },
+    "always": true
+  }
+]

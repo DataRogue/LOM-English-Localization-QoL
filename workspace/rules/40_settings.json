@@ -1,0 +1,125 @@
+[
+  // SystemSettingPanel: title-screen copy (/UI/Layer_3/SystemSettingPanel) and pause-menu copy
+  // (/[UI]/TopPanel/MenuPanel/SystemSettingPanel). All paths use the "**/SystemSettingPanel/" prefix to cover both.
+
+  {
+    "id": "settings-header",
+    "comment": "Panel title 'Settings': was 2 vertical CJK glyphs at 150px in a 200x400 box, English ran over the vertical divider (x=393) and the logo art. Horizontal 350x130 box inside the left column, bestFit so the single word shrinks to fit. onTextChange because XUnity re-applies overflow on this path.",
+    "path": "**/SystemSettingPanel/Header",
+    "onTextChange": true,
+    "rect": { "x": 30, "y": -100, "width": 350, "height": 130 },
+    "text": { "fontSize": 80, "bestFit": true, "minSize": 40, "maxSize": 84, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+
+  {
+    "id": "settings-section-lines",
+    "comment": "Decorative rule lines beside the section titles (Game/Screen/Sound Settings) were 300px each, sized for 4 CJK glyphs; the ~280px English titles overlapped them. Shorten to 210 so the gap between the lines is 340px.",
+    "paths": ["**/SystemSettingPanel/Panel/*/Title*/Line (*)"],
+    "rect": { "width": 210 }
+  },
+
+  {
+    "id": "settings-language-header",
+    "comment": "'Game Language' wrapped in a 150px header box. Widen to 250 (dropdown is moved right to make room).",
+    "path": "**/SystemSettingPanel/Panel/Game/Language/Header",
+    "onTextChange": true,
+    "rect": { "width": 250 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-language-dropdown",
+    "comment": "Language dropdown: shift right past the widened header and widen 190 -> 330 so 'Traditional Chinese' (281px @28) fits the label area (width-35).",
+    "path": "**/SystemSettingPanel/Panel/Game/Language/Dropdown",
+    "rect": { "dx": 98, "width": 330 }
+  },
+  {
+    "id": "settings-language-dropdown-label",
+    "comment": "Dropdown caption: in the pause-menu copy it wrapped to two lines and got clipped ('Traditiona'). Single line, bestFit floor 18 in case a longer option name appears.",
+    "path": "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Label",
+    "onTextChange": true,
+    "text": { "bestFit": true, "minSize": 18, "maxSize": 28, "hOverflow": "Wrap", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-language-dropdown-items",
+    "comment": "Dropdown list items (Template follows the widened dropdown): single line, no clipping.",
+    "path": "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Template/Viewport/Content/Item/Item Label",
+    "onTextChange": true,
+    "text": { "fontSize": 22, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-language-disabled-note",
+    "comment": "Pause-menu copy only: 'Return to Game Title Settings' note next to the (disabled) language dropdown was a 467x55 box at fs36, wrapped and clipped. Move right of the widened dropdown, two lines at fs26 in a 300x84 box, ending before the close button (x=1554).",
+    "path": "**/SystemSettingPanel/Panel/Game/Language/DisableText",
+    "onTextChange": true,
+    "rect": { "x": 705, "y": -15, "width": 300, "height": 84},
+    "text": { "fontSize": 26, "alignment": "MiddleLeft", "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+
+  {
+    "id": "settings-toggle-labels",
+    "comment": "Checkbox labels (Destiny Wheel, Auto-Save, Fast-Forward, Mark Read, Fullscreen): boxes of 395-600px wrapped or clipped the longer English strings (up to 645px). Nothing sits to their right, so widen to 700 and allow overflow.",
+    "paths": ["**/SystemSettingPanel/Panel/Game/*/ToggleSetting - */Label", "**/SystemSettingPanel/Panel/Graphics/*/ToggleSetting - */Label"],
+    "onTextChange": true,
+    "rect": { "width": 700 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+
+  {
+    "id": "settings-resolution-header",
+    "comment": "'Resolution' (167px) broke as 'Resolutio/n' in a 150px box. Widen to 250.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/Resolution/Header",
+    "onTextChange": true,
+    "rect": { "width": 250 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-resolution-dropdown",
+    "comment": "Resolution dropdown moved right of the widened header; 500 -> 400 wide so its right edge stays aligned with the sliders (x=1290).",
+    "path": "**/SystemSettingPanel/Panel/Graphics/Resolution/Dropdown",
+    "rect": { "dx": 100, "width": 400 }
+  },
+  {
+    "id": "settings-gamepad-header",
+    "comment": "'Controller icon' header (row only active with a gamepad): same 150px box problem, widen to 250.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/GamepadIcon/Header",
+    "onTextChange": true,
+    "rect": { "width": 250 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-gamepad-dropdown",
+    "comment": "Controller-icon dropdown moved right of the widened header (811 -> 890) and widened a little.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/GamepadIcon/Dropdown",
+    "rect": { "dx": 79, "width": 300 }
+  },
+
+  {
+    "id": "settings-volume-headers",
+    "comment": "Master/Music/Sound Volume headers: 200px right-aligned boxes wrapped into two lines that overlapped the next slider row (rows are 68px apart). Widen to 290 and shift left (485..775, slider starts at 795) so each is one line.",
+    "path": "**/SystemSettingPanel/Panel/Sounds/*/Header",
+    "onTextChange": true,
+    "rect": { "x": -110, "width": 290 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleRight" }
+  },
+  {
+    "id": "settings-language-gutter",
+    "comment": "'Game Language' measures 245px in the 250px header box, leaving a 5px gutter before the dropdown. Push the dropdown 30px further right (the disabled-note rule already sits clear of it).",
+    "path": "**/SystemSettingPanel/Panel/Game/Language/Dropdown",
+    "rect": { "dx": 128 }
+  },
+  {
+    "id": "settings-language-caption-english",
+    "comment": "The game still runs its ChineseTraditional locale (every English key and scene line is built on it), so the language dropdown read 'Traditional Chinese' on a fully English UI. Relabel the caption while that slot is selected (englishOnly); selecting the other entries switches the game's own locale, this mod's text layers step aside and the caption shows that language.",
+    "paths": ["**/SystemSettingPanel/Panel/Game/Language/Dropdown/Label"],
+    "onTextChange": true,
+    "englishOnly": true,
+    "text": { "text": "English" }
+  },
+  {
+    "id": "settings-language-item-english",
+    "comment": "The list entry of language index 0 (the Traditional Chinese slot that this mod's English replaces) reads 'English', so a player who switched to Simplified Chinese or Korean can find the way back. Unity names the runtime item 'Item 0: <label>'.",
+    "paths": ["**/SystemSettingPanel/Panel/Game/Language/Dropdown/Dropdown List/Viewport/Content/Item 0*/Item Label"],
+    "onTextChange": true,
+    "text": { "text": "English" }
+  }
+]

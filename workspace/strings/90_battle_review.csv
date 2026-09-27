@@ -1,0 +1,6 @@
+"key","text","note"
+"# --- army battle (Battle.unity) string review of 2026-09-12; keys the owner CSVs do not override; later file wins"
+"System/BattleFriend","Ally","我 = our side on the top-left army health bar (110x60 box); base patch had ""I""; pairs with System/BattleEnemy ""Enemy"""
+"BattleSkill/Name/player_block","Brace","防禦 as the block/defend command is Brace per conventions; Defense is the stat; base patch had ""Defense"""
+"BattleDialog/Ch_2_4_9_3_002","These Tang Clan fools got the wrong target - their hidden weapons keep landing on the Six Great Sects!","4-second soldier speech bubble, 400px at 20px; base line was a 152-character run-on"
+"BattleDialog/Ch_2_4_9_2_005","Filthy beggar, you stink!","臭乞丐，你好臭！ taunt; base line ""Smelly beggar, you're so smelly!"" read as machine output"

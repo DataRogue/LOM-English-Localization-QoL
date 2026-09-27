@@ -1,0 +1,247 @@
+{
+ "note": "Sentinel keys for the plugin's check of what the installed OverLlm patch's files hold: original_sha1 / revised_sha1 = first 16 hex digits of SHA-1 over the UTF-8 English of the OverLlm release / of this mod's pre-0.4 edit of the patch's files (LOM_UI_EN 0.4 MANIFEST.json). No text.",
+ "table": [
+  {
+   "key": "BattleKey/Name/Attack3",
+   "original_sha1": "8aa49fe84036f117",
+   "revised_sha1": "645c93730c0daa63"
+  },
+  {
+   "key": "Book/Name/4004",
+   "original_sha1": "b047eaff5425bb24",
+   "revised_sha1": "97d7325968651841"
+  },
+  {
+   "key": "Book/Name/8008",
+   "original_sha1": "0e8ccf631f9c4d91",
+   "revised_sha1": "296d1bb6e2b4d75c"
+  },
+  {
+   "key": "Character/mask3",
+   "original_sha1": "7340096fffe2945a",
+   "revised_sha1": "78a6c37a4e22cd12"
+  },
+  {
+   "key": "Character/special801",
+   "original_sha1": "c293aeb7573173ed",
+   "revised_sha1": "f73a40daf43a39e7"
+  },
+  {
+   "key": "CharacterIntro1/girl1",
+   "original_sha1": "fe0453e893fed9e2",
+   "revised_sha1": "ff905e004ba7c706"
+  },
+  {
+   "key": "CombatAction/ultimate_006",
+   "original_sha1": "4ecf06bdd9ce0401",
+   "revised_sha1": "a4d676f2ec8f43d9"
+  },
+  {
+   "key": "CombatCharacter/Name/soldier1",
+   "original_sha1": "ded76643f1a71970",
+   "revised_sha1": "1c8f0a63e96aa778"
+  },
+  {
+   "key": "CombatSkill/Name/A011",
+   "original_sha1": "c479dde85f38c19e",
+   "revised_sha1": "6bfb4aff4641c2d1"
+  },
+  {
+   "key": "CombatSkill/Name/C210",
+   "original_sha1": "ee2fb276810cd9d5",
+   "revised_sha1": "dff6f70be39ba107"
+  },
+  {
+   "key": "CombatSkill/Name/C910",
+   "original_sha1": "0147d92966c7747d",
+   "revised_sha1": "f73cdbf0f81b754b"
+  },
+  {
+   "key": "CombatSkill/Name/F001_1",
+   "original_sha1": "60dc7db94e9f3b7a",
+   "revised_sha1": "0ec6791a3dfed5e7"
+  },
+  {
+   "key": "CombatSkill/Name/S806",
+   "original_sha1": "83aa827ca580a669",
+   "revised_sha1": "47b0bf03ed0a966a"
+  },
+  {
+   "key": "EnemyTeam/300",
+   "original_sha1": "ded76643f1a71970",
+   "revised_sha1": "1c8f0a63e96aa778"
+  },
+  {
+   "key": "Facility/Name/003",
+   "original_sha1": "2f6c536bc27e8333",
+   "revised_sha1": "3edecdc8eeb4be0f"
+  },
+  {
+   "key": "Library/Title/10043",
+   "original_sha1": "4dd5d22ea26fd6d7",
+   "revised_sha1": "d14922931fb9d66a"
+  },
+  {
+   "key": "Misc/Desc/6002",
+   "original_sha1": "2e3f7fb013ec8f5b",
+   "revised_sha1": "af8272e8a9a03d76"
+  },
+  {
+   "key": "PlayerInfo/Title/1",
+   "original_sha1": "24d25560123be0dc",
+   "revised_sha1": "87e83a3c59e2cfb6"
+  },
+  {
+   "key": "PlayerTalent/Desc/9106",
+   "original_sha1": "281abfaef90e7114",
+   "revised_sha1": "7a0eaf31c4a79e7b"
+  },
+  {
+   "key": "PlayerTalent/Name/0036",
+   "original_sha1": "4cadc89e101becc1",
+   "revised_sha1": "81fdc28fe484a326"
+  },
+  {
+   "key": "PlayerTalent/Name/4012",
+   "original_sha1": "bc7781c45f38001f",
+   "revised_sha1": "7edeb6c151d8103a"
+  },
+  {
+   "key": "PlayerTalent/Name/9105",
+   "original_sha1": "2161ed7b920bc8b8",
+   "revised_sha1": "f1622b3720900c9d"
+  },
+  {
+   "key": "Position/title/training2",
+   "original_sha1": "72a09e3e17ed53f3",
+   "revised_sha1": "b6fe7f5e79177b05"
+  },
+  {
+   "key": "System/Accountant",
+   "original_sha1": "d38b8a220e056fd8",
+   "revised_sha1": "1aa2f31ee7ccbdf2"
+  }
+ ],
+ "scene": [
+  {
+   "key": "上官世家",
+   "original_sha1": "720285189fc82837",
+   "revised_sha1": "dd0170bab6592f17"
+  },
+  {
+   "key": "丐幫的情況",
+   "original_sha1": "bfb1224c14283aa5",
+   "revised_sha1": "fe45cc4eac69b6f5"
+  },
+  {
+   "key": "使出無影爪",
+   "original_sha1": "467f3c48d83787dc",
+   "revised_sha1": "6ecddcc6501a9d67"
+  },
+  {
+   "key": "分身而死",
+   "original_sha1": "8d72504498ac1f5b",
+   "revised_sha1": "366b838b5f106219"
+  },
+  {
+   "key": "向南宮世家致哀",
+   "original_sha1": "91d98787d9a170ef",
+   "revised_sha1": "941b8faa3a3f6f2c"
+  },
+  {
+   "key": "唐門叛徒",
+   "original_sha1": "18ee20dbe9f99963",
+   "revised_sha1": "c3c722104fb34740"
+  },
+  {
+   "key": "唐門祖師劍",
+   "original_sha1": "c588ee656a3b6f1f",
+   "revised_sha1": "b573ba57cc9db7f1"
+  },
+  {
+   "key": "啟程",
+   "original_sha1": "071381e4e438b7fa",
+   "revised_sha1": "acd1f5e6eb5d8483"
+  },
+  {
+   "key": "失衡",
+   "original_sha1": "e298c4a7b79b1766",
+   "revised_sha1": "9e12438db5e61494"
+  },
+  {
+   "key": "小師妹不在唐門",
+   "original_sha1": "f9d9797b475107e2",
+   "revised_sha1": "05c09eafed84277a"
+  },
+  {
+   "key": "小梅的守望",
+   "original_sha1": "8e57a718d1c83c54",
+   "revised_sha1": "bf40d6bc876c659e"
+  },
+  {
+   "key": "小蘭",
+   "original_sha1": "fffbf56c487497f3",
+   "revised_sha1": "4d23d325c1cd80c9"
+  },
+  {
+   "key": "形意拳",
+   "original_sha1": "2c813213030b896e",
+   "revised_sha1": "e9ba7646143e5510"
+  },
+  {
+   "key": "拜訪飛石幫",
+   "original_sha1": "e370c8315be49240",
+   "revised_sha1": "1cbf38b3ff6a2c58"
+  },
+  {
+   "key": "最後的唐門弟子",
+   "original_sha1": "c71d34af6f6f3dc9",
+   "revised_sha1": "cb5e72bb4b32a2bd"
+  },
+  {
+   "key": "武林傳奇",
+   "original_sha1": "8eb012c6b0f24012",
+   "revised_sha1": "c2ee9490a9350c72"
+  },
+  {
+   "key": "泥教好感度",
+   "original_sha1": "55b5085455f054b3",
+   "revised_sha1": "a6fb346c85c9d9b3"
+  },
+  {
+   "key": "白鯊幫",
+   "original_sha1": "1ba088cbd18701f6",
+   "revised_sha1": "6dc514cffbfc5118"
+  },
+  {
+   "key": "臥雲崗之戰",
+   "original_sha1": "27af22b39034ed7b",
+   "revised_sha1": "d9aea3f180e3993b"
+  },
+  {
+   "key": "訪問唐門師兄弟",
+   "original_sha1": "719a08ed7674163c",
+   "revised_sha1": "818c7fa43e636eac"
+  },
+  {
+   "key": "逆天",
+   "original_sha1": "378fa315e62016ed",
+   "revised_sha1": "eb507695453847e0"
+  },
+  {
+   "key": "關心小師妹",
+   "original_sha1": "60f908f48fbfb970",
+   "revised_sha1": "8416a14f34d3429a"
+  },
+  {
+   "key": "飛天腳",
+   "original_sha1": "0c17f06b55403972",
+   "revised_sha1": "be9abd86024d7286"
+  },
+  {
+   "key": "香囊",
+   "original_sha1": "734c1f42ce47b35d",
+   "revised_sha1": "e7bdf29fd384992d"
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+[
+ {
+  "id": "title-flag-banner-horizontal",
+  "comment": "The banner art itself is a vertical hanging cloth with its swallowtail point and fringe at the bottom, so a horizontal English title had to squeeze into a ~140px column. Swap the plate to the rotated sprite and its box to 300x205, which gives the title a wide field at full size. The sprite is rotated counter-clockwise (see tools/gen_title_flag.py) so the mount is on the left and the swallowtail trails off to the right, the direction English reads; rotating it the other way points the tail back into the first letter.",
+  "paths": [
+   "**/TitleFlag",
+   "**/TitleFlag_*"
+  ],
+  "always": true,
+  "rect": {
+   "width": 300,
+   "height": 205
+  },
+  "image": {
+   "sprite": "icon_title_flag.png"
+  }
+ },
+ {
+  "id": "title-flag-horizontal",
+  "comment": "Category banners (Status / Training / Forging / Alchemy / Inheritance / Development). The game draws these with a TMP text style whose tags rotate every glyph 90 degrees, inside a RectTransform rotated -90: together that yields upright Chinese running down the cloth, but English lay on its side. Clearing the style and the rotation makes the word read across the banner, and the face is swapped because the banner font has no upright Latin. The box is measured from the rotated sprite's cream field (local x 9..249 of 316, drawn into 300px, so screen x 184..412 for a banner at 176): the title starts at the mount end with a 14px inset and runs 200px toward the swallowtail, stopping short of the point where the field tapers. Left-aligned, so every category name begins at the same place instead of drifting with word length.",
+  "paths": [
+   "**/TitleFlag*/Title"
+  ],
+  "always": true,
+  "onTextChange": true,
+  "rect": {
+   "rotationZ": 0,
+   "width": 200,
+   "height": 120,
+   "anchoredPos": [-27, 0]
+  },
+  "tmp": {
+   "style": "normal",
+   "font": "SourceHanSerifTC-Bold",
+   "autoSize": true,
+   "minSize": 18,
+   "maxSize": 46,
+   "wordWrap": true,
+   "alignment": "Left",
+   "charSpacing": 0,
+   "overflow": "Overflow"
+  }
+ }
+]
