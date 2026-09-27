@@ -29,7 +29,7 @@ body:
       label: How did you install it?
       options:
         - Full package (with BepInEx), nothing else
-        - Mod-only package, next to the OverLlm English patch
+        - Mod-only package, next to Lash's English Patch
         - Something else (please say below)
     validations:
       required: true

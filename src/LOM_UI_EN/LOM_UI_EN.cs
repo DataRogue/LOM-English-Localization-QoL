@@ -2023,6 +2023,13 @@ namespace LOM_UI_EN
 		/// <summary>Where players get updates and report problems.</summary>
 		public const string ProjectUrl = "github.com/DataRogue/LOM-English-Localization-QoL";
 
+		/// <summary>What players call the English patch this mod grew from (github.com/joshfreitas1984/LegendOfMortalOverLlm; the
+		/// code, the configs' enum values and the tools call it OverLlm, Original or the base patch). Owner's naming, 2026-09-27.</summary>
+		public const string BaseModName = "Lash's English Patch";
+
+		/// <summary>BaseModName where a button only has room for one word (the Which translation choices).</summary>
+		public const string BaseModShortName = "Lash's";
+
 		public static ConfigEntry<bool> CfgEnabled;
 
 		public static ConfigEntry<bool> CfgSpriteReplace;
@@ -5447,7 +5454,7 @@ namespace LOM_UI_EN
 			Type type = TranslationProfiles.HookMods;
 			if (type == null)
 			{
-				F.QuietBinarizer.NotNeededWhy = "the original patch's Binarizer is not installed";
+				F.QuietBinarizer.NotNeededWhy = "the Binarizer of " + Plugin.BaseModName + " is not installed";
 				return;
 			}
 			FieldInfo field = AccessTools.Field(type, "mapString");

@@ -93,7 +93,7 @@ namespace LOM_UI_EN
 			CfgLogUntranslated = cfg.Bind("Translation", "LogUntranslated", true, "Write Chinese scene text that has no English line to plugins/LOM_UI_EN/translation/untranslated.txt (once per text per session), so gaps can be translated.");
 			CfgApplyResizers = cfg.Bind("Translation", "ApplyResizers", true, "Apply the resizer files (translation/scene/resize/*.resizer.txt, XUnity format) to text this mod translates, the way XUnity AutoTranslator applied them.");
 			CfgWideTextOverflow = cfg.Bind("Translation", "WideTextOverflow", true, "XUnity's implicit resize: a translated Text wider than a quarter of the screen, without best fit, may wrap and overflow vertically; a TextMeshPro in Masking overflow switches to Truncate.");
-			CfgLetBaseFillGaps = cfg.Bind("Translation", "LetBaseModFillGaps", false, "When the original English patch's XUnity AutoTranslator is running: let it translate scene text this mod has no line for (from its own file or its online machine translation, which it appends to its file). Off = such text stays Chinese and is logged to untranslated.txt.");
+			CfgLetBaseFillGaps = cfg.Bind("Translation", "LetBaseModFillGaps", false, "When the XUnity AutoTranslator of " + Plugin.BaseModName + " is running: let it translate scene text this mod has no line for (from its own file or its online machine translation, which it appends to its file). Off = such text stays Chinese and is logged to untranslated.txt.");
 			CfgSkipPaths = cfg.Bind("Translation", "SceneTextSkipPaths", "", "Object paths (glob, ';'-separated, '*' and '**' like the layout rules) whose text this mod never translates.");
 		}
 
@@ -1361,7 +1361,7 @@ namespace LOM_UI_EN
 				object tr = Translator();
 				if (tr == null)
 				{
-					F.XUnityBridge.NotNeededWhy = "XUnity AutoTranslator (the original patch) is not running";
+					F.XUnityBridge.NotNeededWhy = "the XUnity AutoTranslator of " + Plugin.BaseModName + " is not running";
 					return;
 				}
 				F.XUnityBridge.NotNeededWhy = null;

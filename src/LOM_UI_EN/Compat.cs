@@ -278,12 +278,12 @@ namespace LOM_UI_EN
 		{
 			// Grouped like the Mod Settings pages that hold their switches.
 			// The names and fallbacks are shown to players (notices, Mod Settings > Compatibility): plain words, no plugin internals.
-			GameText = Compat.Register("gameText", "Game data text", "Translation", "The OverLlm patch's text, or the game's own, shows instead.");
-			SceneText = Compat.Register("sceneText", "Scene text", "Translation", "The OverLlm patch's text, or the game's own, shows instead.");
-			XUnityBridge = Compat.Register("xunityBridge", "Working with the OverLlm patch", "Translation", "The OverLlm patch may translate some on-screen text again on its own.");
-			Fallback = Compat.Register("fallback", "Fall back to OverLlm", "Translation", "This mod's lines show even where a game update changed them.");
-			QuietBinarizer = Compat.Register("quietBinarizer", "Quiet OverLlm lookups", "Translation", "The OverLlm patch logs every text lookup, which is slower.");
-			Detector = Compat.Register("detector", "OverLlm patch detection", "Translation", "This mod may not notice whether the OverLlm patch is installed.");
+			GameText = Compat.Register("gameText", "Game data text", "Translation", "The text of " + Plugin.BaseModName + ", or the game's own, shows instead.");
+			SceneText = Compat.Register("sceneText", "Scene text", "Translation", "The text of " + Plugin.BaseModName + ", or the game's own, shows instead.");
+			XUnityBridge = Compat.Register("xunityBridge", "Working with " + Plugin.BaseModName, "Translation", Plugin.BaseModName + " may translate some on-screen text again on its own.");
+			Fallback = Compat.Register("fallback", "Fall back to " + Plugin.BaseModName, "Translation", "This mod's lines show even where a game update changed them.");
+			QuietBinarizer = Compat.Register("quietBinarizer", "Quiet " + Plugin.BaseModName + " lookups", "Translation", Plugin.BaseModName + " logs every text lookup, which is slower.");
+			Detector = Compat.Register("detector", "Detecting " + Plugin.BaseModName, "Translation", "This mod may not notice whether " + Plugin.BaseModName + " is installed.");
 			Language = Compat.Register("language", "Game language check", "Translation", "This mod assumes the game's language is English.");
 			Layout = Compat.Register("layout", "Layout fixes", "Localization", "Screens keep the game's own layout; long English may overflow.");
 			Layout.BurstLimit = 100;
@@ -854,8 +854,8 @@ namespace LOM_UI_EN
 					{
 						fb = TextTable.FallbackLog.ToList();
 					}
-					sb.Append("translation: game data ").Append(TranslationProfiles.TableMode).Append(TranslationProfiles.TableHasBase ? " over the OverLlm patch's table" : " (OverLlm patch table not found)").Append(", scene ").Append(TranslationProfiles.SceneMode).Append(TranslationProfiles.SceneHasBase ? " over the OverLlm patch's scene file" : " (OverLlm patch scene file not found)").Append("\n");
-					sb.Append("fallback to the OverLlm patch: ").Append((TextTable.CfgFallback != null && TextTable.CfgFallback.Value) ? "on" : "off").Append(", ").Append(TextTable.FellBackChanged).Append(" changed by a game update, ").Append(TextTable.FellBackPlaceholders).Append(" placeholders, ").Append(TextTable.StaleKept).Append(" out of date kept (only keys the game asked for this session)\n");
+					sb.Append("translation: game data ").Append(TranslationProfiles.TableMode).Append(TranslationProfiles.TableHasBase ? (" over the table of " + Plugin.BaseModName) : (" (table of " + Plugin.BaseModName + " not found)")).Append(", scene ").Append(TranslationProfiles.SceneMode).Append(TranslationProfiles.SceneHasBase ? (" over the scene file of " + Plugin.BaseModName) : (" (scene file of " + Plugin.BaseModName + " not found)")).Append("\n");
+					sb.Append("fallback to " + Plugin.BaseModName + ": ").Append((TextTable.CfgFallback != null && TextTable.CfgFallback.Value) ? "on" : "off").Append(", ").Append(TextTable.FellBackChanged).Append(" changed by a game update, ").Append(TextTable.FellBackPlaceholders).Append(" placeholders, ").Append(TextTable.StaleKept).Append(" out of date kept (only keys the game asked for this session)\n");
 					foreach (string f in fb.Take(2000))
 					{
 						sb.Append("  ").Append(f).Append("\n");
@@ -937,7 +937,7 @@ namespace LOM_UI_EN
 				return;
 			}
 			string names = string.Join(", ", _features.Where((Feature f) => f.Health == Health.NotWorking || f.Health == Health.TurnedOff).Select((Feature f) => f.Name).Take(3));
-			Notice("LOM_UI_EN: " + bad + ((bad == 1) ? " feature does" : " features do") + " not work with this game version (" + names + ((bad > 3) ? ", ..." : "") + "). The rest works. See Mod Settings > Compatibility." + ((missing != null) ? ("\n" + missing) : ""));
+			Notice(Plugin.DisplayName + ": " + bad + ((bad == 1) ? " feature does" : " features do") + " not work with this game version (" + names + ((bad > 3) ? ", ..." : "") + "). The rest works. See Mod Settings > Compatibility." + ((missing != null) ? ("\n" + missing) : ""));
 		}
 
 		/// <summary>Where this mod's own lines do not carry a layer by themselves (MANIFEST.json "standalone"; a 0.5 overlay never
@@ -959,9 +959,9 @@ namespace LOM_UI_EN
 				}
 				if (!r.BaseTableFile && !r.BaseSceneFile)
 				{
-					return "LOM_UI_EN: without the OverLlm patch, some text shows in Chinese. See Mod Settings > Translation.";
+					return Plugin.DisplayName + ": without " + Plugin.BaseModName + ", some text shows in Chinese. See Mod Settings > Translation.";
 				}
-				return "LOM_UI_EN: part of the OverLlm patch is missing, so some text shows in Chinese. Reinstall it (see Mod Settings > Translation).";
+				return Plugin.DisplayName + ": part of " + Plugin.BaseModName + " is missing, so some text shows in Chinese. Reinstall it (see Mod Settings > Translation).";
 			}
 			catch (Exception)
 			{

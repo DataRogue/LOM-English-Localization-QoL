@@ -5,12 +5,12 @@ and ships the library listed under 3 unmodified. Each is under the MIT License, 
 requires its copyright notice and permission notice to be included with copies or
 substantial portions of the software; they are reproduced verbatim below.
 
-Translation origin: this mod's English grew from the OverLlm English patch by joshfreitas1984
+Translation origin: this mod's English grew from Lash's English Patch by joshfreitas1984
 (https://github.com/joshfreitas1984/LegendOfMortalOverLlm), a machine translation of the game. Since
 0.6 every line has been reviewed in its scene and many rewritten; the reviewed lines that kept that
 patch's wording, and the three layout files in translation/scene/resize/ (copies of that patch's
 resizers), are that patch's work. When the patch is installed, the plugin also reads the player's own
-copy at runtime (fallback and Original); it never changes it.
+copy at runtime (the fallback and the "Lash's" option); it never changes it.
 
 ==============================================================================
 1. XUnity.AutoTranslator 5.3.1
@@ -90,7 +90,7 @@ SOFTWARE.
    https://www.newtonsoft.com/json, https://github.com/JamesNK/Newtonsoft.Json
    Shipped unmodified as Newtonsoft.Json.dll: lib/net45 of the official NuGet package
    newtonsoft.json.13.0.2.nupkg (SHA-256 of the DLL c5c83bbc1741be6f...ce13199e).
-   The game has none; the OverLlm patch installs its own copy in BepInEx/core,
+   The game has none; Lash's English Patch installs its own copy in BepInEx/core,
    which then loads instead of this one.
 
 The MIT License (MIT)

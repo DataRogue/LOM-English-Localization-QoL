@@ -4,6 +4,10 @@ This repository is the maintainer's `LOM_Localization` folder, which lives insid
 `<game>/LOM_Localization`. The tools assume that place. Set `LOM_GAME` if the game is somewhere other than the default
 Steam folder.
 
+Lash's English Patch is the English patch this mod grew from
+([joshfreitas1984/LegendOfMortalOverLlm](https://github.com/joshfreitas1984/LegendOfMortalOverLlm)). Players and these
+docs call it that. The code, the tools and the engineering notes call it OverLlm, Original or the base patch.
+
 ## What is where
 
 | Path | Holds |
@@ -15,12 +19,12 @@ Steam folder.
 | `release/vendor/licenses/` | Licence texts of the BepInEx components bundled in the full package |
 
 These stay out of the repository (see `.gitignore`):
-- `base_ref/`: the OverLlm release the workspace is compared with, and the game's own Chinese text (`game_source.tsv`,
+- `base_ref/`: the release of Lash's English Patch that the workspace is compared with, and the game's own Chinese text (`game_source.tsv`,
   from the harness `srcdump`).
 - `gamedata/`: the game's Lua scripts.
 - `backups/`, and the working files of the review passes.
 
-`publish.py` needs `base_ref/`. Rebuild it from the OverLlm release with `python tools/publish.py rebase <release dir>`,
+`publish.py` needs `base_ref/`. Rebuild it from a release of Lash's English Patch with `python tools/publish.py rebase <release dir>`,
 then `python tools/publish.py source <srcdump.tsv>`.
 
 ## Requirements
@@ -50,8 +54,8 @@ python tools/publish.py check
 ```
 
 `build` writes the plugin folder's `translation/`, `strings/`, `rules/`, `nametips.tsv`, `factiontips.tsv` and
-`THIRD_PARTY_NOTICES.txt`. `check` verifies that folder against the workspace and scans it for text that is only the
-OverLlm patch's.
+`THIRD_PARTY_NOTICES.txt`. `check` verifies that folder against the workspace and scans it for text that only
+Lash's English Patch has.
 
 ## Third-party files (release/vendor)
 
@@ -64,7 +68,7 @@ OverLlm patch's.
 
 The plugin folder ships `lib/net45/Newtonsoft.Json.dll` from that package (SHA-256
 `c5c83bbc1741be6ff4c490c0aee34c162945423ec577c646538b2d21ce13199e`, pinned in `publish.py` `PINNED_LIBS`). The game
-has no Newtonsoft.Json of its own. The OverLlm patch puts a different build in `BepInEx/core`, and when that one is
+has no Newtonsoft.Json of its own. Lash's English Patch puts a different build in `BepInEx/core`, and when that one is
 present it loads first.
 
 ## Release checklist
@@ -78,11 +82,11 @@ present it loads first.
 3. **Candidate packages.** `python tools/release.py --candidate` writes `release/dist/<version>-candidate/`.
 4. **Test in game** with the scripts in `tools/ingame/`, backing up the saves and the registry key first:
    - **A clean install:**
-     - move the OverLlm patch aside with `overllm_aside.ps1 out`;
+     - move Lash's English Patch aside with `overllm_aside.ps1 out`;
      - put back the stock `Mortal_Data/Managed/Unity.Addressables.dll`;
      - move the plugin folder aside;
      - extract the `-full` candidate zip.
-   - **Alongside the OverLlm patch:** the `-mod-only` candidate zip.
+   - **Alongside Lash's English Patch:** the `-mod-only` candidate zip.
    - **Both ways:**
      - the 11 standard screens (`screens05.ps1`), a duel and an army battle;
      - `[Dev] SimulateGameChange=all` and `SimulateHookErrors`, then Try again.

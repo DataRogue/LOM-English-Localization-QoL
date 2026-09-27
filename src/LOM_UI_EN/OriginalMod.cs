@@ -264,8 +264,8 @@ namespace LOM_UI_EN
 
 		public static void Bind(ConfigFile cfg)
 		{
-			CfgSuppressKr = cfg.Bind("Compat", "SuppressKrPlugin", false, "Remove the Harmony patches of the original patch's LOM_UI_Plugin_KR at startup. Its layout fixes are built into this mod's rules, so this only drops its per-object SetActive hook. Turning it back off needs a restart.");
-			CfgDetach = cfg.Bind("Dev", "DetachBaseMod", false, "Testing only: at startup remove every Harmony patch of the original English patch (Binarizer, XUnity AutoTranslator, LOM_UI_Plugin_KR) and disable its components, to see this mod running on its own without uninstalling anything. Needs a restart both ways.");
+			CfgSuppressKr = cfg.Bind("Compat", "SuppressKrPlugin", false, "Remove the Harmony patches of LOM_UI_Plugin_KR (the Korean layout plugin that comes with " + Plugin.BaseModName + ") at startup. Its layout fixes are built into this mod's rules, so this only drops its per-object SetActive hook. Turning it back off needs a restart.");
+			CfgDetach = cfg.Bind("Dev", "DetachBaseMod", false, "Testing only: at startup remove every Harmony patch of " + Plugin.BaseModName + " (Binarizer, XUnity AutoTranslator, LOM_UI_Plugin_KR) and disable its components, to see this mod running on its own without uninstalling anything. Needs a restart both ways.");
 			LoadManifest();
 		}
 

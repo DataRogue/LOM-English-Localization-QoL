@@ -655,6 +655,16 @@ and a mod-only package.
   `dll_search_path_override`; without it, BepInEx be.692's `UnityPreloaderRunner.LocalResolve` finds it under plugins/.
 - `Plugin.DisplayName` / `Plugin.ProjectUrl`: the Mod Settings subtitle reads "LOM English Localization + QoL · version
   1.0.0", About > Version names the mod, and About has "Updates and problems" (the project page and the report to attach).
+  The on-screen notices start with the display name instead of "LOM_UI_EN:".
+- **"Lash's English Patch"** (owner, 2026-09-27): everything a player reads calls the OverLlm patch by that name:
+  - where: Mod Settings, the notices, the compat report, Compat feature names and fallbacks, `NotNeededWhy`, the `.cfg`
+    descriptions, PLAYER_README and THIRD_PARTY_NOTICES;
+  - how: `Plugin.BaseModName`, and `Plugin.BaseModShortName` "Lash's" on the three-way Which translation and layer buttons.
+    Those buttons are 124 px with about 108 px of text at 22 px and no wrap, which the full name overflows; the help text
+    under them spells it out;
+  - unchanged: code identifiers, comments, log lines, the TextSource enum and cfg keys (`Original`).
+  - `OriginalProblem` keeps the words "not installed", which `ShortProblem` keys on. The status lines now say what the
+    player can act on ("Can't switch: Lash's English Patch isn't installed.", "Showing this mod's text: ...").
 - build.ps1: `-Game` / `LOM_GAME`, compiler found through vswhere (VS 2022 first, the compiler of every tested build),
   reference assemblies 4.7.1 to 4.8.1, `-deterministic` and `-pathmap`, so a rebuild of the tagged source reproduces the
   released DLL byte for byte (tools/release.py checks it).

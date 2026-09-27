@@ -629,6 +629,10 @@ namespace LOM_UI_EN
 		/// <summary>Lists in help and status lines: one bullet per item (the window font, Palatino Linotype, has it).</summary>
 		private const string Bullet = "• ";
 
+		private const string BaseName = Plugin.BaseModName;
+
+		private const string BaseShort = Plugin.BaseModShortName;
+
 		private static string Warn(string s)
 		{
 			return "<color=" + MMUi.WarnHex + ">" + s + "</color>";
@@ -637,7 +641,7 @@ namespace LOM_UI_EN
 		/// <summary>TranslationProfiles.OriginalProblem names files; a player only needs to know what to do about it.</summary>
 		private static string ShortProblem(string problem)
 		{
-			return problem.Contains("not installed") ? "the OverLlm patch isn't installed" : "reinstall the OverLlm patch";
+			return problem.Contains("not installed") ? (BaseName + " isn't installed") : (BaseName + " needs reinstalling");
 		}
 
 		private static string ModeName(LayerMode m)
@@ -648,9 +652,9 @@ namespace LOM_UI_EN
 				return "Revised";
 			case LayerMode.OriginalHandBack:
 			case LayerMode.OriginalFromFiles:
-				return "OverLlm";
+				return BaseName;
 			case LayerMode.BaseOnly:
-				return "OverLlm only";
+				return BaseName + " only";
 			default:
 				return "off";
 			}
@@ -675,22 +679,22 @@ namespace LOM_UI_EN
 				OriginalMod.Report r = OriginalMod.Current;
 				if (r.BinarizerHooked || r.XUnityRunning)
 				{
-					return "UI only: the OverLlm patch provides the text.";
+					return "UI only: " + BaseName + " provides the text.";
 				}
-				return r.AnyInstalled ? "UI only: the OverLlm patch isn't running, so the text shows in Chinese." : "UI only: without the OverLlm patch the text shows in Chinese.";
+				return r.AnyInstalled ? ("UI only: " + BaseName + " isn't running, so the text shows in Chinese.") : ("UI only: without " + BaseName + " the text shows in Chinese.");
 			}
 			string tableProblem = TranslationProfiles.OriginalProblem(table: true);
 			string sceneProblem = TranslationProfiles.OriginalProblem(table: false);
 			if (tableProblem != null && sceneProblem != null)
 			{
 				// Nothing could show the patch's text, so nothing changes (the wording fixes stay as they are).
-				return "OverLlm isn't available: " + ShortProblem(tableProblem) + ".";
+				return "Can't switch: " + ShortProblem(tableProblem) + ".";
 			}
 			TranslationProfiles.SetTable(TextSource.Original);
 			TranslationProfiles.SetScene(TextSource.Original);
 			StringsPlugin.CfgEnabled.Value = false;
 			StringOverrides.Refresh();
-			string msg = "OverLlm translation on.";
+			string msg = BaseName + " translation on.";
 			if (tableProblem != null || sceneProblem != null)
 			{
 				msg += " Some text stays Revised: " + ShortProblem(tableProblem ?? sceneProblem) + ".";
@@ -700,13 +704,13 @@ namespace LOM_UI_EN
 
 		private static ChoiceItem SourceChoice(ConfigEntry<TextSource> e, bool table, string label, string help, Action<TextSource> apply, Func<string> status)
 		{
-			return new ChoiceItem(label, help, new string[3] { "Revised", "OverLlm", "Off" }, () => (int)e.Value, delegate(int i)
+			return new ChoiceItem(label, help, new string[3] { "Revised", BaseShort, "Off" }, () => (int)e.Value, delegate(int i)
 			{
 				TextSource src = (TextSource)i;
 				string problem = TranslationProfiles.OriginalProblem(table);
 				if (src == TextSource.Original && problem != null)
 				{
-					return "OverLlm isn't available here: " + ShortProblem(problem) + ".";
+					return "Not available here: " + ShortProblem(problem) + ".";
 				}
 				apply(src);
 				return label + ": " + ModeName(table ? TranslationProfiles.TableMode : TranslationProfiles.SceneMode) + ".";
@@ -759,7 +763,7 @@ namespace LOM_UI_EN
 		/// lines carry the layer by themselves (TranslationProfiles.OwnTableComplete), a warning otherwise.</summary>
 		private static string NoBaseWarning(int own, bool complete)
 		{
-			return complete ? ("This mod's " + N(own) + " lines.") : Warn("Only this mod's " + N(own) + " lines; the rest shows in Chinese without the OverLlm patch.");
+			return complete ? ("This mod's " + N(own) + " lines.") : Warn("Only this mod's " + N(own) + " lines; the rest shows in Chinese without " + BaseName + ".");
 		}
 
 		private static string BaseStatus()
@@ -778,9 +782,9 @@ namespace LOM_UI_EN
 			case BaseSummary.Absent:
 				return TranslationProfiles.OwnComplete ? "Not installed. It's optional: this mod has its own full translation." : Warn("Not installed, so some text shows in Chinese. Get it at github.com/joshfreitas1984/LegendOfMortalOverLlm.");
 			case BaseSummary.Complete:
-				return (r.BinarizerData == BaseData.OurEdits || r.XUnityData == BaseData.OurEdits) ? Warn("Installed, but its files hold edits from an older version of this mod. Reinstall it to use the OverLlm option.") : "Installed.";
+				return (r.BinarizerData == BaseData.OurEdits || r.XUnityData == BaseData.OurEdits) ? Warn("Installed, but its files hold edits from an older version of this mod. Reinstall it to use its translation.") : "Installed.";
 			default:
-				return Warn("Partly installed. Reinstall it to use the OverLlm option.");
+				return Warn("Partly installed. Reinstall it to use its translation.");
 			}
 		}
 
@@ -788,14 +792,14 @@ namespace LOM_UI_EN
 		{
 			if (!OriginalMod.Current.BaseTableFile)
 			{
-				return "Needs the OverLlm patch.";
+				return "Needs " + BaseName + ".";
 			}
 			if (TranslationProfiles.TableMode != LayerMode.Revised)
 			{
 				return "Only with Revised.";
 			}
 			int n = TextTable.FellBackChanged + TextTable.FellBackPlaceholders;
-			string s = (n > 0) ? (N(n) + " lines used the OverLlm patch's this session.") : null;
+			string s = (n > 0) ? (N(n) + " lines used " + BaseName + " this session.") : null;
 			string problem = TextTable.RecordsProblem ?? (TranslationProfiles.TableHasRecords ? null : "the revision record has no game-text hashes, so game updates aren't noticed");
 			if (problem != null)
 			{
@@ -812,17 +816,17 @@ namespace LOM_UI_EN
 			}
 			if (!F.GameText.Live)
 			{
-				return Warn("Not working with this game version; " + (OriginalMod.Current.BinarizerHooked ? "the OverLlm patch provides this text." : "the game's own text shows."));
+				return Warn("Not working with this game version; " + (OriginalMod.Current.BinarizerHooked ? (BaseName + " provides this text.") : "the game's own text shows."));
 			}
 			if (TranslationProfiles.CfgTable.Value == TextSource.Off)
 			{
-				return (TranslationProfiles.TableMode == LayerMode.BaseOnly) ? "Off: the OverLlm patch provides this text." : Warn("Off: the game's own (Chinese) text shows.");
+				return (TranslationProfiles.TableMode == LayerMode.BaseOnly) ? ("Off: " + BaseName + " provides this text.") : Warn("Off: the game's own (Chinese) text shows.");
 			}
 			string s;
 			switch (TranslationProfiles.TableMode)
 			{
 			case LayerMode.Revised:
-				s = TranslationProfiles.TableHasBase ? ("This mod's " + N(TranslationProfiles.OwnTableRows) + " lines, the OverLlm patch's for the rest (" + N(TranslationProfiles.TableEntries) + " in all).") : NoBaseWarning(TranslationProfiles.OwnTableRows, TranslationProfiles.OwnTableComplete);
+				s = TranslationProfiles.TableHasBase ? ("This mod's " + N(TranslationProfiles.OwnTableRows) + " lines, " + BaseName + " for the rest (" + N(TranslationProfiles.TableEntries) + " in all).") : NoBaseWarning(TranslationProfiles.OwnTableRows, TranslationProfiles.OwnTableComplete);
 				if (TextTable.Gaps > 0)
 				{
 					s += " " + N(TextTable.Gaps) + " with no English this session.";
@@ -833,13 +837,13 @@ namespace LOM_UI_EN
 				}
 				break;
 			case LayerMode.OriginalHandBack:
-				s = "The OverLlm patch's own plugin (" + N(OriginalMod.Current.BinarizerEntries) + " lines).";
+				s = "The plugin of " + BaseName + " (" + N(OriginalMod.Current.BinarizerEntries) + " lines).";
 				break;
 			case LayerMode.OriginalFromFiles:
-				s = "The OverLlm patch's file, " + N(TranslationProfiles.TableEntries) + " lines (" + FromFilesReason(table: true) + ").";
+				s = "The file of " + BaseName + ", " + N(TranslationProfiles.TableEntries) + " lines (" + FromFilesReason(table: true) + ").";
 				break;
 			case LayerMode.BaseOnly:
-				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.TableError + "); the OverLlm patch's are used.");
+				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.TableError + "); those of " + BaseName + " are used.");
 				break;
 			default:
 				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.TableError + "); this text shows in Chinese.");
@@ -847,7 +851,7 @@ namespace LOM_UI_EN
 			}
 			if (TranslationProfiles.TableOriginalProblem != null)
 			{
-				s += " " + Warn("OverLlm isn't available: " + ShortProblem(TranslationProfiles.TableOriginalProblem) + ".");
+				s += " " + Warn("Showing this mod's text: " + ShortProblem(TranslationProfiles.TableOriginalProblem) + ".");
 			}
 			return s;
 		}
@@ -860,31 +864,31 @@ namespace LOM_UI_EN
 			}
 			if (!F.SceneText.Live)
 			{
-				return Warn("Not working with this game version; " + (OriginalMod.Current.XUnityRunning ? "the OverLlm patch translates on its own." : "the game's own text shows."));
+				return Warn("Not working with this game version; " + (OriginalMod.Current.XUnityRunning ? (BaseName + " translates on its own.") : "the game's own text shows."));
 			}
 			if (TranslationProfiles.CfgScene.Value == TextSource.Off)
 			{
-				return (TranslationProfiles.SceneMode == LayerMode.BaseOnly) ? "Off: the OverLlm patch translates on its own." : Warn("Off: the game's own (Chinese) text shows.");
+				return (TranslationProfiles.SceneMode == LayerMode.BaseOnly) ? ("Off: " + BaseName + " translates on its own.") : Warn("Off: the game's own (Chinese) text shows.");
 			}
-			string session = " This session: " + N(SceneText.Hits) + " shown, " + N(SceneText.SessionUntranslated) + " without a line" + ((SceneText.BaseFills > 0) ? (", " + N(SceneText.BaseFills) + " from the OverLlm patch") : "") + ".";
+			string session = " This session: " + N(SceneText.Hits) + " shown, " + N(SceneText.SessionUntranslated) + " without a line" + ((SceneText.BaseFills > 0) ? (", " + N(SceneText.BaseFills) + " from " + BaseName) : "") + ".";
 			string s;
 			switch (TranslationProfiles.SceneMode)
 			{
 			case LayerMode.Revised:
-				s = (TranslationProfiles.SceneHasBase ? ("This mod's " + N(TranslationProfiles.OwnSceneLines) + " lines, the OverLlm patch's for the rest (" + N(TranslationProfiles.SceneEntries) + " in all).") : NoBaseWarning(TranslationProfiles.OwnSceneLines, TranslationProfiles.OwnSceneComplete)) + session;
+				s = (TranslationProfiles.SceneHasBase ? ("This mod's " + N(TranslationProfiles.OwnSceneLines) + " lines, " + BaseName + " for the rest (" + N(TranslationProfiles.SceneEntries) + " in all).") : NoBaseWarning(TranslationProfiles.OwnSceneLines, TranslationProfiles.OwnSceneComplete)) + session;
 				if (TranslationProfiles.SceneError != null)
 				{
 					s += " " + Warn(TranslationProfiles.SceneError + ".");
 				}
 				break;
 			case LayerMode.OriginalHandBack:
-				s = "The OverLlm patch's own plugin.";
+				s = "The plugin of " + BaseName + ".";
 				break;
 			case LayerMode.OriginalFromFiles:
-				s = "The OverLlm patch's file, " + N(TranslationProfiles.SceneEntries) + " lines (" + FromFilesReason(table: false) + ")." + session;
+				s = "The file of " + BaseName + ", " + N(TranslationProfiles.SceneEntries) + " lines (" + FromFilesReason(table: false) + ")." + session;
 				break;
 			case LayerMode.BaseOnly:
-				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.SceneError + "); the OverLlm patch translates on its own.");
+				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.SceneError + "); " + BaseName + " translates on its own.");
 				break;
 			default:
 				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.SceneError + "); this text shows in Chinese.");
@@ -892,7 +896,7 @@ namespace LOM_UI_EN
 			}
 			if (TranslationProfiles.SceneOriginalProblem != null)
 			{
-				s += " " + Warn("OverLlm isn't available: " + ShortProblem(TranslationProfiles.SceneOriginalProblem) + ".");
+				s += " " + Warn("Showing this mod's text: " + ShortProblem(TranslationProfiles.SceneOriginalProblem) + ".");
 			}
 			return s;
 		}
@@ -1045,7 +1049,7 @@ namespace LOM_UI_EN
 				Title = "Translation",
 				Intro = "Which English the game shows."
 			};
-			tr.Items.Add(new ChoiceItem("Which translation", "• Revised: this mod's reviewed translation.\n• OverLlm: the OverLlm patch's translation.\n• UI only: no text from this mod; its fixes and extras stay.", new string[3] { "Revised", "OverLlm", "UI only" }, PresetIndex, ApplyPreset)
+			tr.Items.Add(new ChoiceItem("Which translation", "• Revised: this mod's reviewed translation.\n• " + BaseShort + ": the translation of " + BaseName + ".\n• UI only: no text from this mod; its fixes and extras stay.", new string[3] { "Revised", BaseShort, "UI only" }, PresetIndex, ApplyPreset)
 			{
 				Status = PresetStatus,
 				Reset = delegate
@@ -1060,12 +1064,12 @@ namespace LOM_UI_EN
 			});
 			tr.Items.Add(new InfoItem
 			{
-				Label = "OverLlm patch",
+				Label = BaseName,
 				Help = "The fan translation this mod grew from.",
 				Status = BaseStatus,
 				Feature = F.Detector
 			});
-			tr.Items.Add(OnOff(TextTable.CfgFallback, "Fall back to OverLlm", "When a game update changes a line this mod translated, show the OverLlm patch's newer line.", delegate
+			tr.Items.Add(OnOff(TextTable.CfgFallback, "Fall back to " + BaseName, "When a game update changes a line this mod translated, show the newer line from " + BaseName + ".", delegate
 			{
 				TextTable.ClearDecisions();
 				StringOverrides.Refresh();
@@ -1159,25 +1163,25 @@ namespace LOM_UI_EN
 			adv.Items[adv.Items.Count - 1].Feature = F.GameText;
 			adv.Items.Add(SourceChoice(TranslationProfiles.CfgScene, table: false, "Scene text", "Buttons, captions and battle lines drawn on screen.", TranslationProfiles.SetScene, SceneStatus));
 			adv.Items[adv.Items.Count - 1].Feature = F.SceneText;
-			adv.Items.Add(OnOff(SceneText.CfgLetBaseFillGaps, "Let OverLlm fill gaps", "The OverLlm patch machine-translates on-screen text that has no English line."));
+			adv.Items.Add(OnOff(SceneText.CfgLetBaseFillGaps, "Let " + BaseName + " fill gaps", BaseName + " machine-translates on-screen text that has no English line."));
 			adv.Items[adv.Items.Count - 1].IsEnabled = () => OriginalMod.Current.XUnityRunning && XUnityBridge.Registered;
 			adv.Items[adv.Items.Count - 1].Status = delegate
 			{
 				if (!OriginalMod.Current.XUnityRunning)
 				{
-					return "The OverLlm patch isn't running.";
+					return BaseName + " isn't running.";
 				}
-				return XUnityBridge.Registered ? null : Warn("Couldn't connect to the OverLlm patch's scene translator (see Compatibility).");
+				return XUnityBridge.Registered ? null : Warn("Couldn't connect to the scene translator of " + BaseName + " (see Compatibility).");
 			};
 			adv.Items[adv.Items.Count - 1].Feature = F.XUnityBridge;
-			adv.Items.Add(OnOff(SceneText.CfgApplyResizers, "OverLlm text sizes", "Uses the OverLlm patch's text-size adjustments."));
+			adv.Items.Add(OnOff(SceneText.CfgApplyResizers, "Text sizes of " + BaseName, "Uses the text-size adjustments of " + BaseName + "."));
 			adv.Items[adv.Items.Count - 1].Status = () => N(SceneText.ResizeNodes) + " adjustments loaded.";
-			adv.Items.Add(OnOff(SceneText.CfgWideTextOverflow, "Wide text overflow", "Very wide text may wrap past its box, as with the OverLlm patch."));
-			adv.Items.Add(OnOff(Plugin.CfgQuietBinarizer, "Quiet OverLlm lookups", "Stops the OverLlm patch logging every text lookup."));
+			adv.Items.Add(OnOff(SceneText.CfgWideTextOverflow, "Wide text overflow", "Very wide text may wrap past its box, as with " + BaseName + "."));
+			adv.Items.Add(OnOff(Plugin.CfgQuietBinarizer, "Quiet " + BaseName + " lookups", "Stops " + BaseName + " logging every text lookup."));
 			adv.Items[adv.Items.Count - 1].IsEnabled = () => PerfPatches.Hooked;
-			adv.Items[adv.Items.Count - 1].Status = () => PerfPatches.Hooked ? "Matters only with the OverLlm option." : "The OverLlm patch isn't running.";
+			adv.Items[adv.Items.Count - 1].Status = () => PerfPatches.Hooked ? ("Matters only when showing " + BaseName + ".") : (BaseName + " isn't running.");
 			adv.Items[adv.Items.Count - 1].Feature = F.QuietBinarizer;
-			adv.Items.Add(OnOff(OriginalMod.CfgSuppressKr, "Remove the KR plugin's hooks", "Turns off the OverLlm patch's Korean layout plugin; this mod makes the same fixes."));
+			adv.Items.Add(OnOff(OriginalMod.CfgSuppressKr, "Remove the KR plugin's hooks", "Turns off the Korean layout plugin that comes with " + BaseName + "; this mod makes the same fixes."));
 			adv.Items[adv.Items.Count - 1].Restart = true;
 			adv.Items[adv.Items.Count - 1].Status = () => OriginalMod.Current.KrSuppressed ? "Removed at startup." : (OriginalMod.Current.KrHooked ? "Running." : "Not running.");
 			adv.Items.Add(OnOff(SceneText.CfgLogUntranslated, "Note untranslated text", "Lists Chinese text that has no English line in translation/untranslated.txt."));
@@ -1185,7 +1189,7 @@ namespace LOM_UI_EN
 			adv.Items.Add(new ActionItem("Reload translation files", "Re-reads the translation files and redraws the text.", "Reload", TranslationProfiles.ReloadFiles));
 			adv.Items.Add(new InfoItem
 			{
-				Label = "OverLlm patch details",
+				Label = BaseName + " details",
 				Status = AboutBase
 			});
 			adv.Items.Add(new SectionItem("Localization"));
@@ -1219,7 +1223,7 @@ namespace LOM_UI_EN
 			adv.Items.Add(new KeyItem(Plugin.CfgDumpKey, "Screen dump key", "Saves the screen's layout and a screenshot to harness/out."));
 			adv.Items.Add(new KeyItem(Plugin.CfgReloadKey, "Reload layout rules key", "Re-reads the layout fixes, images and fonts."));
 			adv.Items.Add(new KeyItem(StringsPlugin.CfgReloadKey, "Reload wording fixes key", "Re-reads the wording fixes."));
-			adv.Items.Add(OnOff(OriginalMod.CfgDetach, "Detach the OverLlm patch", "Testing only: runs this mod without the OverLlm patch's plugins."));
+			adv.Items.Add(OnOff(OriginalMod.CfgDetach, "Detach " + BaseName, "Testing only: runs this mod without the plugins of " + BaseName + "."));
 			adv.Items[adv.Items.Count - 1].Restart = true;
 			adv.Items.Add(new TextItem(Compat.CfgSimulateGameChange, "Simulate a game change", "Feature ids (see All features; 'all' for every one) to treat as broken at startup.")
 			{
