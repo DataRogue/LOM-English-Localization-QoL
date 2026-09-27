@@ -391,6 +391,13 @@ the installed game can still draw, then reviews only those. Working files go to 
   by exact line match (the raw key is unchanged, so the ledger needs nothing), and writes the change log, the skipped list
   and the reviewers' notes about rows and overrides (`ref_issues.<stamp>.tsv`, not applied). `--live` backs up the scene
   file to `backups/` and publishes; run `publish.py check` afterwards.
+- **rowfix.py** `chunks ISSUES.json` / `apply JOURNAL... [--arbiter FILE] [--live]` and **rowfix_workflow.js** -- the
+  follow-up for live table rows and strings overrides found wrong (ISSUES.json: `[{key, issue}]`). A key with a strings
+  override is fixed there (the text players see; its note gets `was: <old> | <why>`), other keys in the workspace table.
+  A Sonnet fixer per chunk of about 5 lines, a Sonnet refuter per fix. A fix must keep the markup, placeholders and line
+  breaks of the English it replaces. The scene lines showing the same text follow: exactly, or without the markup for a
+  line keyed by the Chinese without it, and only where every row and override with that Chinese agrees. `--arbiter`
+  takes `{"reject": {id: why}, "use": {id: text}}`. Chunks in `scene_audit/rowfix/`.
 
 ## checks/ -- one-off verification scripts
 

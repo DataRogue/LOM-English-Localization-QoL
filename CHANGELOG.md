@@ -5,9 +5,13 @@ Player-facing changes. The detailed engineering notes for every version are in
 
 ## Unreleased
 
-- **Text fixes.** The text drawn outside the string table was checked line by line: dice-check headers, dates,
-  credits, labels, item tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names,
-  terms, and the game's date format.
+- **Text fixes.**
+  - The text drawn outside the string table was checked line by line: dice-check headers, dates, credits, labels, item
+    tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names, terms, and the game's
+    date format.
+  - 20 story lines and dice-check headers that read wrongly were fixed. Examples: 我數十聲 now counts to ten, as the
+    countdown after it expects. The crowd's 算！ now answers that he counts as a hero. Several cries no longer read as
+    word-by-word glosses. Xiaomei and Eldest Senior Brother are spelled as everywhere else.
 
 ## 1.0.0 (2026-09-27)
 
