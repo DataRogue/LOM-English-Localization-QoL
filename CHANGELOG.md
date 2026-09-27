@@ -3,6 +3,12 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
+## Unreleased
+
+- **Text fixes.** The text drawn outside the string table was checked line by line: dice-check headers, dates,
+  credits, labels, item tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names,
+  terms, and the game's date format.
+
 ## 1.0.0 (2026-09-27)
 
 First public release, tested with game version `release_1.0.5000.13` (Steam build 20337760). It was tested in game on a
@@ -19,9 +25,7 @@ clean install (BepInEx and this mod only) and alongside Lash's English Patch.
 - **Text fixes.**
   - 唐門 now reads "Tang Clan" everywhere, and 唐掌門 "Sect Leader Tang".
   - The four staff handles in the credits are romanized like the rest.
-  - The text drawn outside the string table was checked line by line: dice-check headers, dates, credits, labels,
-    item tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names, terms, and the
-    game's date format.
+  - A few scene lines were corrected along the way.
 
 ## Before 1.0 (private builds, 2026-09)
 
