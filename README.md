@@ -3,14 +3,15 @@
 A complete, reviewed English translation of **Legend of Mortal** (活俠傳, Obb Studio), with layout fixes for English and a
 handful of quality-of-life features.
 
-It is built on **[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm)**, the original English
-patch for the game, and it is made to work alongside it. See [Thanks to Lash](#thanks-to-lash).
+Many thanks to Lash for **[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm)**, the original
+English patch for the game, which this mod is built on. This mod is meant to be compatible with it, so you can keep both
+installed.
 
 ![Title screen with the mod installed](docs/screenshots/title.jpg)
 
 **[Download the latest release](https://github.com/DataRogue/LOM-English-Localization-QoL/releases/latest)** ·
-[Features](#features) · [Install](#install) · [Thanks to Lash](#thanks-to-lash) · [Updates and forks](#updates-and-forks)
-· [Troubleshooting](#troubleshooting) · [Report a problem](https://github.com/DataRogue/LOM-English-Localization-QoL/issues)
+[Features](#features) · [Install](#install) · [Updates and forks](#updates-and-forks) ·
+[Troubleshooting](#troubleshooting) · [Report a problem](https://github.com/DataRogue/LOM-English-Localization-QoL/issues)
 
 ## Features
 
@@ -57,7 +58,8 @@ patch for the game, and it is made to work alongside it. See [Thanks to Lash](#t
   Each setting has one plain sentence of help, and almost all of them apply immediately.
 - **Built to survive game updates.** Each feature checks the game when it starts. If an update breaks one, that feature
   switches itself off and says so, and the rest of the mod keeps working.
-- **Works with or without Lash's English Patch.** See [below](#made-to-work-with-lashs-english-patch).
+- **Works with or without Lash's English Patch.** Installed together, you can switch to its text in Mod Settings, and
+  after a game update it can fill in lines this mod has not caught up with.
 
 ![The Mod Settings window](docs/screenshots/mod-settings.jpg)
 
@@ -85,31 +87,6 @@ does not remove mods.
 
 **Steam Deck and Linux (Proton):** not tested. BepInEx under Proton usually needs the launch option
 `WINEDLLOVERRIDES="winhttp=n,b" %command%`.
-
-## Thanks to Lash
-
-This mod would not exist without **Lash** and
-[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm), the original English patch for Legend
-of Mortal. It is the translation this mod started from:
-- the first versions of this mod were layout fixes on top of it;
-- its text was the starting point of every review pass since;
-- many lines here still keep Lash's wording, and three of the layout files are Lash's.
-
-Thank you, Lash, for opening this game up to English-speaking players in the first place.
-
-### Made to work with Lash's English Patch
-
-This mod is made to be compatible with Lash's patches, and you can keep both installed:
-- It never changes the patch's files; it only reads them.
-- Mod Settings > Translation lets you choose the text:
-  - this mod's reviewed translation ("Revised");
-  - Lash's own translation ("Lash's");
-  - "UI only", which leaves all the text to Lash's patch and keeps this mod's layout fixes and extras.
-- After a game update, where a line of this mod no longer fits the game, it can show Lash's newer line instead ("Fall
-  back to Lash's English Patch").
-- The mod-only package installs next to Lash's patch, which already includes BepInEx.
-
-It is tested alongside Lash's English Patch as released in February 2026.
 
 ## Updates and forks
 
