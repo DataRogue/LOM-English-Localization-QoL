@@ -24,8 +24,35 @@ These stay out of the repository (see `.gitignore`):
 - `gamedata/`: the game's Lua scripts.
 - `backups/`, and the working files of the review passes.
 
-`publish.py` needs `base_ref/`. Rebuild it from a release of Lash's English Patch with `python tools/publish.py rebase <release dir>`,
-then `python tools/publish.py source <srcdump.tsv>`.
+`publish.py` and `release.py` need `base_ref/`, and it cannot be rebuilt from a fresh clone. `workspace/base_ref.lock`
+pins its exact files, and its scene file also holds 113 lines XUnity appended on the maintainer's machine. With
+`base_ref/` in place, `python tools/publish.py rebase <release dir>` moves to a newer release of Lash's English Patch, and
+`python tools/publish.py source <srcdump.tsv>` records the game's current text. Without it, use the fork path below.
+
+## Updating in a fork
+
+Forks are welcome (see the README). Without `base_ref/`, the maintainer pipeline (`publish.py`, `release.py`) will not
+run, but you don't need it to keep the mod working:
+
+1. **Get a working plugin folder.** Extract the latest `-mod-only.zip` from Releases into the game folder. Since 0.6 its
+   `translation/` files hold the whole text, not just a patch over Lash's.
+2. **Fix what a game update broke.**
+   - Mod Settings > Compatibility (and its report) names each feature that switched itself off, and the game member it
+     could not find.
+   - The features live in `src/LOM_UI_EN/`; `Compat.cs` lists them.
+   - Rebuild with `build.ps1` and copy `bin/LOM_UI_EN.dll` into the plugin folder.
+3. **Bring the text up to date.**
+   - Turn on Mod Settings > Advanced > *Note untranslated text*. Chinese the mod has no line for is then written to
+     `translation/untranslated.txt`.
+   - Add scene lines to `translation/scene/scene_text.txt` (`Chinese=English`, one per line, escapes as in the file).
+   - Add or change game-data rows in `translation/StringTable.csv` (`key,"English"`; the keys are the game's).
+   - Edit the plugin folder's files, not `workspace/`. The workspace tables hold asset rows (fonts, images) that must
+     never be copied into the plugin.
+4. **Test and package.**
+   - Play-test the screens you touched. Mod Settings > Advanced > *Mark as checked* records the game version you
+     tested.
+   - Zip `BepInEx/plugins/LOM_UI_EN` (leave out `translation/untranslated.txt` and `compat_report.txt`). For a full
+     package, add BepInEx 6.0.0-be.692 as in the table below.
 
 ## Requirements
 

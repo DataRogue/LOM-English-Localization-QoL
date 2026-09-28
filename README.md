@@ -1,36 +1,65 @@
 # LOM English Localization + QoL
 
-A complete, reviewed English translation of **Legend of Mortal** (活俠傳, Obb Studio) with layout fixes for English and a
-handful of quality-of-life features: quick save, character and faction tooltips, clearer duel gauges and an in-game
-settings window.
+A complete, reviewed English translation of **Legend of Mortal** (活俠傳, Obb Studio), with layout fixes for English and a
+handful of quality-of-life features.
+
+It is built on **[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm)**, the original English
+patch for the game, and it is made to work alongside it. See [Thanks to Lash](#thanks-to-lash).
 
 ![Title screen with the mod installed](docs/screenshots/title.jpg)
 
 **[Download the latest release](https://github.com/DataRogue/LOM-English-Localization-QoL/releases/latest)** ·
-[Install](#install) · [Features](#features) · [Troubleshooting](#troubleshooting) ·
-[Report a problem](https://github.com/DataRogue/LOM-English-Localization-QoL/issues)
+[Features](#features) · [Install](#install) · [Thanks to Lash](#thanks-to-lash) · [Updates and forks](#updates-and-forks)
+· [Troubleshooting](#troubleshooting) · [Report a problem](https://github.com/DataRogue/LOM-English-Localization-QoL/issues)
 
-## Highlights
+## Features
 
-- **The whole game in English, reviewed line by line.** All 72,524 game-data entries and 52,714 scene lines were reviewed
-  in their scene for accuracy and for the wuxia voice of the original. About 39,000 of them were rewritten, under one
-  glossary with fixed names, titles and martial-arts terms. Choice lines were checked against the story scripts they lead
-  to.
-- **Screens that fit English.** Layout fixes for the status, martial arts, shop, library, battle and army battle screens,
-  translated title and menu images, horizontal layouts where vertical Chinese text was stacked, English numerals, and
-  dialogue spacing and reveal speed tuned for text that runs about twice as long as the Chinese.
-- **Quality of life.**
-  - Quick save (F5) and quick load (F9).
-  - Tooltips on character names in dialogue (portrait, title, your affinity) and on faction names (a short, spoiler-free
-    description).
-  - The exact affinity value in Status > Social.
-  - Poison and paralysis tier marks on the duel gauges, with exact values.
-- **Survives game updates.** Each feature checks the game at startup and turns itself off cleanly if an update breaks it,
-  while the rest keeps working. If you also have Lash's English Patch installed, its lines fill in where an update changed
-  the text.
-- **Standalone.** Everything it needs is in the download. It also works alongside
-  [Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm), the translation it grew from, and never
-  changes that patch's files.
+### Translation
+
+- **The whole game in English.** All 72,524 game-data entries (items, skills, stats, menus and story) and all 52,714
+  scene lines were reviewed in their scene, for accuracy and for the wuxia voice of the original.
+- **One consistent glossary** for names, sects, titles, ranks and martial arts. 唐門 is always the Tang Clan, and 內力
+  always Internal Force.
+- **Names restored** where the machine translation had turned them into words.
+- **Choices you can trust.** Every choice line was checked against the story branch it leads to.
+- **Your pick of text.** Choose between this mod's translation, the text of Lash's English Patch, or no text from this
+  mod at all ("UI only"). You can switch in the game.
+
+### Screens that fit English
+
+- **Layout fixes** where English would overflow, overlap or be cut off. They cover the status screens, martial arts,
+  upgrades, the fate shop, the HUD, menus, dialogue, settings, the library, save slots, duels and army battles.
+- **Translated images** for the title, the menus and other art with Chinese baked in.
+- **Horizontal layouts** where the game stacks Chinese text vertically.
+- **English numerals** instead of Chinese ones.
+- **Dialogue tuned for English:** line spacing and text speed, since English runs about twice as long as the Chinese.
+- **Long dialogue logs stay readable**, where the game's own backlog would go blank.
+
+### Quality of life (all optional)
+
+- **Quick save and quick load** with F5 and F9, wherever the game allows saving.
+- **Character tooltips.** Point at a name in dialogue or a choice menu to see the character's portrait, title and your
+  affinity. A character gets a tooltip only once the story has introduced them, so tooltips never spoil a reveal.
+
+  ![A character tooltip over a line of narration](docs/screenshots/name-tooltip.jpg)
+- **Faction tooltips.** Each sect, clan and gang has a short, spoiler-free description.
+
+  ![A faction tooltip in a talk menu](docs/screenshots/faction-tooltip.jpg)
+- **Exact affinity values** in Status > Social.
+- **Clearer duel gauges.** Poison and paralysis get a mark at every tier (50, 100 and 150). The gauge's tooltip gives
+  the exact build-up, what each tier does and how fast the build-up falls.
+
+  ![A duel gauge tooltip](docs/screenshots/duel-gauge-tip.jpg)
+
+### Settings and game updates
+
+- **An in-game Mod Settings window.** Open it with F8, or with the button on the title screen and in the pause menus.
+  Each setting has one plain sentence of help, and almost all of them apply immediately.
+- **Built to survive game updates.** Each feature checks the game when it starts. If an update breaks one, that feature
+  switches itself off and says so, and the rest of the mod keeps working.
+- **Works with or without Lash's English Patch.** See [below](#made-to-work-with-lashs-english-patch).
+
+![The Mod Settings window](docs/screenshots/mod-settings.jpg)
 
 ## Install
 
@@ -57,55 +86,44 @@ does not remove mods.
 **Steam Deck and Linux (Proton):** not tested. BepInEx under Proton usually needs the launch option
 `WINEDLLOVERRIDES="winhttp=n,b" %command%`.
 
-## Features
+## Thanks to Lash
 
-### Translation
+This mod would not exist without **Lash** and
+[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm), the original English patch for Legend
+of Mortal. It is the translation this mod started from:
+- the first versions of this mod were layout fixes on top of it;
+- its text was the starting point of every review pass since;
+- many lines here still keep Lash's wording, and three of the layout files are Lash's.
 
-- The complete text, carried by the mod itself. Lash's English Patch is optional.
-- One glossary for names, sects, titles, ranks and martial arts: 唐門 is always the Tang Clan and 內力 always Internal
-  Force, and the Little Junior Sister stays the Little Junior Sister.
-- Names restored where the machine translation turned them into words (a given name rendered as "Mermaid Bell" is
-  a person again).
-- Choice lines checked against the story branch each one leads to, so the option you pick says what happens.
-- With Lash's English Patch installed, Mod Settings > Translation can switch to its text, or fall back to its line
-  wherever one of this mod's no longer fits the game after an update.
+Thank you, Lash, for opening this game up to English-speaking players in the first place.
 
-### Localization fixes
+### Made to work with Lash's English Patch
 
-- Layout rules for the screens where English would overflow, overlap or be cut off.
-- Translated images for the title, menus and other baked-in Chinese art.
-- Horizontal layouts, English numerals, and dialogue line spacing tuned for English.
-- Faster text reveal and a guard for long dialogue logs, because English runs about twice the length of the Chinese
-  and would otherwise crawl or blank the backlog.
+This mod is made to be compatible with Lash's patches, and you can keep both installed:
+- It never changes the patch's files; it only reads them.
+- Mod Settings > Translation lets you choose the text:
+  - this mod's reviewed translation ("Revised");
+  - Lash's own translation ("Lash's");
+  - "UI only", which leaves all the text to Lash's patch and keeps this mod's layout fixes and extras.
+- After a game update, where a line of this mod no longer fits the game, it can show Lash's newer line instead ("Fall
+  back to Lash's English Patch").
+- The mod-only package installs next to Lash's patch, which already includes BepInEx.
 
-### Extras (all optional, in Mod Settings > Extras)
+It is tested alongside Lash's English Patch as released in February 2026.
 
-- **Quick save and quick load** (F5 / F9) to the slot the game's own Save button uses, wherever the game allows saving.
-- **Character tooltips.** Names of characters with portrait art are coloured in dialogue and choice menus. Point at one
-  for their portrait, title and your affinity with them. A character only gets a tooltip once the story has introduced
-  them, so the tooltips never spoil a reveal.
+## Updates and forks
 
-  ![A character tooltip over a line of narration](docs/screenshots/name-tooltip.jpg)
-- **Faction tooltips.** Sect, clan and gang names get a short, spoiler-free description, so you know which is which.
+A note from the maintainer: I may be slow to update this mod, especially after a game update. Two things soften that.
 
-  ![A faction tooltip in a talk menu](docs/screenshots/faction-tooltip.jpg)
-- **Exact affinity.** Hovering a level in Status > Social shows the value out of 100.
-- **Duel gauges.** The poison and paralysis gauges get a mark at every tier (50, 100, 150). Pointing at a gauge shows
-  the exact build-up, what each tier does, how far off it is, and how much the build-up falls each round.
-
-![Duel gauge tooltip](docs/screenshots/duel-gauge-tip.jpg)
-
-### Mod Settings
-
-F8, or the button on the title screen and in the pause menus. The pages are:
-- Translation, Localization and Extras, ordered from closest to the original game to furthest from it.
-- Compatibility, for the state after a game update.
-- Advanced, for everything technical.
-- About.
-
-Settings take effect at once, except one font setting on Advanced, which needs a restart.
-
-![The Mod Settings window](docs/screenshots/mod-settings.jpg)
+- **The mod keeps working after a game update.** Anything the update breaks switches itself off, and the rest carries
+  on. New or changed game text may show in Chinese until the mod catches up. With Lash's English Patch installed, its
+  lines fill in wherever it has them.
+- **You don't have to wait for me.** You are welcome to fork this repository, update it yourself and share your version.
+  You don't need to ask. The code is MIT-licensed and the translation text is free to reuse with credit (see
+  [Licence](#licence)). The developer guide's
+  [Updating in a fork](docs/DEVELOPMENT.md#updating-in-a-fork) explains how to fix what a game update broke, bring the
+  text up to date, test your build and package it. If you keep an updated fork, feel free to
+  open an issue here with a link, so players can find it.
 
 ## Troubleshooting
 
@@ -152,8 +170,8 @@ package releases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Credits
 
-- **[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm)** by joshfreitas1984: the English
-  translation this mod grew from. Lines that kept its wording, and three layout files, are its work.
+- **Lash**, for [Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm), the original English
+  patch this mod grew from. Lines that kept its wording, and three layout files, are Lash's work.
 - **[BepInEx](https://github.com/BepInEx/BepInEx)** (LGPL-2.1), the mod loader, bundled unmodified in the full package.
 - **[XUnity.AutoTranslator](https://github.com/bbepis/XUnity.AutoTranslator)** (MIT): its translation-file format and
   lookup are ported in the scene text engine.
@@ -170,7 +188,7 @@ Full notices are in `THIRD_PARTY_NOTICES.txt`, and in `BepInEx/THIRD_PARTY_NOTIC
 - **Code** (the plugin in `src/` and the tools in `tools/`): [MIT](LICENSE).
 - **Translation text** (`workspace/` and the files the release ships in `translation/`, `strings/`, `nametips.tsv` and
   `factiontips.tsv`): you may reuse it in other Legend of Mortal mods and translations, with credit to this project.
-  Lines kept from Lash's English Patch remain that project's work.
+  Lines kept from Lash's English Patch remain Lash's work.
 - **The game itself:** Legend of Mortal and its text, names and art belong to Obb Studio. The translated images in
   `sprites/` are edited game art. This is an unofficial fan project, not affiliated with or endorsed by Obb Studio.
   Please buy the game.
