@@ -690,6 +690,12 @@ and a mod-only package.
   broken (`Compat.MarkBroken`, listed in Problems and logged). One broken part makes the feature partly working, all
   three make it not working. So a failure like the one above now shows up in Compatibility, the report and the startup
   notice.
+- **Rebuilt before publishing (owner's call, 2026-09-27 evening).** The 1.0.0 draft had not been published, so its zips
+  were rebuilt from the text as of the scene-line audit and the name rulings (8acc4ae to 52e72d3), and the v1.0.0 tag
+  moved to that commit.
+  - Only text changed; the plugin source, and so the DLL, is identical to the tested build. The in-game mark of
+    2026-09-27 therefore still stands.
+  - The first build's zips are kept in `release/dist/1.0.0-first-build-826f802/`.
 - `Plugin.DisplayName` / `Plugin.ProjectUrl`: the Mod Settings subtitle reads "LOM English Localization + QoL · version
   1.0.0", About > Version names the mod, and About has "Updates and problems" (the project page and the report to attach).
   The on-screen notices start with the display name instead of "LOM_UI_EN:".

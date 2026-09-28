@@ -3,20 +3,6 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
-## Unreleased
-
-- **Text fixes.**
-  - The text drawn outside the string table was checked line by line: dice-check headers, dates, credits, labels, item
-    tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names, terms, and the game's
-    date format.
-  - 20 story lines and dice-check headers that read wrongly were fixed. Examples: 我數十聲 now counts to ten, as the
-    countdown after it expects. The crowd's 算！ now answers that he counts as a hero. Several cries no longer read as
-    word-by-word glosses. Xiaomei and Eldest Senior Brother are spelled as everywhere else.
-  - Five names the text used two ways for are now the same everywhere:
-    - 小師妹 is always "Junior Martial Sister", and 大公子 always "Eldest Young Lord";
-    - 第三香 is always "Di San Xiang"; his name was also shown as "Third Fragrance";
-    - 小竹 is always "Xiao Zhu", and 金烏上人 always "Venerable Golden Crow" (no more "Jinwu Shangren").
-
 ## 1.0.0 (2026-09-27)
 
 First public release, tested with game version `release_1.0.5000.13` (Steam build 20337760). It was tested in game on a
@@ -31,9 +17,18 @@ clean install (BepInEx and this mod only) and alongside Lash's English Patch.
 - **The patch this mod grew from is called Lash's English Patch everywhere.** Mod Settings, notices and the README
   used to call it OverLlm. The option on the Which translation buttons reads "Lash's".
 - **Text fixes.**
-  - 唐門 now reads "Tang Clan" everywhere, and 唐掌門 "Sect Leader Tang".
+  - The text drawn outside the string table was checked line by line: dice-check headers, dates, credits, labels, item
+    tooltips, and the fallback copies of story lines. 392 lines were corrected, for meaning, names, terms, and the game's
+    date format.
+  - 20 story lines and dice-check headers that read wrongly were fixed. Examples: 我數十聲 now counts to ten, as the
+    countdown after it expects. The crowd's 算！ now answers that he counts as a hero. Several cries no longer read as
+    word-by-word glosses. Xiaomei and Eldest Senior Brother are spelled as everywhere else.
+  - Seven names the text used two ways for are now the same everywhere:
+    - 唐門 is always "Tang Clan", and 唐掌門 "Sect Leader Tang";
+    - 小師妹 is always "Junior Martial Sister", and 大公子 always "Eldest Young Lord";
+    - 第三香 is always "Di San Xiang"; his name was also shown as "Third Fragrance";
+    - 小竹 is always "Xiao Zhu", and 金烏上人 always "Venerable Golden Crow" (no more "Jinwu Shangren").
   - The four staff handles in the credits are romanized like the rest.
-  - A few scene lines were corrected along the way.
 
 ## Before 1.0 (private builds, 2026-09)
 
