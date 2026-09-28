@@ -29,6 +29,18 @@ pins its exact files, and its scene file also holds 113 lines XUnity appended on
 `base_ref/` in place, `python tools/publish.py rebase <release dir>` moves to a newer release of Lash's English Patch, and
 `python tools/publish.py source <srcdump.tsv>` records the game's current text. Without it, use the fork path below.
 
+Lash's English Patch changes its layout with its 2026.09.28 release, the first from its `llmkit-upgrade` branch. The
+single `Mods/English/StringTable.csv` becomes one table per game file. Its own BepInEx 5 plugins replace Binarizer and
+XUnity, and the release installs BepInEx 5.4.23.3. The plugin reads either layout, and `tools/lashtables.py` reads both
+the same way for the tools. `rebase` accepts a release in the new layout (an unpacked release zip): it keeps BASE_REF's
+XUnity file when the release has none. `publish.py rebase <dir> --dry-run` shows what a rebase would change. BASE_REF
+still holds the 2026-02-06 release. A dry run onto `EnglishPatch-2026.09.28.13.56` keeps every row, with these results:
+- 16,168 conflicts, 4,323 of them rows the review kept as the patch's line;
+- 294 rows that now equal the patch's, so `--allow-converged` is needed;
+- 2 rows taken over and 2 removed;
+- 33 wording overrides that no longer change anything;
+- no scene change.
+
 ## Updating in a fork
 
 Forks are welcome (see the README). Without `base_ref/`, the maintainer pipeline (`publish.py`, `release.py`) will not
@@ -56,7 +68,8 @@ run, but you don't need it to keep the mod working:
 
 ## Requirements
 
-- The game with BepInEx 6.0.0-be.692 installed (the full release package installs it).
+- The game with BepInEx 6.0.0-be.692 installed (the full release package installs it), or with BepInEx 5 (Lash's
+  English Patch installs it from its 2026.09.28 release on; building the BepInEx 6 DLL then needs `-CoreDir`, below).
 - Visual Studio 2022 or later, or its Build Tools, with the .NET Framework 4.7.1+ targeting pack.
 - Python 3.10 or later.
 
@@ -64,12 +77,18 @@ run, but you don't need it to keep the mod working:
 
 ```
 powershell -ExecutionPolicy Bypass -File src/LOM_UI_EN/build.ps1 [-Game <game folder>] [-OutDir <folder>]
+powershell -ExecutionPolicy Bypass -File src/LOM_UI_EN/build.ps1 -BepInEx5 [-BepInEx5Dir <folder with BepInEx.dll 5.4>]
 ```
 
-The output is `src/LOM_UI_EN/bin/LOM_UI_EN.dll`. Copy it into `BepInEx/plugins/LOM_UI_EN/` while the game is closed,
-and keep the previous one in `BepInEx/backup_stock/`. The build is deterministic: the same source, compiler and
-references give the same bytes. `release.py` relies on that to prove that a release DLL is the build of the tagged
-source.
+The output is `src/LOM_UI_EN/bin/LOM_UI_EN.dll`, and with `-BepInEx5` `LOM_UI_EN.BepInEx5.dll`: the same source built
+for BepInEx 5 (`BIE5`, see `Loader.cs`). That is the loader of Lash's English Patch's own plugins from its 2026.09.28
+release on. `-BepInEx5Dir` defaults to the game's `BepInEx/core`, which holds a BepInEx 5 `BepInEx.dll` either way:
+5.4.21 next to BepInEx 6 from that patch's older package, 5.4.23.3 alone from its new release. Without BepInEx 6 in
+`BepInEx/core`, pass `-CoreDir <a be.692 core folder>` for the BepInEx 6 DLL. Both DLLs ship, and each BepInEx loads
+only its own. Copy them into `BepInEx/plugins/LOM_UI_EN/`
+while the game is closed, and keep the previous ones in `BepInEx/backup_stock/`. The build is deterministic: the same
+source, compiler and references give the same bytes. `release.py` relies on that to prove that each release DLL is the
+build of the tagged source.
 
 ## Change the translation
 
@@ -95,8 +114,9 @@ Lash's English Patch has.
 
 The plugin folder ships `package/Runtime/AOT/Newtonsoft.Json.dll` from Unity's package (SHA-256
 `a56146202232958f46bd6a28b5a7da166aea123ee0d646735a46e5c341dfbf1f`, pinned in `publish.py` `PINNED_LIBS`; extracted to
-`release/vendor/unity-newtonsoft/Runtime-AOT/`). The game has no Newtonsoft.Json of its own. Lash's English Patch puts
-this same file in `BepInEx/core`, and when that copy is present it loads first.
+`release/vendor/unity-newtonsoft/Runtime-AOT/`). The game has no Newtonsoft.Json of its own. Lash's English Patch up
+to its 2026-02 releases puts this same file in `BepInEx/core`, and when that copy is present it loads first. Its
+2026.09.28 release has none, so the plugin folder's copy loads.
 
 It has to be the AOT build. The official NuGet build generates code at run time (Reflection.Emit), and this game's
 stripped runtime refuses that with "Operation is not supported on this platform". The 1.0.0 clean-install test caught
@@ -108,10 +128,33 @@ plugin marks those data parts as not working in Compatibility (`Plugin.CheckLayo
 1. **Version and notes.** Set `VERSION` in `src/LOM_UI_EN/LOM_UI_EN.cs`, then add the version to `CHANGELOG.md` (for
    players) and to `src/LOM_UI_EN/README.md` (engineering notes).
 2. **Build and install.**
-   - Run `build.ps1` and install the DLL.
+   - Run `build.ps1` and `build.ps1 -BepInEx5`, and install both DLLs.
    - Copy `src/LOM_UI_EN/PLAYER_README.txt` over the plugin's `README.txt`.
    - Run `publish.py build`, then `publish.py check`.
 3. **Candidate packages.** `python tools/release.py --candidate` writes `release/dist/<version>-candidate/`.
+   Besides A, B and C below, the scenarios for the releases of Lash's English Patch from 2026.09.28 on (its
+   `llmkit-upgrade`) run between `prep` and `final`:
+   - `release_test.py r_setup <its release zip>`, then `r_teardown`, and again with `--clean`. The zip is extracted
+     the way a player unzips it. Without `--clean` it goes over the current install and keeps what the older version
+     leaves (its `StringTable.csv`, its BepInEx 6 plugins). With `--clean` the BepInEx folder, `Mods` and the loader
+     files are held aside first, and this mod's plugin folder and settings go back in. Check:
+     - `detect`, `compat`, `invoke static LOM_UI_EN.BaseGuards.Describe`;
+     - the 11 screens, compared with B's;
+     - Mod Settings > Translation and About, and Which translation set to Lash's and back;
+     - a duel;
+     - once, the newer plugins' guards failing. First `cfg Dev/SimulateHookErrors=basePlugins`: it turns off with its
+       fallback, and About reads "text resizer on". Clear it (`cfg Dev/SimulateHookErrors=`), then `invoke static
+       LOM_UI_EN.Compat.TryAgain`. Then `SimulateGameChange = basePlugins` in the cfg and a restart: not working, with
+       the patch's labels and text sizes.
+
+     While R is set up, `BepInEx\core` holds BepInEx 5: build with `-CoreDir` (a be.692 core folder), or after
+     `r_teardown`.
+   - For tables and a plugin built from the branch before a release, `release_test.py l_setup <its Mods/English> <its
+     FanslationStudio.LegendOfMortal.Plugin.dll>` (add `--leftover` for an older StringTable.csv left next to the new
+     tables), then `l_teardown`;
+   - on top of L, `release_test.py l5_setup` / `l5_teardown` puts BepInEx 5 in place of 6. It needs the official
+     `BepInEx_win_x86_5.4.*.zip` in `release/vendor`. While it is set up, `BepInEx\core` holds BepInEx 5: build with
+     `build.ps1 -CoreDir BepInEx\_lom_release_test\L5_core` (both DLLs).
 4. **Test in game** with `tools/ingame/release_test.py`. It sets up and undoes each scenario exactly: every move is
    hash-checked, and the saves and registry key are backed up and restored. Drive the game with `run_batch.ps1` and
    `screens05.ps1`.

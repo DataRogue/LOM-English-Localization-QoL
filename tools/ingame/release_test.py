@@ -1,8 +1,11 @@
 """Release test: set up and undo the in-game test scenarios of a release candidate, exactly and verifiably.
 
   python release_test.py prep | a_setup | a_teardown | b_setup | b_teardown | final | status
+  python release_test.py l_setup TABLES_DIR PLUGIN_DLL [--leftover] | l_teardown | l5_setup | l5_teardown
+  python release_test.py r_setup RELEASE_ZIP [--clean] | r_teardown
 
   prep        refuses while the game runs; backs up the save folder and the game's registry key, parks the harness output
+              (a finished run's state.json moves into that run's folder first)
   a_setup     scenario A, a clean install: Lash's English Patch aside (overllm_aside.ps1 out), the BepInEx/core files the
               official be.692 zip lacks aside (Newtonsoft.Json among them), the stock Unity.Addressables.dll in, the plugin
               folder and this mod's and BepInEx's configs aside, the newest release/dist/*-candidate/*-full.zip extracted as a
@@ -13,6 +16,25 @@
   b_teardown  harness off, the BepInEx log kept
   final       saves put back (changed files restored, new files moved out, then compared with the backup), the registry
               key imported and checked value by value, steam_appid.txt removed, the harness output kept in the run folder
+  l_setup     scenario L, the llmkit-upgrade release of Lash's English Patch (2026-09): Mods/English held aside, the release's
+              per-file tables (TABLES_DIR, e.g. its Mods/English) and its own plugin (PLUGIN_DLL, FanslationStudio.
+              LegendOfMortal.Plugin.dll, built for BepInEx 5) put in; --leftover also puts the older StringTable.csv back
+              next to them, as unpacking the new release over the old one leaves it. Harness on, steam_appid.txt. On this
+              game's BepInEx 6 the new plugin never loads: this mod reads the tables itself
+  l_teardown  everything L put in moved to the run folder (the plugin's BepInEx/plugins/raw dump too), Mods/English back
+  l5_setup    scenario L5, on top of L: BepInEx 5 instead of 6, as the new release may ship it. The official
+              BepInEx_win_x86_5.4.*.zip from release/vendor (not pinned: test only) is extracted in place of the loader
+              files it replaces (doorstop files, BepInEx/core), which are held aside with BepInEx/config/BepInEx.cfg and
+              the chainloader cache; this mod then runs from LOM_UI_EN.BepInEx5.dll and the new plugin runs too
+  l5_teardown BepInEx 5's files and whatever it created moved to the run folder, BepInEx 6 back, verified
+  r_setup     scenario R, a release zip of Lash's English Patch (e.g. EnglishPatch-2026.09.28.13.56.zip: BepInEx 5, its own
+              plugin and FanslationStudio.Plugins pack, the per-file tables) extracted into the game folder as a player's unzip
+              does: over the current install (default, as unpacking a new version over an older one does, its leftovers kept) or
+              --clean (the current BepInEx folder, Mods and the loader's root files held aside first, then this mod's plugin
+              folder and settings put back, as its mod-only package installs them). This mod's harness cache
+              (BepInEx/cache/LOM_UI_EN) stays in place. Harness on, steam_appid.txt
+  r_teardown  the release's install moved to the run folder, everything R changed back, verified against the hashes taken
+              before
 
 Launch the game in between (Mortal.exe, working directory the game folder) and drive it with run_batch.ps1 and
 screens05.ps1; docs/DEVELOPMENT.md has the whole checklist. Every move and overwrite is recorded in state.json and verified
@@ -26,7 +48,8 @@ import lom_paths as P
 
 G = P.GAME
 LOC = P.REAL_LOCALIZATION
-HERE = os.path.join(LOC, "_release_test")
+# LOM_RELEASE_TEST_DIR: a different run area (with LOM_GAME, for trying the scenario steps on a copy of the game folder)
+HERE = os.environ.get("LOM_RELEASE_TEST_DIR") or os.path.join(LOC, "_release_test")
 STATE = os.path.join(HERE, "state.json")
 REGKEY = r"HKCU\Software\Obb Studio\Mortal"
 
@@ -120,6 +143,10 @@ def ps(script, *args):
 def prep():
     need_closed()
     st = load()
+    if st.get("run") and st.get("final_done") and os.path.isdir(st["run"]):
+        # a finished run: its record goes into its own folder, and a new run starts from nothing
+        shutil.move(STATE, os.path.join(st["run"], "state.json"))
+        st = {}
     if st.get("run"):
         sys.exit("REFUSED: a run is already prepared: %s" % st["run"])
     run = os.path.join(HERE, "run_" + time.strftime("%Y%m%d-%H%M%S"))
@@ -268,8 +295,11 @@ def a_teardown():
 
 def set_harness(on):
     p = os.path.join(CFG, "lom.ui.english.cfg")
-    t = open(p, encoding="utf-8").read()
+    t = open(p, encoding="utf-8", newline="").read()     # newline="": the cfg's CRLF stays as it is
     a, b = ("Harness = false", "Harness = true") if on else ("Harness = true", "Harness = false")
+    if t.count(a) == 0 and t.count(b) == 1:
+        print("harness already %s" % ("on" if on else "off"))   # e.g. r_setup right after b_setup
+        return
     if t.count(a) != 1:
         sys.exit("cannot switch the harness: '%s' found %d times" % (a, t.count(a)))
     open(p, "w", encoding="utf-8", newline="").write(t.replace(a, b))
@@ -360,5 +390,356 @@ def status():
     print("game running:", game_running())
 
 
-{"prep": prep, "a_setup": a_setup, "a_teardown": a_teardown, "b_setup": b_setup, "b_teardown": b_teardown, "final": final,
- "status": status}[sys.argv[1]]()
+# ---- scenarios L and L5: the llmkit-upgrade release of Lash's English Patch --------------------------------------------------
+
+MODS_EN = os.path.join(G, "Mods", "English")
+LLMKIT_DLL = "FanslationStudio.LegendOfMortal.Plugin.dll"
+LASH_PLUGIN = os.path.join(G, "BepInEx", "plugins", LLMKIT_DLL)
+RAW_DUMP = os.path.join(G, "BepInEx", "plugins", "raw")          # the new plugin's dump of the game's sources (BepInEx 5)
+BIE5_ZIPS = os.path.join(os.environ.get("LOM_VENDOR_DIR") or os.path.join(LOC, "release", "vendor"), "BepInEx_win_x86_5.4.*.zip")
+BIE_CFG = os.path.join(CFG, "BepInEx.cfg")
+CACHE = os.path.join(G, "BepInEx", "cache")
+LOM_CACHE = "LOM_UI_EN"                                          # this mod's cache (the harness) stays where it is
+
+
+def _run_active():
+    st = load()
+    if not st.get("run") or st.get("final_done"):
+        sys.exit("REFUSED: run prep first")
+    return st
+
+
+def l_setup(tables, dll, leftover=False):
+    need_closed()
+    st = _run_active()
+    if st.get("l") and not st["l"].get("undone"):
+        sys.exit("REFUSED: scenario L is set up already")
+    import lashtables          # tools/, on sys.path above
+    lay = lashtables.find(tables)
+    if lay.kind != "per-file":
+        sys.exit("REFUSED: %s holds no per-file tables of the llmkit-upgrade release" % tables)
+    if os.path.basename(dll) != LLMKIT_DLL or not os.path.isfile(dll):
+        sys.exit("REFUSED: the plugin must be a file named %s" % LLMKIT_DLL)
+    for p in (LASH_PLUGIN, RAW_DUMP):
+        if os.path.exists(p):
+            sys.exit("REFUSED: %s exists already" % p)
+    run = st["run"]
+    held = os.path.join(HOLD, "L_Mods_English")
+    n = move_verified(MODS_EN, held) if os.path.exists(MODS_EN) else 0
+    os.makedirs(MODS_EN)
+    added = {}
+    for f in lay.files:
+        dst = os.path.join(MODS_EN, os.path.basename(f))
+        shutil.copy2(f, dst)
+        added[os.path.relpath(dst, G)] = sha(dst)
+    if leftover:
+        old = os.path.join(held, "StringTable.csv")
+        if not os.path.exists(old):
+            sys.exit("REFUSED: --leftover needs the held Mods/English to hold StringTable.csv")
+        dst = os.path.join(MODS_EN, "StringTable.csv")
+        shutil.copy2(old, dst)
+        added[os.path.relpath(dst, G)] = sha(dst)
+    shutil.copy2(dll, LASH_PLUGIN)
+    added[os.path.relpath(LASH_PLUGIN, G)] = sha(LASH_PLUGIN)
+    set_harness(True)
+    with open(APPID, "w") as f:
+        f.write("1859910")
+    st["l"] = {"held_mods_english": held if n else None, "held_files": n, "added": added, "leftover": leftover,
+               "tables_from": tables, "plugin_from": dll, "plugin_sha256": sha(dll)}
+    save(st)
+    print("scenario L set up: Mods/English (%d files) held, %d tables%s and %s put in, harness on" % (
+        n, len(lay.files), " plus the old StringTable.csv" if leftover else "", LLMKIT_DLL))
+
+
+def l_teardown():
+    need_closed()
+    st = _run_active()
+    l = st.get("l")
+    if not l or l.get("undone"):
+        sys.exit("REFUSED: scenario L is not set up")
+    if st.get("l5") and not st["l5"].get("undone"):
+        sys.exit("REFUSED: undo L5 first (l5_teardown)")
+    run = st["run"]
+    pre = _attempt(run, "L")
+    log = os.path.join(G, "BepInEx", "LogOutput.log")
+    if os.path.exists(log):
+        shutil.copy2(log, os.path.join(run, pre + "LogOutput.log"))
+    changed = [rel for rel, h in l["added"].items() if not os.path.exists(os.path.join(G, rel)) or sha(os.path.join(G, rel)) != h]
+    if changed:
+        print("note: files the test put in changed or went missing while it ran: %s" % changed)
+    n = move_verified(MODS_EN, os.path.join(run, pre + "Mods_English_test"))
+    move_verified(LASH_PLUGIN, os.path.join(run, pre + "plugin", LLMKIT_DLL))
+    raw = move_verified(RAW_DUMP, os.path.join(run, pre + "raw_dump")) if os.path.exists(RAW_DUMP) else 0
+    if l.get("held_mods_english"):
+        move_verified(l["held_mods_english"], MODS_EN)
+    if os.path.isdir(HOLD) and not any(fs for r, ds, fs in os.walk(HOLD)):
+        shutil.rmtree(HOLD)   # the holding area is empty folders only now
+    set_harness(False)
+    l["undone"] = True
+    save(st)
+    print("scenario L undone: %d test tables and the plugin moved to the run folder%s, Mods/English back (%d files)" % (
+        n, (", its raw dump (%d files) too" % raw) if raw else "", l.get("held_files", 0)))
+
+
+def _attempt(run, scenario):
+    """The file prefix of this teardown in the run folder: '<scenario>_' the first time, '<scenario>-2_' and on when the scenario
+    ran again in the same run (L with and without --leftover), so no attempt's files meet another's."""
+    k = 1
+    while glob.glob(os.path.join(run, ("%s_*" % scenario) if k == 1 else ("%s-%d_*" % (scenario, k)))):
+        k += 1
+    return ("%s_" % scenario) if k == 1 else ("%s-%d_" % (scenario, k))
+
+
+def _cache_files():
+    """BepInEx/cache files outside this mod's own folder, relative."""
+    out = {}
+    for rel, h in (tree_hashes(CACHE) if os.path.isdir(CACHE) else {}).items():
+        if not rel.startswith(LOM_CACHE + "/"):
+            out[rel] = h
+    return out
+
+
+def l5_setup():
+    need_closed()
+    st = _run_active()
+    if not st.get("l") or st["l"].get("undone"):
+        sys.exit("REFUSED: set up scenario L first")
+    if st.get("l5") and not st["l5"].get("undone"):
+        sys.exit("REFUSED: scenario L5 is set up already")
+    zips = sorted(glob.glob(BIE5_ZIPS))
+    if not zips:
+        sys.exit("REFUSED: no %s: download the official BepInEx 5 (Unity Mono, x86) zip from "
+                 "https://github.com/BepInEx/BepInEx/releases into release/vendor" % os.path.basename(BIE5_ZIPS))
+    zpath = zips[-1]
+    if not os.path.exists(os.path.join(PLUGIN, "LOM_UI_EN.BepInEx5.dll")):
+        sys.exit("REFUSED: the plugin folder has no LOM_UI_EN.BepInEx5.dll (build.ps1 -BepInEx5, then install it)")
+    run = st["run"]
+    with zipfile.ZipFile(zpath) as z:
+        entries = [i for i in z.infolist() if not i.is_dir()]
+        names = [i.filename for i in entries]
+        roots = sorted({n.split("/")[0] for n in names})
+        if [n for n in names if "/" in n and not n.startswith("BepInEx/core/")]:
+            sys.exit("REFUSED: %s holds files outside the game root and BepInEx/core: %s" % (
+                os.path.basename(zpath), [n for n in names if "/" in n and not n.startswith("BepInEx/core/")][:5]))
+        held = {}
+        for n in [r for r in roots if r != "BepInEx"]:
+            src = os.path.join(G, n)
+            if os.path.exists(src):
+                move_verified(src, os.path.join(HOLD, "L5_root", n))
+                held[n] = os.path.join(HOLD, "L5_root", n)
+        move_verified(CORE, os.path.join(HOLD, "L5_core"))
+        held["BepInEx/core"] = os.path.join(HOLD, "L5_core")
+        if os.path.exists(BIE_CFG):
+            move_verified(BIE_CFG, os.path.join(HOLD, "L5_config", "BepInEx.cfg"))
+            held["BepInEx/config/BepInEx.cfg"] = os.path.join(HOLD, "L5_config", "BepInEx.cfg")
+        cache_before = _cache_files()
+        for rel in cache_before:
+            move_verified(os.path.join(CACHE, *rel.split("/")), os.path.join(HOLD, "L5_cache", *rel.split("/")))
+        added = {}
+        for i in entries:
+            dst = os.path.join(G, *i.filename.split("/"))
+            if os.path.exists(dst):
+                sys.exit("REFUSED: %s exists after holding the loader files (undo with l5_teardown)" % dst)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with z.open(i) as src, open(dst, "wb") as out:
+                shutil.copyfileobj(src, out)
+            added[i.filename] = sha(dst)
+    st["l5"] = {"zip": zpath, "zip_sha256": sha(zpath), "held": held, "cache_held": sorted(cache_before), "added": added,
+                "bepinex_dirs_before": sorted(os.listdir(os.path.join(G, "BepInEx"))),
+                "configs_before": sorted(os.listdir(CFG)) if os.path.isdir(CFG) else []}
+    save(st)
+    print("scenario L5 set up: %s extracted (%d files), BepInEx 6's loader files, BepInEx.cfg and %d cache files held" % (
+        os.path.basename(zpath), len(added), len(cache_before)))
+
+
+def l5_teardown():
+    need_closed()
+    st = _run_active()
+    l5 = st.get("l5")
+    if not l5 or l5.get("undone"):
+        sys.exit("REFUSED: scenario L5 is not set up")
+    run = st["run"]
+    pre = _attempt(run, "L5")
+    out = os.path.join(run, pre + "bepinex5")
+    log = os.path.join(G, "BepInEx", "LogOutput.log")
+    if os.path.exists(log):
+        shutil.copy2(log, os.path.join(run, pre + "LogOutput.log"))
+    # BepInEx 5's own files (the zip's), then whatever it created: its config, its cache, new BepInEx folders
+    for rel in sorted({r.split("/")[0] for r in l5["added"] if "/" not in r} | ({"BepInEx/core"})):
+        p = os.path.join(G, *rel.split("/"))
+        if os.path.exists(p):
+            move_verified(p, os.path.join(out, *rel.split("/")))
+    if os.path.exists(BIE_CFG):
+        move_verified(BIE_CFG, os.path.join(out, "created", "BepInEx.cfg"))
+    # the settings files of plugins only BepInEx 5 loads (Lash's plugin writes FanslationStudio.LegendOfMortal.Plugin.cfg)
+    for f in sorted(os.listdir(CFG)) if "configs_before" in l5 and os.path.isdir(CFG) else []:
+        if f not in l5["configs_before"]:
+            move_verified(os.path.join(CFG, f), os.path.join(out, "created", "config", f))
+    for rel in _cache_files():
+        move_verified(os.path.join(CACHE, *rel.split("/")), os.path.join(out, "created", "cache", *rel.split("/")))
+    for d in sorted(os.listdir(os.path.join(G, "BepInEx"))):
+        if d not in l5["bepinex_dirs_before"]:
+            move_verified(os.path.join(G, "BepInEx", d), os.path.join(out, "created", "BepInEx", d))
+    # BepInEx 6 back
+    for rel, src in sorted(l5["held"].items()):
+        move_verified(src, os.path.join(G, *rel.split("/")))
+    for rel in l5["cache_held"]:
+        move_verified(os.path.join(HOLD, "L5_cache", *rel.split("/")), os.path.join(CACHE, *rel.split("/")))
+    # the holding folders are empty now
+    for d in ("L5_root", "L5_core", "L5_config", "L5_cache"):
+        p = os.path.join(HOLD, d)
+        for r, ds, fs in sorted(os.walk(p, topdown=False), reverse=False) if os.path.isdir(p) else []:
+            if not os.listdir(r):
+                os.rmdir(r)
+    l5["undone"] = True
+    save(st)
+    print("scenario L5 undone: BepInEx 5 and what it created moved to %s, BepInEx 6 back (verified)" % out)
+
+
+# ---- scenario R: a release zip of Lash's English Patch, installed as a player would --------------------------------------------
+
+BEPINEX = os.path.join(G, "BepInEx")
+MODS = os.path.join(G, "Mods")
+LOM_CACHE_DIR = os.path.join(CACHE, LOM_CACHE)
+
+
+def _game_tree():
+    """Hashes of what a release install touches: BepInEx (without this mod's harness cache), Mods, the loader's root files."""
+    out = {}
+    for rel, h in (tree_hashes(BEPINEX) if os.path.isdir(BEPINEX) else {}).items():
+        if not rel.startswith("cache/" + LOM_CACHE + "/"):
+            out["BepInEx/" + rel] = h
+    for rel, h in (tree_hashes(MODS) if os.path.isdir(MODS) else {}).items():
+        out["Mods/" + rel] = h
+    for n in ROOT_LOADER_FILES:
+        if os.path.isfile(os.path.join(G, n)):
+            out[n] = sha(os.path.join(G, n))
+    return out
+
+
+ROOT_LOADER_FILES = ("doorstop_config.ini", "winhttp.dll", ".doorstop_version", "changelog.txt")
+
+
+def _copy_verified(src, dst):
+    shutil.copytree(src, dst)
+    if tree_hashes(src) != tree_hashes(dst):
+        sys.exit("HASH MISMATCH copying %s -> %s" % (src, dst))
+
+
+def r_setup(zpath, clean=False):
+    need_closed()
+    st = _run_active()
+    if st.get("r") and not st["r"].get("undone"):
+        sys.exit("REFUSED: scenario R is set up already")
+    if not os.path.isfile(zpath):
+        sys.exit("REFUSED: no such zip: %s" % zpath)
+    run = st["run"]
+    n = 1 + sum(1 for d in os.listdir(run) if re.match(r"^R\d+_before$", d))
+    before = os.path.join(run, "R%d_before" % n)
+    with zipfile.ZipFile(zpath) as z:
+        entries = [i for i in z.infolist() if not i.is_dir()]
+        roots = sorted({i.filename for i in entries if "/" not in i.filename})
+        odd = [r for r in roots if r not in ROOT_LOADER_FILES]
+        tops = sorted({i.filename.split("/")[0].lower() for i in entries if "/" in i.filename})
+        if odd or [t for t in tops if t not in ("bepinex", "mods")]:
+            sys.exit("REFUSED: the zip holds files outside BepInEx, Mods and the loader's root files: %s %s" % (odd, tops))
+        game_before = _game_tree()
+        cache_hold = os.path.join(run, "R%d_harness_cache" % n)
+        if os.path.isdir(LOM_CACHE_DIR):
+            move_verified(LOM_CACHE_DIR, cache_hold)
+        if clean:
+            move_verified(BEPINEX, os.path.join(before, "BepInEx"))
+            if os.path.isdir(MODS):
+                move_verified(MODS, os.path.join(before, "Mods"))
+            for r in ROOT_LOADER_FILES:
+                if os.path.isfile(os.path.join(G, r)):
+                    move_verified(os.path.join(G, r), os.path.join(before, "root", r))
+            # this mod as its mod-only package installs it, with its settings
+            _copy_verified(os.path.join(before, "BepInEx", "plugins", "LOM_UI_EN"), PLUGIN)
+            os.makedirs(CFG, exist_ok=True)
+            for c in ("lom.ui.english.cfg", "lom.strings.english.cfg"):
+                if os.path.isfile(os.path.join(before, "BepInEx", "config", c)):
+                    shutil.copy2(os.path.join(before, "BepInEx", "config", c), os.path.join(CFG, c))
+        else:
+            _copy_verified(BEPINEX, os.path.join(before, "BepInEx"))
+            if os.path.isdir(MODS):
+                _copy_verified(MODS, os.path.join(before, "Mods"))
+            for r in ROOT_LOADER_FILES:
+                if os.path.isfile(os.path.join(G, r)):
+                    os.makedirs(os.path.join(before, "root"), exist_ok=True)
+                    shutil.copy2(os.path.join(G, r), os.path.join(before, "root", r))
+        if os.path.isdir(cache_hold):
+            move_verified(cache_hold, LOM_CACHE_DIR)
+        # a player's unzip: every entry written where it says (Windows paths ignore case, so "BepinEx/" lands in BepInEx)
+        written = 0
+        for i in entries:
+            dst = os.path.join(G, *i.filename.split("/"))
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with z.open(i) as src, open(dst, "wb") as out:
+                shutil.copyfileobj(src, out)
+            written += 1
+    set_harness(True)
+    with open(APPID, "w") as f:
+        f.write("1859910")
+    st["r"] = {"zip": zpath, "zip_sha256": sha(zpath), "clean": clean, "before": before, "n": n, "game_before": game_before}
+    save(st)
+    print("scenario R set up (%s): %s extracted (%d files)%s, harness on" % (
+        "clean install" if clean else "over the current install", os.path.basename(zpath), written,
+        "; the previous BepInEx, Mods and loader files held in " + before if clean else "; the previous state copied to " + before))
+
+
+def r_teardown():
+    need_closed()
+    st = _run_active()
+    r = st.get("r")
+    if not r or r.get("undone"):
+        sys.exit("REFUSED: scenario R is not set up")
+    run, n, before = st["run"], r["n"], r["before"]
+    after = os.path.join(run, "R%d_after" % n)
+    log = os.path.join(BEPINEX, "LogOutput.log")
+    if os.path.exists(log):
+        shutil.copy2(log, os.path.join(run, "R%d_LogOutput.log" % n))
+    cache_hold = os.path.join(run, "R%d_harness_cache_after" % n)
+    if os.path.isdir(LOM_CACHE_DIR):
+        move_verified(LOM_CACHE_DIR, cache_hold)
+    move_verified(BEPINEX, os.path.join(after, "BepInEx"))
+    if os.path.isdir(MODS):
+        move_verified(MODS, os.path.join(after, "Mods"))
+    for name in ROOT_LOADER_FILES:
+        if os.path.isfile(os.path.join(G, name)):
+            move_verified(os.path.join(G, name), os.path.join(after, "root", name))
+    move_verified(os.path.join(before, "BepInEx"), BEPINEX)
+    if os.path.isdir(os.path.join(before, "Mods")):
+        move_verified(os.path.join(before, "Mods"), MODS)
+    for name in ROOT_LOADER_FILES:
+        if os.path.isfile(os.path.join(before, "root", name)):
+            move_verified(os.path.join(before, "root", name), os.path.join(G, name))
+    if os.path.isdir(cache_hold):
+        move_verified(cache_hold, LOM_CACHE_DIR)
+    now = _game_tree()
+    diff = sorted(k for k in set(now) | set(r["game_before"]) if now.get(k) != r["game_before"].get(k))
+    if diff:
+        sys.exit("GAME FOLDER DIFFERS from before scenario R: %s" % diff[:10])
+    r["undone"] = True
+    save(st)
+    print("scenario R undone: the release's install moved to %s; BepInEx, Mods and the loader files back, %d files verified" % (
+        after, len(now)))
+
+
+if __name__ == "__main__":
+    cmd = sys.argv[1]
+    if cmd == "r_setup":
+        a = [x for x in sys.argv[2:] if x != "--clean"]
+        if len(a) != 1:
+            sys.exit("usage: release_test.py r_setup RELEASE_ZIP [--clean]")
+        r_setup(a[0], "--clean" in sys.argv[2:])
+    elif cmd == "r_teardown":
+        r_teardown()
+    elif cmd == "l_setup":
+        a = [x for x in sys.argv[2:] if x != "--leftover"]
+        if len(a) != 2:
+            sys.exit("usage: release_test.py l_setup TABLES_DIR PLUGIN_DLL [--leftover]")
+        l_setup(a[0], a[1], "--leftover" in sys.argv[2:])
+    else:
+        {"prep": prep, "a_setup": a_setup, "a_teardown": a_teardown, "b_setup": b_setup, "b_teardown": b_teardown,
+         "final": final, "status": status, "l_teardown": l_teardown, "l5_setup": l5_setup, "l5_teardown": l5_teardown}[cmd]()

@@ -3,7 +3,8 @@ param([Parameter(Mandatory = $true)][ValidateSet('out', 'back')][string]$Mode)
 $g = 'C:\Program Files (x86)\Steam\steamapps\common\LegendOfMortal'
 $aside = Join-Path $g 'BepInEx\_lom_overllm_aside_test'
 $hashFile = Join-Path $PSScriptRoot 'overllm_aside_hashes.txt'
-$items = @('Mods\English', 'BepInEx\Translation', 'BepInEx\plugins\FunctionalPlugin_Binarizer.dll', 'BepInEx\plugins\XUnity.AutoTranslator', 'BepInEx\plugins\XUnity.ResourceRedirector', 'BepInEx\plugins\LOM_UI_Plugin_KR.dll')
+# Its newer releases (llmkit-upgrade) replace Binarizer with their own plugin and add BepInEx\resizers; a missing item is skipped.
+$items = @('Mods\English', 'BepInEx\Translation', 'BepInEx\plugins\FunctionalPlugin_Binarizer.dll', 'BepInEx\plugins\FanslationStudio.LegendOfMortal.Plugin.dll', 'BepInEx\resizers', 'BepInEx\plugins\XUnity.AutoTranslator', 'BepInEx\plugins\XUnity.ResourceRedirector', 'BepInEx\plugins\LOM_UI_Plugin_KR.dll')
 if (Get-Process Mortal -ErrorAction SilentlyContinue) { 'GAME RUNNING - refused'; exit 1 }
 function HashAll([string]$root) {
     $lines = @()

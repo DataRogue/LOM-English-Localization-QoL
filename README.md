@@ -78,6 +78,12 @@ shows that language in English. It is tested with game version `release_1.0.5000
 The full package includes [BepInEx](https://github.com/BepInEx/BepInEx) 6.0.0-be.692, the mod loader. If you already
 have it, for example because Lash's English Patch is installed, use the smaller `-mod-only.zip` instead.
 
+From 1.1.0 the mod also runs on BepInEx 5. Lash's English Patch moves the game to BepInEx 5 from its 2026-09-28
+release on. The mod carries a DLL for each BepInEx, and each BepInEx loads only its own. Version 1.0.0 runs on BepInEx 6
+only, so update this mod when you install such a release. With one installed, use the `-mod-only.zip`: the full
+package would switch the game back to BepInEx 6, where that patch's plugins do not run, though this mod still reads
+its text.
+
 **Updating:** delete the folder `BepInEx/plugins/LOM_UI_EN`, then extract the new `-mod-only.zip` into the game folder.
 Your settings are kept in `BepInEx/config`.
 
@@ -140,8 +146,8 @@ something reads wrong, please report it.
 
 ## Building from source
 
-The plugin is C# for BepInEx 6 on Unity 2020.3 Mono. `src/LOM_UI_EN/build.ps1` builds it with the compiler that comes
-with Visual Studio 2022 or later. The build is deterministic, so you can check a release DLL against the source. The
+The plugin is C# for BepInEx 6 on Unity 2020.3 Mono; `build.ps1 -BepInEx5` builds the same source for BepInEx 5.
+`src/LOM_UI_EN/build.ps1` builds it with the compiler that comes with Visual Studio 2022 or later. The build is deterministic, so you can check a release DLL against the source. The
 translation lives in `workspace/`, and `tools/` holds the maintainer tools that turn it into the plugin folder and
 package releases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 

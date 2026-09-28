@@ -677,7 +677,12 @@ namespace LOM_UI_EN
 				StringsPlugin.CfgEnabled.Value = false;
 				StringOverrides.Refresh();
 				OriginalMod.Report r = OriginalMod.Current;
-				if (r.BinarizerHooked || r.XUnityRunning)
+				if (r.TablesUnserved && r.BaseTableFile)
+				{
+					// The newer patch's tables are only read by this mod, which now adds none of them.
+					return (r.BinarizerHooked && r.BinarizerEntries > 0) ? ("UI only: " + BaseName + " provides the text, from its older version (its newer plugin doesn't run with this game's BepInEx).") : ("UI only: most text shows in Chinese, since the plugin of " + BaseName + "'s newer version doesn't run with this game's BepInEx.");
+				}
+				if (r.TablePluginHooked || r.XUnityRunning)
 				{
 					return "UI only: " + BaseName + " provides the text.";
 				}
@@ -755,7 +760,11 @@ namespace LOM_UI_EN
 			{
 				return "its plugins are detached for testing";
 			}
-			bool running = table ? r.BinarizerHooked : (r.XUnityRunning && r.XUnityHooked);
+			if (table && r.TablesUnserved && r.LlmKitOtherBepInEx)
+			{
+				return "its plugin doesn't run with this game's BepInEx";
+			}
+			bool running = table ? r.TablePluginHooked : (r.XUnityRunning && r.XUnityHooked);
 			return running ? "its plugin's text couldn't be identified" : "its plugin isn't running";
 		}
 
@@ -777,15 +786,28 @@ namespace LOM_UI_EN
 			{
 				return Warn("Detached for testing (Advanced page).");
 			}
-			switch (r.Summary)
+			if (r.Summary == BaseSummary.Absent)
 			{
-			case BaseSummary.Absent:
 				return TranslationProfiles.OwnComplete ? "Not installed. It's optional: this mod has its own full translation." : Warn("Not installed, so some text shows in Chinese. Get it at github.com/joshfreitas1984/LegendOfMortalOverLlm.");
-			case BaseSummary.Complete:
-				return (r.BinarizerData == BaseData.OurEdits || r.XUnityData == BaseData.OurEdits) ? Warn("Installed, but its files hold edits from an older version of this mod. Reinstall it to use its translation.") : "Installed.";
-			default:
-				return Warn("Partly installed. Reinstall it to use its translation.");
 			}
+			if (r.BinarizerData == BaseData.OurEdits || r.LlmKitData == BaseData.OurEdits || r.XUnityData == BaseData.OurEdits)
+			{
+				return Warn("Installed, but its files hold edits from an older version of this mod. Reinstall it to use its translation.");
+			}
+			if (r.TableLeftover && r.LlmKitHooked)
+			{
+				// Its plugin reads every table in the folder, the old one too, over part of the new text.
+				return Warn("Installed, but a file of its older version is still in Mods/English (StringTable.csv). Delete that file.");
+			}
+			if (r.Summary == BaseSummary.Complete)
+			{
+				return "Installed.";
+			}
+			if (r.TablesUnserved && r.BaseTableFile)
+			{
+				return (r.LlmKitInstalled && r.LlmKitOtherBepInEx) ? "Installed. Its newer version's plugin doesn't run with this game's BepInEx, so its text shows through this mod." : "Installed. Its text shows through this mod, since its own plugin isn't running.";
+			}
+			return Warn("Partly installed. Reinstall it to use its translation.");
 		}
 
 		private static string FallbackStatus()
@@ -816,7 +838,7 @@ namespace LOM_UI_EN
 			}
 			if (!F.GameText.Live)
 			{
-				return Warn("Not working with this game version; " + (OriginalMod.Current.BinarizerHooked ? (BaseName + " provides this text.") : "the game's own text shows."));
+				return Warn("Not working with this game version; " + (OriginalMod.Current.TablePluginHooked ? (BaseName + " provides this text.") : "the game's own text shows."));
 			}
 			if (TranslationProfiles.CfgTable.Value == TextSource.Off)
 			{
@@ -837,10 +859,10 @@ namespace LOM_UI_EN
 				}
 				break;
 			case LayerMode.OriginalHandBack:
-				s = "The plugin of " + BaseName + " (" + N(OriginalMod.Current.BinarizerEntries) + " lines).";
+				s = "The plugin of " + BaseName + " (" + N(OriginalMod.Current.HandBackEntries) + " lines).";
 				break;
 			case LayerMode.OriginalFromFiles:
-				s = "The file of " + BaseName + ", " + N(TranslationProfiles.TableEntries) + " lines (" + FromFilesReason(table: true) + ").";
+				s = ((OriginalMod.BaseTable.Layout == BaseTableLayout.PerFile) ? "The files of " : "The file of ") + BaseName + ", " + N(TranslationProfiles.TableEntries) + " lines (" + FromFilesReason(table: true) + ").";
 				break;
 			case LayerMode.BaseOnly:
 				s = Warn("This mod's lines couldn't be read (" + TranslationProfiles.TableError + "); those of " + BaseName + " are used.");
@@ -1011,16 +1033,46 @@ namespace LOM_UI_EN
 			}
 		}
 
-		private static string PartState(bool installed, bool running, string runningText)
+		private static string PartState(bool installed, bool running, string runningText, bool otherBepInEx = false)
 		{
-			return running ? runningText : (installed ? "installed, not running" : "not installed");
+			return running ? runningText : (installed ? (otherBepInEx ? ("installed, but it is built for BepInEx " + ((OriginalMod.RunningBepInExMajor == 6) ? "5" : "6") + ", which this game doesn't run") : "installed, not running") : "not installed");
 		}
 
 		/// <summary>Advanced: the OverLlm patch's parts as detected.</summary>
 		private static string AboutBase()
 		{
 			OriginalMod.Report r = OriginalMod.Current;
-			string s = Bullet + "Game data (Binarizer): " + PartState(r.BinarizerInstalled, r.BinarizerHooked, N(Math.Max(r.BinarizerEntries, 0)) + " lines" + ((r.BinarizerData == BaseData.OurEdits) ? ", holding this mod's old edits" : "")) + ".\n" + Bullet + "Scene text (XUnity AutoTranslator): " + PartState(r.XUnityInstalled, r.XUnityRunning && r.XUnityHooked, "running" + ((r.XUnityData == BaseData.OurEdits) ? ", its file holding this mod's old edits" : "")) + ".\n" + Bullet + "Korean layout plugin: " + (r.KrSuppressed ? "hooks removed" : PartState(r.KrInstalled, r.KrHooked, "running")) + ".\n" + Bullet + "Its text files: game data " + (r.BaseTableFile ? "found" : "not found") + ", scene " + (r.BaseSceneFile ? "found" : "not found") + ". This mod only reads them.";
+			bool perFile = r.TableLayout == BaseTableLayout.PerFile;
+			string s = "";
+			// Binarizer serves the older releases' single table; the newer releases' own plugin serves one table per game file.
+			if (r.BinarizerInstalled || (!perFile && !r.LlmKitInstalled))
+			{
+				string running = (perFile && r.BinarizerEntries <= 0) ? "running, with no table of its own (the newer version's tables are for its own plugin)" : (N(Math.Max(r.BinarizerEntries, 0)) + " lines" + ((r.BinarizerData == BaseData.OurEdits) ? ", holding this mod's old edits" : ""));
+				s += Bullet + "Game data (Binarizer): " + PartState(r.BinarizerInstalled, r.BinarizerHooked, running, r.BinarizerOtherBepInEx) + ".\n";
+			}
+			if (r.LlmKitInstalled || r.LlmKitHooked || perFile)
+			{
+				s += Bullet + "Game data (its own plugin, newer versions): " + PartState(r.LlmKitInstalled, r.LlmKitHooked, N(Math.Max(r.LlmKitEntries, 0)) + " lines" + ((r.LlmKitData == BaseData.OurEdits) ? ", holding this mod's old edits" : "") + ((r.LlmKitLabelsHooked && BaseGuards.LabelsHolding) ? "; its labels give way to this mod's text" : ""), r.LlmKitOtherBepInEx) + ".\n";
+			}
+			if (r.PackInstalled || r.PackLoaded)
+			{
+				string pack = "running";
+				if (BaseGuards.PrefabGuarded)
+				{
+					pack += "; prefab texts: " + N(BaseGuards.PrefabLoaded - BaseGuards.PrefabTaken) + " of " + N(BaseGuards.PrefabLoaded) + " its own, the rest this mod's";
+				}
+				if (BaseGuards.CodeGuarded)
+				{
+					pack += "; code texts: " + N(BaseGuards.CodeLoaded - BaseGuards.CodeTaken) + " of " + N(BaseGuards.CodeLoaded) + " its own";
+				}
+				if (BaseGuards.ResizerGuarded)
+				{
+					pack += "; text resizer " + (BaseGuards.ResizerHolding ? "held back" : "on");
+				}
+				s += Bullet + "Its plugin pack (prefab text, code text, text sizes): " + PartState(r.PackInstalled, r.PackLoaded, pack, r.PackOtherBepInEx) + ".\n";
+			}
+			string tables = !r.BaseTableFile ? "not found" : (perFile ? (N(OriginalMod.BaseTable.Files.Length) + " tables found" + (r.TableLeftover ? " (an older StringTable.csv next to them is left out)" : "")) : "found");
+			s += Bullet + "Scene text (XUnity AutoTranslator): " + PartState(r.XUnityInstalled, r.XUnityRunning && r.XUnityHooked, "running" + ((r.XUnityData == BaseData.OurEdits) ? ", its file holding this mod's old edits" : ""), r.XUnityOtherBepInEx) + ".\n" + Bullet + "Korean layout plugin: " + (r.KrSuppressed ? "hooks removed" : PartState(r.KrInstalled, r.KrHooked, "running", r.KrOtherBepInEx)) + ".\n" + Bullet + "Its text files: game data " + tables + ", scene " + (r.BaseSceneFile ? "found" : "not found") + ". This mod only reads them.";
 			if (r.Detached)
 			{
 				s += "\n" + Warn("Detached for testing.");
@@ -1176,6 +1228,10 @@ namespace LOM_UI_EN
 			adv.Items[adv.Items.Count - 1].Feature = F.XUnityBridge;
 			adv.Items.Add(OnOff(SceneText.CfgApplyResizers, "Text sizes of " + BaseName, "Uses the text-size adjustments of " + BaseName + "."));
 			adv.Items[adv.Items.Count - 1].Status = () => N(SceneText.ResizeNodes) + " adjustments loaded.";
+			adv.Items.Add(OnOff(BaseGuards.CfgLetResize, "Resizer of " + BaseName, "Lets the text resizer of its newer versions change text sizes too; this mod's layout fixes size the text without it."));
+			adv.Items[adv.Items.Count - 1].IsEnabled = () => BaseGuards.ResizerGuarded;
+			adv.Items[adv.Items.Count - 1].Status = () => !BaseGuards.ResizerGuarded ? (BaseName + "'s resizer isn't running.") : (BaseGuards.CfgLetResize.Value ? "On. Turning it off again takes a restart." : (N(BaseGuards.ResizesHeld) + " resizes held back this session."));
+			adv.Items[adv.Items.Count - 1].Feature = F.BasePlugins;
 			adv.Items.Add(OnOff(SceneText.CfgWideTextOverflow, "Wide text overflow", "Very wide text may wrap past its box, as with " + BaseName + "."));
 			adv.Items.Add(OnOff(Plugin.CfgQuietBinarizer, "Quiet " + BaseName + " lookups", "Stops " + BaseName + " logging every text lookup."));
 			adv.Items[adv.Items.Count - 1].IsEnabled = () => PerfPatches.Hooked;

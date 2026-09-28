@@ -14,7 +14,9 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Core.Logging.Interpolation;
 using BepInEx.Logging;
+#if !BIE5
 using BepInEx.Unity.Mono;
+#endif
 using DG.Tweening;
 using Fungus;
 using HarmonyLib;
@@ -2011,6 +2013,10 @@ namespace LOM_UI_EN
 	// Soft dependencies only: none of these is needed, but when the original English patch is installed its plugins load first,
 	// so its hooks and tables exist when OriginalMod looks for them.
 	[BepInDependency("binarizer.plugin.mortal", BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInDependency(OriginalMod.LlmKitGuid, BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInDependency(BaseGuards.PackGuid + ".TextResizer", BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInDependency(BaseGuards.PackGuid + ".PrefabTextReplacer", BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInDependency(BaseGuards.PackGuid + ".DynamicStringPatcher", BepInDependency.DependencyFlags.SoftDependency)]
 	[BepInDependency("gravydevsupreme.xunity.autotranslator", BepInDependency.DependencyFlags.SoftDependency)]
 	[BepInDependency("gravydevsupreme.xunity.resourceredirector", BepInDependency.DependencyFlags.SoftDependency)]
 	[BepInDependency("LegendOfMortal_UI_KR", BepInDependency.DependencyFlags.SoftDependency)]
@@ -2020,7 +2026,7 @@ namespace LOM_UI_EN
 
 		public const string NAME = "LOM_UI_EN";
 
-		public const string VERSION = "1.0.0";
+		public const string VERSION = "1.1.0";
 
 		/// <summary>The mod's public name (the plugin keeps NAME and GUID, so configs and logs stay the same).</summary>
 		public const string DisplayName = "LOM English Localization + QoL";
@@ -2087,6 +2093,17 @@ namespace LOM_UI_EN
 		{
 			Instance = this;
 			Log = base.Logger;
+#if BIE5
+			// BepInEx 6 always creates its manager object hidden (HideAndDontSave); BepInEx 5 only with [Chainloader]
+			// HideManagerGameObject, off by default. This game then destroys the visible object, and every plugin's Update and
+			// coroutines stop with it (found in the 1.1.0 test: the harness never ran, nor would F8, quick save or the deferred
+			// text passes). Hide it as BepInEx 6 does, before the first scene loads.
+			if ((base.gameObject.hideFlags & HideFlags.HideAndDontSave) != HideFlags.HideAndDontSave)
+			{
+				base.gameObject.hideFlags = HideFlags.HideAndDontSave;
+				Log.LogInfo("BepInEx 5: the BepInEx manager object is now hidden from the game, as BepInEx 6 creates it, so the mod's per-frame work keeps running");
+			}
+#endif
 			PluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			Compat.Bind(base.Config);
 			CfgEnabled = base.Config.Bind("General", "Enabled", defaultValue: true, "Master switch for the UI fix rules.");
@@ -2111,6 +2128,7 @@ namespace LOM_UI_EN
 			BuildupGauges.Bind(base.Config);
 			TranslationProfiles.Bind(base.Config);
 			SceneText.Bind(base.Config);
+			BaseGuards.Bind(base.Config);
 			EnglishLanguage.Bind(base.Config);
 			OriginalMod.Bind(base.Config);
 			ModMenu.Bind(base.Config);
@@ -2136,6 +2154,7 @@ namespace LOM_UI_EN
 				Compat.Setup(F.SceneText, () => SceneText.Patch(h));
 				Compat.Setup(F.Language, () => EnglishLanguage.Patch(h));
 				Compat.Setup(F.QuietBinarizer, () => PerfPatches.Patch(h));
+				Compat.Setup(F.BasePlugins, () => BaseGuards.Install(h));
 				Compat.Setup(F.XUnityBridge, XUnityBridge.TryRegister);
 				Compat.Setup(F.StoryLog, () => NarrativeLogGuard.Patch(h));
 				Compat.Setup(F.TextSpeed, () => TextSpeedPatch.Patch(h));
@@ -2345,6 +2364,14 @@ namespace LOM_UI_EN
 				_deferred.Enqueue(a);
 			}
 		}
+
+#if BIE5
+		/// <summary>BepInEx 5 has no chainloader Finished event: Start comes after every plugin's Awake (Loader.WhenAllLoaded).</summary>
+		private void Start()
+		{
+			Loader.AllLoaded();
+		}
+#endif
 
 		private void Update()
 		{
@@ -5301,8 +5328,8 @@ namespace LOM_UI_EN
 			}
 			else
 			{
-				// Game data text handed back to the base patch: its Binarizer table has the same keys.
-				found = TranslationProfiles.TableMode == LayerMode.OriginalHandBack && PerfPatches.TryGetBase(key, out value);
+				// Game data text handed back to the base patch: its plugin's table (Binarizer's or its own) has the same keys.
+				found = TranslationProfiles.TableMode == LayerMode.OriginalHandBack && OriginalMod.TryGetHandBackLine(key, out value);
 			}
 			if (!found || string.IsNullOrEmpty(value) || SceneDictionary.IsTranslatableChinese(value))
 			{
@@ -5517,7 +5544,8 @@ namespace LOM_UI_EN
 			Type type = TranslationProfiles.HookMods;
 			if (type == null)
 			{
-				F.QuietBinarizer.NotNeededWhy = "the Binarizer of " + Plugin.BaseModName + " is not installed";
+				// Not loaded: not installed, or (on BepInEx 5) built for BepInEx 6.
+				F.QuietBinarizer.NotNeededWhy = "the Binarizer of " + Plugin.BaseModName + " is not running";
 				return;
 			}
 			FieldInfo field = AccessTools.Field(type, "mapString");

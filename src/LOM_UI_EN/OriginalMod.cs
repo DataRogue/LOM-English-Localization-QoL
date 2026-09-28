@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Unity.Mono.Bootstrap;
 using HarmonyLib;
 using Mortal.Core;
 using Newtonsoft.Json.Linq;
@@ -30,14 +29,26 @@ namespace LOM_UI_EN
 		Partial
 	}
 
+	/// <summary>The base patch's plugin that answers game data lookups from its own table.</summary>
+	public enum TablePlugin
+	{
+		None,
+		/// <summary>Binarizer, reading one StringTable.csv (releases up to 2026.02).</summary>
+		Binarizer,
+		/// <summary>The patch's own FanslationStudio.LegendOfMortal.Plugin, reading the per-file tables (llmkit-upgrade, 2026-09).</summary>
+		LlmKit
+	}
+
 	/// <summary>
 	/// Detects the original English patch (OverLlm EnglishPatch: Binarizer, XUnity AutoTranslator + ResourceRedirector,
-	/// LOM_UI_Plugin_KR, Mods/English/StringTable.csv) by what is running, not by what is listed: in BepInEx be.692 a plugin whose
-	/// Awake died is still in the chainloader's list, so each component is checked for its Harmony hooks and its data. The data
+	/// LOM_UI_Plugin_KR, Mods/English/StringTable.csv; since its llmkit-upgrade its own plugin FanslationStudio.LegendOfMortal.Plugin
+	/// with one table per game source file in Mods/English, see BaseTableSet) by what is running, not by what is listed: in BepInEx
+	/// be.692 a plugin whose Awake died is still in the chainloader's list, so each component is checked for its Harmony hooks and
+	/// its data. The new plugin is built for BepInEx 5, which be.692 never loads: then its tables are only read by this mod. The data
 	/// check compares a few sentinel lines (translation/MANIFEST.json, which keeps only hashes of their English) whose revised and
 	/// original English differ, which tells whether the base patch still has its own text (Pristine; Other = a different release)
 	/// or holds this mod's edits. Since 0.6 this mod ships its whole reviewed translation; when the base patch is installed its
-	/// files (BaseTablePath, BaseScenePath, BaseResizeDir) are read under this mod's lines (fallback, Original), never written.
+	/// files (BaseTable, BaseScenePath, BaseResizeDir) are read under this mod's lines (fallback, Original), never written.
 	/// Nothing here changes the base patch unless [Compat] SuppressKrPlugin or [Dev] DetachBaseMod is on.
 	/// </summary>
 	public static class OriginalMod
@@ -47,6 +58,15 @@ namespace LOM_UI_EN
 		public const string RedirectorGuid = "gravydevsupreme.xunity.resourceredirector";
 		public const string KrGuid = "LegendOfMortal_UI_KR";
 		public const string XUnityHarmony = "xunity.common.hookinghelper";
+		/// <summary>The patch's own plugin since its llmkit-upgrade (BepInEx.PluginInfoProps: GUID and assembly = AssemblyName). Its
+		/// GetString prefix is StringTableInjectionPatches.GetString_Prefix, its table the static Dictionary _translations, filled
+		/// on the first lookup through the static property Translations.</summary>
+		public const string LlmKitGuid = "FanslationStudio.LegendOfMortal.Plugin";
+		public const string LlmKitAssembly = "FanslationStudio.LegendOfMortal.Plugin";
+		public const string LlmKitDll = LlmKitAssembly + ".dll";
+		public const string LlmKitInjection = "StringTableInjectionPatches";
+		/// <summary>The FanslationStudio.Plugins pack the newer releases ship next to it (BaseGuards).</summary>
+		public const string PackDll = "FanslationStudio.Plugins.dll";
 
 		public sealed class Sentinel
 		{
@@ -70,35 +90,171 @@ namespace LOM_UI_EN
 			}
 		}
 
-		/// <summary>The base patch's game data table: Mods/English/StringTable.csv, or the StringTable.csv of a folder Binarizer loads.</summary>
-		public static string BaseTablePath
+		/// <summary>
+		/// The text has the given TextHash as it is or in Binarizer's form: the hashes of the base patch's lines (MANIFEST.json
+		/// sentinels, the revision record) are taken as Binarizer reads its StringTable.csv, which gives every line break inside a
+		/// value as CRLF and drops blank lines, while the per-file tables of its newer releases give LF and keep them. A difference
+		/// in line breaks alone is not a new line.
+		/// </summary>
+		public static bool SameText(string s, string hash)
 		{
-			get
+			if (s == null || hash == null)
 			{
-				string p = Path.Combine(Path.Combine(Paths.GameRootPath, "Mods"), Path.Combine("English", "StringTable.csv"));
-				if (File.Exists(p))
+				return false;
+			}
+			if (TextHash(s) == hash)
+			{
+				return true;
+			}
+			return s.IndexOf('\n') >= 0 && TextHash(BinarizerForm(s)) == hash;
+		}
+
+		/// <summary>Line breaks as Binarizer's parser returns them: each run of them one CRLF (it skips empty lines).</summary>
+		public static string BinarizerForm(string s)
+		{
+			return System.Text.RegularExpressions.Regex.Replace(s.Replace("\r\n", "\n"), "\n+", "\r\n");
+		}
+
+		public static string EnglishModDir => Path.Combine(Path.Combine(Paths.GameRootPath, "Mods"), "English");
+
+		private static BaseTableSet _baseTable;
+
+		/// <summary>
+		/// The base patch's game data table as installed: the llmkit-upgrade per-file tables in Mods/English, else Mods/English/
+		/// StringTable.csv or the StringTable.csv of a folder Binarizer loads. Looked up again on every detection.
+		/// </summary>
+		public static BaseTableSet BaseTable => _baseTable ?? (_baseTable = FindBaseTable());
+
+		private static BaseTableSet FindBaseTable()
+		{
+			List<string> binarizerDirs = null;
+			try
+			{
+				Type hook = TranslationProfiles.HookMods;
+				if (hook != null)
 				{
-					return p;
+					binarizerDirs = AccessTools.Field(hook, "ModPaths")?.GetValue(null) as List<string>;
 				}
-				try
+			}
+			catch (Exception)
+			{
+			}
+			try
+			{
+				return BaseTableSet.Find(EnglishModDir, binarizerDirs);
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("base patch table check failed: " + ex.Message);
+				return BaseTableSet.Empty;
+			}
+		}
+
+		/// <summary>The BepInEx major version running (5 or 6), from the name of the assembly that holds Paths.</summary>
+		public static int RunningBepInExMajor => (typeof(Paths).Assembly.GetName().Name == "BepInEx.Core") ? 6 : 5;
+
+		/// <summary>
+		/// A plugin DLL built for another BepInEx major version than the one running (BepInEx never loads those): BepInEx 6 plugins
+		/// reference the assembly BepInEx.Core, BepInEx 5 ones only BepInEx. Read from the metadata's string heap, without loading.
+		/// </summary>
+		private static bool ForOtherBepInEx(string dll)
+		{
+			try
+			{
+				FileInfo fi = new FileInfo(dll);
+				string id = dll + "|" + fi.Length + "|" + fi.LastWriteTimeUtc.Ticks;
+				bool other;
+				lock (_otherBepInEx)
 				{
-					Type hook = TranslationProfiles.HookMods;
-					if (hook != null && AccessTools.Field(hook, "ModPaths")?.GetValue(null) is List<string> paths)
+					if (_otherBepInEx.TryGetValue(id, out other))
 					{
-						foreach (string dir in paths)
-						{
-							string q = Path.Combine(dir, "StringTable.csv");
-							if (File.Exists(q))
-							{
-								return q;
-							}
-						}
+						return other;
 					}
 				}
-				catch (Exception)
+				byte[] bytes = File.ReadAllBytes(dll);
+				bool bie6 = IndexOf(bytes, System.Text.Encoding.ASCII.GetBytes("\0BepInEx.Core\0")) >= 0;
+				other = bie6 != (RunningBepInExMajor == 6);
+				lock (_otherBepInEx)
 				{
+					_otherBepInEx[id] = other;
 				}
-				return p;
+				return other;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		/// <summary>ForOtherBepInEx by path, size and write time (detection runs several times at startup).</summary>
+		private static readonly Dictionary<string, bool> _otherBepInEx = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+		private static int IndexOf(byte[] hay, byte[] needle)
+		{
+			for (int i = 0; i + needle.Length <= hay.Length; i++)
+			{
+				int j = 0;
+				while (j < needle.Length && hay[i + j] == needle[j])
+				{
+					j++;
+				}
+				if (j == needle.Length)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		private static Type _llmKitType;
+		private static Dictionary<string, string> _llmKitMap;
+
+		/// <summary>The table of the patch's own plugin (null while it is not hooked). load = fill it now if its first lookup has not
+		/// happened yet, the way that lookup would (reading its files once).</summary>
+		private static Dictionary<string, string> LlmKitMap(bool load)
+		{
+			Type t = _llmKitType;
+			if (t == null)
+			{
+				return null;
+			}
+			Dictionary<string, string> map = AccessTools.Field(t, "_translations")?.GetValue(null) as Dictionary<string, string>;
+			if (map == null && load)
+			{
+				map = AccessTools.Property(t, "Translations")?.GetValue(null, null) as Dictionary<string, string>;
+			}
+			if (map != null)
+			{
+				_llmKitMap = map;
+			}
+			return map;
+		}
+
+		private static bool IsLlmKitPatch(MethodInfo m)
+		{
+			Type t = m?.DeclaringType;
+			return t != null && (t.Assembly.GetName().Name == LlmKitAssembly || t.Name == LlmKitInjection);
+		}
+
+		/// <summary>The base patch's own line for a key, from the plugin the game data text is handed back to (Original).</summary>
+		public static bool TryGetHandBackLine(string key, out string value)
+		{
+			value = null;
+			if (key == null)
+			{
+				return false;
+			}
+			switch (Current.HandBackTable)
+			{
+			case TablePlugin.LlmKit:
+			{
+				Dictionary<string, string> map = _llmKitMap;
+				return map != null && map.TryGetValue(key, out value);
+			}
+			case TablePlugin.Binarizer:
+				return PerfPatches.TryGetBase(key, out value);
+			default:
+				return false;
 			}
 		}
 
@@ -149,12 +305,48 @@ namespace LOM_UI_EN
 			public bool Detached;
 			public string BinarizerVote = "";
 			public string XUnityVote = "";
+			/// <summary>The patch's own plugin (llmkit-upgrade): its DLL on disk, in the chainloader, its GetString prefix, its table.</summary>
+			public bool LlmKitInstalled;
+			public bool LlmKitLoaded;
+			public bool LlmKitHooked;
+			public int LlmKitEntries = -1;
+			public BaseData LlmKitData = BaseData.Unknown;
+			public string LlmKitVote = "";
+			/// <summary>Its DLL is built for another BepInEx major version than the one running, which never loads it.</summary>
+			public bool LlmKitOtherBepInEx;
+			/// <summary>The same for its older plugins, built for BepInEx 6: on BepInEx 5 (the loader of its own plugin) they never run.</summary>
+			public bool BinarizerOtherBepInEx;
+			public bool XUnityOtherBepInEx;
+			public bool KrOtherBepInEx;
+			/// <summary>How the table on disk is laid out, and whether an old StringTable.csv sits next to the per-file tables.</summary>
+			public BaseTableLayout TableLayout;
+			public bool TableLeftover;
+			/// <summary>Its plugin also writes its English into Lean's labels (a GetTranslation postfix, release 2026.09.28 on).</summary>
+			public bool LlmKitLabelsHooked;
+			/// <summary>Its FanslationStudio.Plugins pack (prefab text, code strings, text resizer, UI editor), on disk and loaded.</summary>
+			public bool PackInstalled;
+			public bool PackLoaded;
+			public bool PackOtherBepInEx;
 
 			/// <summary>Any of the base patch's plugins or text files is on disk (this mod reads the text files itself).</summary>
-			public bool AnyInstalled => BinarizerInstalled || XUnityInstalled || KrInstalled || BaseTableFile || BaseSceneFile;
+			public bool AnyInstalled => BinarizerInstalled || LlmKitInstalled || PackInstalled || XUnityInstalled || KrInstalled || BaseTableFile || BaseSceneFile;
 
 			/// <summary>The base patch's English is on disk for this mod to lay its revisions over.</summary>
 			public bool TextInstalled => BaseTableFile || BaseSceneFile;
+
+			/// <summary>A game data plugin of the base patch has its lookup hook in.</summary>
+			public bool TablePluginHooked => BinarizerHooked || LlmKitHooked;
+
+			/// <summary>A game data plugin of the base patch answers lookups from a table of its own.</summary>
+			public bool TablePluginRuns => (BinarizerHooked && BinarizerEntries > 0) || (LlmKitHooked && LlmKitEntries > 0);
+
+			/// <summary>The plugin for the table layout on disk runs with it (Binarizer holding an older release's StringTable.csv
+			/// next to the per-file tables does not serve the installed text).</summary>
+			public bool TablePluginServesLayout => (TableLayout == BaseTableLayout.PerFile) ? (LlmKitHooked && LlmKitEntries > 0) : (BinarizerHooked && BinarizerEntries > 0);
+
+			/// <summary>The per-file tables are installed but no plugin serves them (the patch's own plugin not loaded by this
+			/// BepInEx): this mod reads them itself, and they only show through this mod.</summary>
+			public bool TablesUnserved => TableLayout == BaseTableLayout.PerFile && !LlmKitHooked;
 
 			public BaseSummary Summary
 			{
@@ -164,7 +356,10 @@ namespace LOM_UI_EN
 					{
 						return BaseSummary.Absent;
 					}
-					if (BinarizerHooked && BinarizerEntries > 0 && XUnityRunning && XUnityHooked && BaseSceneFile)
+					// The llmkit-upgrade release no longer updates XUnity's files, and its BepInEx 5 never runs XUnity's BepInEx 6
+					// build: without a XUnity that can run, the table alone is the patch.
+					bool scene = (XUnityRunning && XUnityHooked && BaseSceneFile) || (TableLayout == BaseTableLayout.PerFile && (!XUnityInstalled || XUnityOtherBepInEx));
+					if (TablePluginServesLayout && scene)
 					{
 						return BaseSummary.Complete;
 					}
@@ -172,8 +367,41 @@ namespace LOM_UI_EN
 				}
 			}
 
-			/// <summary>Binarizer runs with its own (non-revised) table, so the Original table can be left to it.</summary>
-			public bool TableHandBack => !Detached && BinarizerHooked && BinarizerEntries > 0 && (BinarizerData == BaseData.Pristine || BinarizerData == BaseData.Other);
+			private static bool OwnText(BaseData d)
+			{
+				return d == BaseData.Pristine || d == BaseData.Other;
+			}
+
+			/// <summary>
+			/// The plugin the Original table can be left to: one that runs with its own (non-revised) table read from the layout on
+			/// disk (Binarizer the single StringTable.csv, the patch's own plugin the per-file tables; Binarizer holding an old
+			/// release's file next to the new tables is not the patch's text any more).
+			/// </summary>
+			public TablePlugin HandBackTable
+			{
+				get
+				{
+					if (Detached)
+					{
+						return TablePlugin.None;
+					}
+					if (LlmKitHooked && LlmKitEntries > 0 && OwnText(LlmKitData) && TableLayout == BaseTableLayout.PerFile)
+					{
+						return TablePlugin.LlmKit;
+					}
+					if (BinarizerHooked && BinarizerEntries > 0 && OwnText(BinarizerData) && TableLayout != BaseTableLayout.PerFile)
+					{
+						return TablePlugin.Binarizer;
+					}
+					return TablePlugin.None;
+				}
+			}
+
+			/// <summary>A plugin of the base patch runs with its own (non-revised) table, so the Original table can be left to it.</summary>
+			public bool TableHandBack => HandBackTable != TablePlugin.None;
+
+			/// <summary>Lines in the table of the plugin the Original table is left to.</summary>
+			public int HandBackEntries => (HandBackTable == TablePlugin.LlmKit) ? LlmKitEntries : BinarizerEntries;
 
 			/// <summary>XUnity runs with its own (non-revised) lines, so Original scene text can be left to it.</summary>
 			public bool SceneHandBack => !Detached && XUnityRunning && XUnityHooked && (XUnityData == BaseData.Pristine || XUnityData == BaseData.Other);
@@ -181,39 +409,69 @@ namespace LOM_UI_EN
 			public List<string> Diagnoses()
 			{
 				List<string> d = new List<string>();
+				bool perFile = TableLayout == BaseTableLayout.PerFile;
 				if (Detached)
 				{
 					d.Add("detached for testing ([Dev] DetachBaseMod): its hooks were removed at startup");
 				}
+				if (LlmKitInstalled && !LlmKitHooked && !Detached)
+				{
+					d.Add("its plugin (" + LlmKitDll + ") is installed but not running" + (LlmKitOtherBepInEx ? (": it is built for another BepInEx version than this game runs (BepInEx " + RunningBepInExMajor + "), which never loads it") : "") + (perFile ? "; this mod reads its tables itself" : ""));
+				}
+				else if (LlmKitHooked && LlmKitEntries <= 0)
+				{
+					d.Add("its plugin is running with no tables in Mods/English");
+				}
+				else if (perFile && !LlmKitInstalled && !Detached)
+				{
+					d.Add("its tables are in Mods/English but not its plugin (" + LlmKitDll + "); this mod reads them itself");
+				}
 				if (BinarizerInstalled && !BinarizerHooked)
 				{
-					d.Add(AddressablesPatched ? "Binarizer is installed but not running" : "Binarizer is installed but not running: Unity.Addressables.dll is the stock copy (a Steam update or file check replaces the patched one); this mod does not need it");
+					// The per-file tables do not need Binarizer: its state only matters while its table is the one installed.
+					if (!perFile)
+					{
+						d.Add(BinarizerOtherBepInEx ? ("Binarizer is installed but not running: it is built for another BepInEx version than this game runs (BepInEx " + RunningBepInExMajor + ")") : (AddressablesPatched ? "Binarizer is installed but not running" : "Binarizer is installed but not running: Unity.Addressables.dll is the stock copy (a Steam update or file check replaces the patched one); this mod does not need it"));
+					}
+				}
+				else if (BinarizerHooked && perFile)
+				{
+					d.Add((BinarizerEntries > 0) ? "Binarizer still runs, with an older release's table (StringTable.csv); the new release's tables are for its own plugin" : "Binarizer still runs, with no table of its own (the new release's tables are for its own plugin)");
 				}
 				else if (BinarizerHooked && BinarizerEntries <= 0)
 				{
 					d.Add("Binarizer is running with no English table (Mods/English/StringTable.csv)");
 				}
+				if (TableLeftover)
+				{
+					d.Add("Mods/English still holds the " + BaseTableSet.SingleName + " of an older release next to the new tables: this mod leaves it out" + (LlmKitHooked ? ", but the patch's plugin reads it too, over part of the new text (delete that file)" : ""));
+				}
+				if (PackInstalled && !PackLoaded && !Detached)
+				{
+					d.Add("its plugin pack (" + PackDll + ") is installed but not running" + (PackOtherBepInEx ? (": it is built for another BepInEx version than this game runs (BepInEx " + RunningBepInExMajor + "), which never loads it") : ""));
+				}
 				if (XUnityInstalled && !XUnityRunning)
 				{
-					d.Add("XUnity AutoTranslator is installed but not running");
+					d.Add("XUnity AutoTranslator is installed but not running" + (XUnityOtherBepInEx ? (": it is built for another BepInEx version than this game runs (BepInEx " + RunningBepInExMajor + "); this mod serves the scene text itself") : ""));
 				}
-				if (XUnityRunning && !BinarizerHooked)
+				if (XUnityRunning && !TablePluginHooked && !perFile && !LlmKitInstalled)
 				{
 					d.Add("XUnity AutoTranslator runs without Binarizer");
 				}
-				if (BinarizerHooked && !XUnityRunning)
+				if (BinarizerHooked && !XUnityRunning && !perFile)
 				{
 					d.Add("Binarizer runs without XUnity AutoTranslator");
 				}
-				if (BinarizerData == BaseData.OurEdits || XUnityData == BaseData.OurEdits)
+				bool tableEdits = BinarizerData == BaseData.OurEdits || LlmKitData == BaseData.OurEdits;
+				if (tableEdits || XUnityData == BaseData.OurEdits)
 				{
-					d.Add("its files contain this mod's edits (" + ((BinarizerData == BaseData.OurEdits) ? "string table" : "") + ((BinarizerData == BaseData.OurEdits && XUnityData == BaseData.OurEdits) ? " and " : "") + ((XUnityData == BaseData.OurEdits) ? "scene lines" : "") + "); Original cannot show its own text until the patch is reinstalled");
+					d.Add("its files contain this mod's edits (" + (tableEdits ? "string table" : "") + ((tableEdits && XUnityData == BaseData.OurEdits) ? " and " : "") + ((XUnityData == BaseData.OurEdits) ? "scene lines" : "") + "); Original cannot show its own text until the patch is reinstalled");
 				}
 				if (AnyInstalled && !BaseTableFile)
 				{
-					d.Add("its game data table (Mods/English/StringTable.csv) is missing" + (TranslationProfiles.OwnTableComplete ? " (this mod's own table covers the game data text)" : ": only this mod's own game data lines are in English"));
+					d.Add("its game data table (Mods/English) is missing" + (TranslationProfiles.OwnTableComplete ? " (this mod's own table covers the game data text)" : ": only this mod's own game data lines are in English"));
 				}
-				if (AnyInstalled && !BaseSceneFile)
+				if (AnyInstalled && !BaseSceneFile && !(perFile && (!XUnityInstalled || XUnityOtherBepInEx)))
 				{
 					d.Add("its scene text file (BepInEx/Translation/en/Text/_AutoGeneratedTranslations.txt) is missing" + (TranslationProfiles.OwnSceneComplete ? " (this mod's own scene lines cover the scene text)" : ": only this mod's own scene lines are in English"));
 				}
@@ -221,7 +479,7 @@ namespace LOM_UI_EN
 				{
 					d.Add("XUnity AutoTranslator runs but its text hooks are missing");
 				}
-				if (KrInstalled && !BinarizerInstalled && !XUnityInstalled && !TextInstalled)
+				if (KrInstalled && !BinarizerInstalled && !LlmKitInstalled && !XUnityInstalled && !TextInstalled)
 				{
 					d.Add("only its LOM_UI_Plugin_KR layout plugin is installed (its fixes are also built into this mod)");
 				}
@@ -265,7 +523,7 @@ namespace LOM_UI_EN
 		public static void Bind(ConfigFile cfg)
 		{
 			CfgSuppressKr = cfg.Bind("Compat", "SuppressKrPlugin", false, "Remove the Harmony patches of LOM_UI_Plugin_KR (the Korean layout plugin that comes with " + Plugin.BaseModName + ") at startup. Its layout fixes are built into this mod's rules, so this only drops its per-object SetActive hook. Turning it back off needs a restart.");
-			CfgDetach = cfg.Bind("Dev", "DetachBaseMod", false, "Testing only: at startup remove every Harmony patch of " + Plugin.BaseModName + " (Binarizer, XUnity AutoTranslator, LOM_UI_Plugin_KR) and disable its components, to see this mod running on its own without uninstalling anything. Needs a restart both ways.");
+			CfgDetach = cfg.Bind("Dev", "DetachBaseMod", false, "Testing only: at startup remove every Harmony patch of " + Plugin.BaseModName + " (Binarizer or its own " + LlmKitAssembly + ", XUnity AutoTranslator, LOM_UI_Plugin_KR) and disable its components, to see this mod running on its own without uninstalling anything. Needs a restart both ways.");
 			LoadManifest();
 		}
 
@@ -337,13 +595,19 @@ namespace LOM_UI_EN
 			return AccessTools.Method(typeof(LeanLocalizationResolver), "GetString", new Type[1] { typeof(string) });
 		}
 
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		private static MethodInfo LeanGetTranslation()
+		{
+			return AccessTools.Method(typeof(Lean.Localization.LeanLocalization), "GetTranslation", new Type[1] { typeof(string) });
+		}
+
 		public static void DetectEarly()
 		{
 			Current = Detect(Current);
 			Plugin.Log.LogInfo("base patch: " + Describe(Current));
 			try
 			{
-				UnityChainloader.Instance.Finished += DetectLate;
+				Loader.WhenAllLoaded(DetectLate);
 			}
 			catch (Exception ex)
 			{
@@ -397,7 +661,7 @@ namespace LOM_UI_EN
 		{
 			Report old = Current;
 			Current = next;
-			if (old.TableHandBack != next.TableHandBack || old.SceneHandBack != next.SceneHandBack || old.XUnityData != next.XUnityData || old.BinarizerData != next.BinarizerData || old.Detached != next.Detached || old.BinarizerHooked != next.BinarizerHooked || old.XUnityHooked != next.XUnityHooked || old.XUnityRunning != next.XUnityRunning)
+			if (old.TableHandBack != next.TableHandBack || old.HandBackTable != next.HandBackTable || old.SceneHandBack != next.SceneHandBack || old.XUnityData != next.XUnityData || old.BinarizerData != next.BinarizerData || old.LlmKitData != next.LlmKitData || old.Detached != next.Detached || old.BinarizerHooked != next.BinarizerHooked || old.LlmKitHooked != next.LlmKitHooked || old.XUnityHooked != next.XUnityHooked || old.XUnityRunning != next.XUnityRunning || old.TableLayout != next.TableLayout || old.BaseTableFile != next.BaseTableFile)
 			{
 				Plugin.Log.LogInfo("base patch: " + Describe(next));
 				try
@@ -426,10 +690,31 @@ namespace LOM_UI_EN
 			try
 			{
 				string plugins = Paths.PluginPath;
-				r.BinarizerInstalled = FindFile(plugins, "FunctionalPlugin_Binarizer.dll");
+				string binarizer = FindFilePath(plugins, "FunctionalPlugin_Binarizer.dll");
+				r.BinarizerInstalled = binarizer != null;
+				r.BinarizerOtherBepInEx = binarizer != null && ForOtherBepInEx(binarizer);
+				string llmKit = FindFilePath(plugins, LlmKitDll);
+				r.LlmKitInstalled = llmKit != null;
+				r.LlmKitOtherBepInEx = llmKit != null && ForOtherBepInEx(llmKit);
 				r.XUnityInstalled = Directory.Exists(Path.Combine(plugins, "XUnity.AutoTranslator")) || FindFile(plugins, "XUnity.AutoTranslator.Plugin.Core.dll");
-				r.KrInstalled = FindFile(plugins, "LOM_UI_Plugin_KR.dll");
-				r.BaseTableFile = File.Exists(BaseTablePath);
+				// XUnity's BepInEx wrapper is what the chainloader loads (Plugin.Core itself references no BepInEx).
+				string xunity = r.XUnityInstalled ? FindFilePath(plugins, "XUnity.AutoTranslator.Plugin.BepInEx.dll") : null;
+				r.XUnityOtherBepInEx = xunity != null && ForOtherBepInEx(xunity);
+				string kr = FindFilePath(plugins, "LOM_UI_Plugin_KR.dll");
+				r.KrInstalled = kr != null;
+				r.KrOtherBepInEx = kr != null && ForOtherBepInEx(kr);
+				string pack = FindFilePath(plugins, PackDll);
+				r.PackInstalled = pack != null;
+				r.PackOtherBepInEx = pack != null && ForOtherBepInEx(pack);
+				BaseTableSet table = FindBaseTable();
+				if (_baseTable != null && _baseTable.Signature != table.Signature)
+				{
+					Plugin.Log.LogInfo("base patch table changed on disk: " + _baseTable.Describe() + " -> " + table.Describe());
+				}
+				_baseTable = table;
+				r.TableLayout = table.Layout;
+				r.TableLeftover = table.Leftover != null;
+				r.BaseTableFile = table.Exists;
 				r.BaseSceneFile = File.Exists(BaseScenePath);
 			}
 			catch (Exception ex)
@@ -439,6 +724,8 @@ namespace LOM_UI_EN
 			try
 			{
 				r.BinarizerLoaded = Loaded(BinarizerGuid);
+				r.LlmKitLoaded = Loaded(LlmKitGuid) || LoadedAssembly(LlmKitAssembly);
+				r.PackLoaded = LoadedGuidPrefix(BaseGuards.PackGuid + ".");
 				r.XUnityLoaded = Loaded(XUnityGuid);
 				r.RedirectorLoaded = Loaded(RedirectorGuid);
 				r.KrLoaded = Loaded(KrGuid);
@@ -452,12 +739,36 @@ namespace LOM_UI_EN
 				MethodInfo getString = ResolverGetString();
 				Patches info = (getString == null) ? null : Harmony.GetPatchInfo(getString);
 				r.BinarizerHooked = info != null && info.Prefixes.Any((Patch p) => p.PatchMethod?.DeclaringType?.FullName == "Mortal.HookMods");
+				Patch llm = info?.Prefixes.FirstOrDefault((Patch p) => IsLlmKitPatch(p.PatchMethod));
+				r.LlmKitHooked = llm != null;
+				if (llm != null)
+				{
+					_llmKitType = llm.PatchMethod.DeclaringType;
+				}
+				MethodInfo getTranslation = LeanGetTranslation();
+				Patches labels = (getTranslation == null) ? null : Harmony.GetPatchInfo(getTranslation);
+				r.LlmKitLabelsHooked = labels != null && labels.Postfixes.Any((Patch p) => IsLlmKitPatch(p.PatchMethod));
 				r.XUnityHooked = Harmony.HasAnyPatches(XUnityHarmony) && !_detached;
 				r.KrHooked = Harmony.HasAnyPatches(KrGuid) && !_krSuppressed;
 			}
 			catch (Exception ex)
 			{
 				Plugin.Log.LogWarning("Harmony patch check failed: " + ex.Message);
+			}
+			try
+			{
+				Dictionary<string, string> map = r.LlmKitHooked ? LlmKitMap(load: true) : null;
+				// Game keys all have a '/': the rest are the text of the lines its reader cut from rows spanning lines.
+				r.LlmKitEntries = (map == null) ? (-1) : map.Keys.Count((string k) => k.IndexOf('/') >= 0);
+				r.LlmKitData = (map == null || map.Count == 0) ? BaseData.None : Vote(_tableSentinels, delegate(string k, out string v)
+				{
+					return map.TryGetValue(k, out v);
+				}, out r.LlmKitVote);
+			}
+			catch (Exception ex)
+			{
+				r.LlmKitData = BaseData.None;
+				Plugin.Log.LogWarning("the table check of " + LlmKitAssembly + " failed: " + ex.Message);
 			}
 			try
 			{
@@ -534,12 +845,11 @@ namespace LOM_UI_EN
 					continue;
 				}
 				answered++;
-				string h = TextHash(v);
-				if (h == s.Original)
+				if (SameText(v, s.Original))
 				{
 					original++;
 				}
-				else if (h == s.Revised)
+				else if (SameText(v, s.Revised))
 				{
 					revised++;
 				}
@@ -564,34 +874,63 @@ namespace LOM_UI_EN
 
 		private static bool Loaded(string guid)
 		{
-			UnityChainloader cl = UnityChainloader.Instance;
+			IDictionary<string, PluginInfo> plugins = Loader.Plugins;
 			PluginInfo pi;
-			return cl != null && cl.Plugins.TryGetValue(guid, out pi) && pi != null && pi.Instance != null;
+			return plugins != null && plugins.TryGetValue(guid, out pi) && pi != null && pi.Instance != null;
+		}
+
+		/// <summary>The patch's own plugin (newer releases) is loaded and running: by its GUID or its assembly.</summary>
+		internal static bool LlmKitPluginLoaded()
+		{
+			return Loaded(LlmKitGuid) || LoadedAssembly(LlmKitAssembly);
+		}
+
+		/// <summary>A loaded plugin from the named assembly, whatever its GUID (a later build may change it).</summary>
+		private static bool LoadedAssembly(string assembly)
+		{
+			IDictionary<string, PluginInfo> plugins = Loader.Plugins;
+			return plugins != null && plugins.Values.Any((PluginInfo pi) => pi?.Instance != null && pi.Instance.GetType().Assembly.GetName().Name == assembly);
+		}
+
+		/// <summary>A loaded plugin whose GUID starts with the prefix.</summary>
+		private static bool LoadedGuidPrefix(string prefix)
+		{
+			IDictionary<string, PluginInfo> plugins = Loader.Plugins;
+			return plugins != null && plugins.Any((KeyValuePair<string, PluginInfo> kv) => kv.Key != null && kv.Key.StartsWith(prefix, StringComparison.Ordinal) && kv.Value?.Instance != null);
 		}
 
 		private static bool FindFile(string root, string name)
 		{
+			return FindFilePath(root, name) != null;
+		}
+
+		/// <summary>The file in root or two folder levels below it, or null.</summary>
+		private static string FindFilePath(string root, string name)
+		{
 			if (!Directory.Exists(root))
 			{
-				return false;
+				return null;
 			}
-			if (File.Exists(Path.Combine(root, name)))
+			string p = Path.Combine(root, name);
+			if (File.Exists(p))
 			{
-				return true;
+				return p;
 			}
 			foreach (string d in Directory.GetDirectories(root))
 			{
-				if (File.Exists(Path.Combine(d, name)))
+				p = Path.Combine(d, name);
+				if (File.Exists(p))
 				{
-					return true;
+					return p;
 				}
 				try
 				{
 					foreach (string d2 in Directory.GetDirectories(d))
 					{
-						if (File.Exists(Path.Combine(d2, name)))
+						p = Path.Combine(d2, name);
+						if (File.Exists(p))
 						{
-							return true;
+							return p;
 						}
 					}
 				}
@@ -599,7 +938,7 @@ namespace LOM_UI_EN
 				{
 				}
 			}
-			return false;
+			return null;
 		}
 
 		private static void SuppressKr()
@@ -695,7 +1034,7 @@ namespace LOM_UI_EN
 				foreach (Patch p in info.Prefixes.Concat(info.Postfixes).Concat(info.Transpilers).Concat(info.Finalizers))
 				{
 					string asm = p.PatchMethod?.DeclaringType?.Assembly.GetName().Name;
-					if (asm == "FunctionalPlugin_Binarizer" || (asm != null && asm.StartsWith("XUnity.", StringComparison.Ordinal)) || asm == "LOM_UI_Plugin_KR")
+					if (asm == "FunctionalPlugin_Binarizer" || asm == LlmKitAssembly || (asm != null && (asm.StartsWith("XUnity.", StringComparison.Ordinal) || asm.StartsWith(BaseGuards.PackGuid, StringComparison.Ordinal))) || asm == "LOM_UI_Plugin_KR")
 					{
 						ids.Add(p.owner);
 					}
@@ -718,13 +1057,13 @@ namespace LOM_UI_EN
 				Plugin.Log.LogInfo($"[Dev] DetachBaseMod: {inert} patches on native Unity methods could not be removed and were made inert");
 			}
 			_krSuppressed = true;
-			foreach (string guid in new string[3] { BinarizerGuid, XUnityGuid, RedirectorGuid })
+			foreach (string guid in new string[4] { BinarizerGuid, LlmKitGuid, XUnityGuid, RedirectorGuid })
 			{
 				try
 				{
-					UnityChainloader cl = UnityChainloader.Instance;
+					IDictionary<string, PluginInfo> plugins = Loader.Plugins;
 					PluginInfo pi;
-					if (cl != null && cl.Plugins.TryGetValue(guid, out pi) && pi?.Instance is Behaviour b && b != null)
+					if (plugins != null && plugins.TryGetValue(guid, out pi) && pi?.Instance is Behaviour b && b != null)
 					{
 						b.enabled = false;
 					}
@@ -776,7 +1115,16 @@ namespace LOM_UI_EN
 				s = "partly installed";
 				break;
 			}
-			s += $" (Binarizer {Flags(r.BinarizerInstalled, r.BinarizerLoaded, r.BinarizerHooked)}, {((r.BinarizerEntries >= 0) ? (r.BinarizerEntries + " keys") : "no table")}, data {r.BinarizerData}{(string.IsNullOrEmpty(r.BinarizerVote) ? "" : (" [" + r.BinarizerVote + "]"))}; XUnity {Flags(r.XUnityInstalled, r.XUnityRunning, r.XUnityHooked)}, data {r.XUnityData}{(string.IsNullOrEmpty(r.XUnityVote) ? "" : (" [" + r.XUnityVote + "]"))}; KR {Flags(r.KrInstalled, r.KrLoaded, r.KrHooked)}{(r.KrSuppressed ? " suppressed" : "")})";
+			s += $" (tables on disk: {BaseTable.Describe()}; Binarizer {Flags(r.BinarizerInstalled, r.BinarizerLoaded, r.BinarizerHooked)}, {((r.BinarizerEntries >= 0) ? (r.BinarizerEntries + " keys") : "no table")}, data {r.BinarizerData}{(string.IsNullOrEmpty(r.BinarizerVote) ? "" : (" [" + r.BinarizerVote + "]"))}";
+			if (r.LlmKitInstalled || r.LlmKitLoaded || r.LlmKitHooked)
+			{
+				s += $"; its plugin {Flags(r.LlmKitInstalled, r.LlmKitLoaded, r.LlmKitHooked)}{(r.LlmKitOtherBepInEx ? " (built for another BepInEx)" : "")}, {((r.LlmKitEntries >= 0) ? (r.LlmKitEntries + " keys") : "no table")}, data {r.LlmKitData}{(string.IsNullOrEmpty(r.LlmKitVote) ? "" : (" [" + r.LlmKitVote + "]"))}{(r.LlmKitLabelsHooked ? ", label hook" : "")}";
+			}
+			if (r.PackInstalled || r.PackLoaded)
+			{
+				s += $"; its plugin pack {Flags(r.PackInstalled, r.PackLoaded, r.PackLoaded)}{(r.PackOtherBepInEx ? " (built for another BepInEx)" : "")}";
+			}
+			s += $"; XUnity {Flags(r.XUnityInstalled, r.XUnityRunning, r.XUnityHooked)}, data {r.XUnityData}{(string.IsNullOrEmpty(r.XUnityVote) ? "" : (" [" + r.XUnityVote + "]"))}; KR {Flags(r.KrInstalled, r.KrLoaded, r.KrHooked)}{(r.KrSuppressed ? " suppressed" : "")})";
 			List<string> d = r.Diagnoses();
 			if (d.Count > 0)
 			{

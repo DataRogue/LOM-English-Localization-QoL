@@ -17,8 +17,10 @@ namespace LOM_UI_EN
 	/// The game-data text layer: every LocaleResolver.GetString(key) lookup (items, martial arts, stats, names, menus, story lines
 	/// through GetStoryText) answered from a StringTable.csv, which is what Binarizer's GetStringRedirect did for the English patch.
 	/// Same semantics as Binarizer: key-only and ordinal, the raw value (no LeanTranslation.FormatText), first row wins, a miss
-	/// falls through to the game's own (Chinese) Lean data. The prefix runs at Priority.Low, after Binarizer's Normal-priority
-	/// prefix, so our value is the one written whenever both run; PerfPatches additionally skips Binarizer's body while we serve.
+	/// falls through to the game's own (Chinese) Lean data. The prefix runs at Priority.Low, after the Normal-priority prefix of
+	/// the English patch's plugin (Binarizer, or since the patch's llmkit-upgrade its own FanslationStudio.LegendOfMortal.Plugin):
+	/// HarmonyX runs every prefix and skips the original when any returned false, so our value is the one written whenever both
+	/// run, and a key we lack keeps the patch's. PerfPatches additionally skips Binarizer's body while we serve.
 	/// </summary>
 	public static class TextTable
 	{
@@ -36,8 +38,10 @@ namespace LOM_UI_EN
 			public int WithCjk;
 			public long LoadMs;
 			public readonly List<string> Warnings = new List<string>();
-			/// <summary>Overlay tables: the original patch's table read underneath (null when not found: only this mod's rows are in).</summary>
+			/// <summary>Overlay tables: the original patch's table read underneath (null when not found: only this mod's rows are in):
+			/// its StringTable.csv, or for the per-file layout its folder.</summary>
 			public string BasePath;
+			public BaseTableLayout BaseLayout;
 			public int BaseCount;
 			/// <summary>Overlay tables: this mod's rows, how many replaced a base row, and how many keys the base lacked.</summary>
 			public int OverlayCount;
@@ -360,7 +364,7 @@ namespace LOM_UI_EN
 			cache = true;
 			if (usable.Value && OriginalMod.TextHash(source) != rec.Source)
 			{
-				if (rec.Base == null || OriginalMod.TextHash(baseValue) != rec.Base)
+				if (rec.Base == null || !OriginalMod.SameText(baseValue, rec.Base))
 				{
 					kind = KindChanged;
 					return baseValue;
@@ -546,18 +550,88 @@ namespace LOM_UI_EN
 			}
 		}
 
+		/// <summary>
+		/// The game's own text per key as Lean last built it (TakeSnapshot, after every LeanLocalization.RegisterAndBuild, which
+		/// rebuilds all translations on each UpdateTranslations pass before any label reads them). Since the English patch's
+		/// llmkit-upgrade its own plugin writes its English into the shared LeanTranslation.Data on every GetTranslation (a postfix;
+		/// BaseGuards holds it back while this mod's table serves, but not before and not while Original is handed back to it), so
+		/// Data is no longer always the game's text. Null until hooked (the patch plugin not running) or built.
+		/// </summary>
+		private static Dictionary<string, string> _gameText;
+
+		public static int GameTextCount => _gameText?.Count ?? 0;
+
+		/// <summary>BaseGuards, when the patch plugin's GetTranslation postfix runs: keep the game's text from every Lean rebuild.</summary>
+		public static bool HookSnapshot(Feature f, Harmony h)
+		{
+			return Compat.Hook(f, h, SnapshotTarget(), "LeanLocalization.RegisterAndBuild", null, new HarmonyMethod(typeof(TextTable), nameof(RegisterAndBuild_Postfix)));
+		}
+
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		private static MethodInfo SnapshotTarget()
+		{
+			return AccessTools.Method(typeof(LeanLocalization), "RegisterAndBuild");
+		}
+
+		private static void RegisterAndBuild_Postfix()
+		{
+			if (!F.BasePlugins.Live)
+			{
+				return;
+			}
+			try
+			{
+				F.BasePlugins.Probe();
+				TakeSnapshot();
+			}
+			catch (Exception ex)
+			{
+				F.BasePlugins.Fail(ex, "keeping the game's text");
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		private static void TakeSnapshot()
+		{
+			Dictionary<string, string> d = new Dictionary<string, string>(LeanLocalization.CurrentTranslations.Count, StringComparer.Ordinal);
+			foreach (KeyValuePair<string, LeanTranslation> kv in LeanLocalization.CurrentTranslations)
+			{
+				string s = (kv.Value != null) ? (kv.Value.Data as string) : null;
+				if (s != null)
+				{
+					d[kv.Key] = s;
+				}
+			}
+			_gameText = d;
+		}
+
+		/// <summary>The game's text for a key: the snapshot, else Lean's current data read directly (GetTranslation would run the
+		/// patch plugin's postfix, which writes its English into it).</summary>
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		private static string GameSourceCore(string key)
 		{
-			LeanTranslation tr = LeanLocalization.GetTranslation(key);
-			return (tr != null) ? (tr.Data as string) : null;
+			Dictionary<string, string> snap = _gameText;
+			string s;
+			if (snap != null && snap.TryGetValue(key, out s))
+			{
+				return s;
+			}
+			LeanTranslation tr;
+			return (LeanLocalization.CurrentTranslations.TryGetValue(key, out tr) && tr != null) ? (tr.Data as string) : null;
 		}
 
-		/// <summary>The harness's srcdump: every key of Lean's current translations with its text (the game's Chinese).</summary>
+		/// <summary>The harness's srcdump: every key of Lean's current translations with its text (the game's Chinese), from the
+		/// snapshot when there is one.</summary>
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		public static IEnumerable<KeyValuePair<string, string>> GameSources()
 		{
 			List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+			Dictionary<string, string> snap = _gameText;
+			if (snap != null && snap.Count > 0)
+			{
+				list.AddRange(snap);
+				return list;
+			}
 			foreach (KeyValuePair<string, LeanTranslation> kv in LeanLocalization.CurrentTranslations)
 			{
 				string s = (kv.Value != null) ? (kv.Value.Data as string) : null;
@@ -592,7 +666,7 @@ namespace LOM_UI_EN
 					Served++;
 					return false;
 				}
-				// A key neither this mod's rows nor the original patch's table has (new game content after an update, say): the original patch's Binarizer, whose prefix ran
+				// A key neither this mod's rows nor the original patch's table has (new game content after an update, say): the original patch's plugin, whose prefix ran
 				// before this one, may have answered already; otherwise the game's own text.
 				Missed++;
 				_missKey = key;
@@ -705,15 +779,97 @@ namespace LOM_UI_EN
 		}
 
 		/// <summary>
+		/// The original patch's own table as its plugin serves it: the one StringTable.csv the way Binarizer reads it (Load), or the
+		/// llmkit-upgrade per-file tables the way that patch's own plugin reads them (every file in turn, a later row of a key
+		/// replacing an earlier one; LlmKitCsv). The same non-key phrases are skipped either way.
+		/// </summary>
+		public static Table LoadBase(BaseTableSet set, string label)
+		{
+			if (set == null || !set.Exists)
+			{
+				return null;
+			}
+			if (set.Layout != BaseTableLayout.PerFile)
+			{
+				return Load(set.Files[0], label);
+			}
+			Table t = new Table
+			{
+				Path = set.Dir,
+				Label = label
+			};
+			Stopwatch sw = Stopwatch.StartNew();
+			foreach (string file in set.Files)
+			{
+				try
+				{
+					foreach (KeyValuePair<string, string> kv in LlmKitCsv.Read(file))
+					{
+						t.Rows++;
+						string key = kv.Key;
+						if (key.IndexOf('/') < 0 && (key == "TextFont" || key.StartsWith("Image_", StringComparison.Ordinal) || key.StartsWith("TextMeshFont_", StringComparison.Ordinal)))
+						{
+							t.SkippedNonKey++;
+							continue;
+						}
+						if (t.Map.ContainsKey(key))
+						{
+							// The game's own sources repeat a few keys (Story/undefine); the plugin keeps the last row.
+							t.Duplicates++;
+						}
+						t.Map[key] = kv.Value;
+					}
+				}
+				catch (Exception ex)
+				{
+					// One unreadable file costs its rows only (the plugin fails its whole load then).
+					if (t.Warnings.Count < 20)
+					{
+						t.Warnings.Add(System.IO.Path.GetFileName(file) + ": " + ex.Message);
+					}
+				}
+			}
+			Lint(t);
+			t.LoadMs = sw.ElapsedMilliseconds;
+			return t;
+		}
+
+		/// <summary>The lint counts over what the table serves now.</summary>
+		private static void Lint(Table t)
+		{
+			t.Empty = 0;
+			t.UnbalancedBraces = 0;
+			t.WithCjk = 0;
+			foreach (string value in t.Map.Values)
+			{
+				if (value.Length == 0)
+				{
+					t.Empty++;
+				}
+				else
+				{
+					if (!BracesBalanced(value))
+					{
+						t.UnbalancedBraces++;
+					}
+					if (SceneDictionary.IsTranslatableChinese(value))
+					{
+						t.WithCjk++;
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// The original patch's table with this mod's rows laid over it: a key this mod has takes its value, keys the base lacks are
 		/// added, everything else is the base's own row. Without the base table, only this mod's rows are in.
 		/// </summary>
-		public static Table LoadOverlay(string basePath, string overlayPath, string label, IEnumerable<string> sampleKeys = null)
+		public static Table LoadOverlay(BaseTableSet baseSet, string overlayPath, string label, IEnumerable<string> sampleKeys = null)
 		{
 			Stopwatch sw = Stopwatch.StartNew();
-			bool haveBase = !string.IsNullOrEmpty(basePath) && File.Exists(basePath);
+			bool haveBase = baseSet != null && baseSet.Exists;
 			bool haveOverlay = !string.IsNullOrEmpty(overlayPath) && File.Exists(overlayPath);
-			Table t = haveBase ? Load(basePath, label) : new Table
+			Table t = (haveBase ? LoadBase(baseSet, label) : null) ?? new Table
 			{
 				Path = overlayPath,
 				Label = label
@@ -721,7 +877,8 @@ namespace LOM_UI_EN
 			t.Label = label;
 			if (haveBase)
 			{
-				t.BasePath = basePath;
+				t.BasePath = baseSet.Where;
+				t.BaseLayout = baseSet.Layout;
 				t.BaseCount = t.Map.Count;
 				if (sampleKeys != null)
 				{
@@ -770,27 +927,7 @@ namespace LOM_UI_EN
 				}
 				LoadRecords(t, System.IO.Path.Combine(System.IO.Path.GetDirectoryName(overlayPath), System.IO.Path.GetFileNameWithoutExtension(overlayPath) + ".meta.tsv"));
 				// The lint counts describe what is served now.
-				t.Empty = 0;
-				t.UnbalancedBraces = 0;
-				t.WithCjk = 0;
-				foreach (string value in t.Map.Values)
-				{
-					if (value.Length == 0)
-					{
-						t.Empty++;
-					}
-					else
-					{
-						if (!BracesBalanced(value))
-						{
-							t.UnbalancedBraces++;
-						}
-						if (SceneDictionary.IsTranslatableChinese(value))
-						{
-							t.WithCjk++;
-						}
-					}
-				}
+				Lint(t);
 			}
 			t.LoadMs = sw.ElapsedMilliseconds;
 			return t;

@@ -271,6 +271,8 @@ namespace LOM_UI_EN
 		public static readonly Feature QuickSave;
 		public static readonly Feature MenuButtons;
 		public static readonly Feature QuietBinarizer;
+		/// <summary>BaseGuards: this mod's text and layout next to the plugins of the English patch's newer releases.</summary>
+		public static readonly Feature BasePlugins;
 		public static readonly Feature NameTips;
 		public static readonly Feature Buildup;
 
@@ -283,6 +285,7 @@ namespace LOM_UI_EN
 			XUnityBridge = Compat.Register("xunityBridge", "Working with " + Plugin.BaseModName, "Translation", Plugin.BaseModName + " may translate some on-screen text again on its own.");
 			Fallback = Compat.Register("fallback", "Fall back to " + Plugin.BaseModName, "Translation", "This mod's lines show even where a game update changed them.");
 			QuietBinarizer = Compat.Register("quietBinarizer", "Quiet " + Plugin.BaseModName + " lookups", "Translation", Plugin.BaseModName + " logs every text lookup, which is slower.");
+			BasePlugins = Compat.Register("basePlugins", "Newer plugins of " + Plugin.BaseModName, "Translation", "Some labels and text sizes may be those of " + Plugin.BaseModName + ".");
 			Detector = Compat.Register("detector", "Detecting " + Plugin.BaseModName, "Translation", "This mod may not notice whether " + Plugin.BaseModName + " is installed.");
 			Language = Compat.Register("language", "Game language check", "Translation", "This mod assumes the game's language is English.");
 			Layout = Compat.Register("layout", "Layout fixes", "Localization", "Screens keep the game's own layout; long English may overflow.");
@@ -732,7 +735,7 @@ namespace LOM_UI_EN
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
 		private static void SubscribeFinished()
 		{
-			BepInEx.Unity.Mono.Bootstrap.UnityChainloader.Instance.Finished += Finish;
+			Loader.WhenAllLoaded(Finish);
 		}
 
 		/// <summary>After every feature is set up: fingerprint the game, compare with the last verified build, log a summary.</summary>

@@ -7,7 +7,9 @@ Gates (any failure refuses to package):
   1. publish.py check passes on the plugin folder (the translation is what the workspace says, no OverLlm text beyond the
      review ledger, only the expected binary files).
   2. src/LOM_UI_EN/build.ps1 (deterministic) rebuilt into a temporary folder gives the installed LOM_UI_EN.dll byte for byte,
-     so the published source is the shipped binary (--skip-rebuild-check skips this, and says so in the listing).
+     and build.ps1 -BepInEx5 the installed LOM_UI_EN.BepInEx5.dll (the same source for BepInEx 5, which Lash's English Patch
+     runs on since its llmkit-upgrade; each BepInEx loads only its own), so the published source is the shipped binary
+     (--skip-rebuild-check skips this, and says so in the listing).
   3. The plugin folder's README.txt is src/LOM_UI_EN/PLAYER_README.txt byte for byte.
   4. compat_verified.json was written by this version (Mod Settings > Advanced > Mark as checked, or the harness
      `invoke static LOM_UI_EN.Compat.MarkVerified`, after the in-game test). --candidate lets an unverified build through and
@@ -43,7 +45,7 @@ BEPINEX_SOURCE = "https://builds.bepinex.dev/projects/bepinex_be/692/BepInEx-Uni
 PLUGIN_PREFIX = "BepInEx/plugins/LOM_UI_EN/"
 
 # what ships from the plugin folder (paths relative to it, '/' separated)
-SHIP = re.compile(r"^(LOM_UI_EN\.dll|Newtonsoft\.Json\.dll|README\.txt|THIRD_PARTY_NOTICES\.txt|compat_verified\.json|fonts\.json"
+SHIP = re.compile(r"^(LOM_UI_EN\.dll|LOM_UI_EN\.BepInEx5\.dll|Newtonsoft\.Json\.dll|README\.txt|THIRD_PARTY_NOTICES\.txt|compat_verified\.json|fonts\.json"
                   r"|nametips\.tsv|factiontips\.tsv|rules/[^/]+\.json|sprites/[^/]+\.png|sprites/spritemap\.json|strings/[^/]+\.csv"
                   r"|translation/(StringTable\.csv|StringTable\.meta\.tsv|MANIFEST\.json|scene/scene_text\.txt"
                   r"|scene/resize/[^/]+\.resizer\.txt))$")
@@ -117,14 +119,20 @@ def classify(files):
     return ship, skipped, unknown
 
 
-def rebuild_matches(installed_dll):
+# the plugin DLLs and the build.ps1 switches that make them
+DLLS = (("LOM_UI_EN.dll", []), ("LOM_UI_EN.BepInEx5.dll", ["-BepInEx5"]))
+
+
+def rebuild_matches(installed_dll, name="LOM_UI_EN.dll"):
+    switches = dict(DLLS)[name]
     tmp = tempfile.mkdtemp(prefix="lom_release_build_")
     try:
         r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", os.path.join(SRC, "build.ps1"),
-                            "-Game", P.GAME, "-OutDir", tmp], capture_output=True, text=True)
+                            "-Game", P.GAME, "-OutDir", tmp] + switches, capture_output=True, text=True)
         if r.returncode != 0:
-            raise ReleaseError("build.ps1 failed:\n%s%s" % (r.stdout, r.stderr))
-        built = read(os.path.join(tmp, "LOM_UI_EN.dll"))
+            raise ReleaseError("build.ps1 %s failed (for -BepInEx5, a BepInEx.dll 5.4.21 must be in the game's BepInEx\\core "
+                               "or the folder LOM_BEPINEX5 names):\n%s%s" % (" ".join(switches), r.stdout, r.stderr))
+        built = read(os.path.join(tmp, name))
         return sha256(built) == sha256(read(installed_dll)), sha256(built)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -205,21 +213,25 @@ def main(argv=None):
     if unknown:
         probs.append("files in the plugin folder that are neither shipped nor known not to be (add them to SHIP or move "
                      "them out): %s" % unknown[:10])
-    for need in ("LOM_UI_EN.dll", "Newtonsoft.Json.dll", "README.txt", "THIRD_PARTY_NOTICES.txt", "compat_verified.json",
-                 "translation/StringTable.csv", "translation/scene/scene_text.txt", "translation/MANIFEST.json"):
+    for need in ("LOM_UI_EN.dll", "LOM_UI_EN.BepInEx5.dll", "Newtonsoft.Json.dll", "README.txt", "THIRD_PARTY_NOTICES.txt",
+                 "compat_verified.json", "translation/StringTable.csv", "translation/scene/scene_text.txt",
+                 "translation/MANIFEST.json"):
         if need not in ship:
             probs.append("missing from the plugin folder: %s" % need)
-    # 2. source == binary
-    if "LOM_UI_EN.dll" in ship:
+    # 2. source == binary, for both BepInEx versions
+    for name, switches in DLLS:
+        if name not in ship:
+            continue
         if a.skip_rebuild_check:
-            notes.append("rebuild check SKIPPED (--skip-rebuild-check)")
+            notes.append("rebuild check of %s SKIPPED (--skip-rebuild-check)" % name)
+            continue
+        same, built = rebuild_matches(ship[name], name)
+        if same:
+            notes.append("%s = a fresh deterministic build of src/LOM_UI_EN%s (SHA-256 %s)" % (
+                name, (" with build.ps1 " + " ".join(switches)) if switches else "", built))
         else:
-            same, built = rebuild_matches(ship["LOM_UI_EN.dll"])
-            if same:
-                notes.append("LOM_UI_EN.dll = a fresh deterministic build of src/LOM_UI_EN (SHA-256 %s)" % built)
-            else:
-                probs.append("the installed LOM_UI_EN.dll is not the build of the current source (fresh build %s, installed %s): "
-                             "build, install and test it first" % (built[:16], sha256(read(ship["LOM_UI_EN.dll"]))[:16]))
+            probs.append("the installed %s is not the build of the current source (fresh build %s, installed %s): "
+                         "build, install and test it first" % (name, built[:16], sha256(read(ship[name]))[:16]))
     # 3. README
     if "README.txt" in ship and read(ship["README.txt"]) != read(os.path.join(SRC, "PLAYER_README.txt")):
         probs.append("README.txt is not src/LOM_UI_EN/PLAYER_README.txt: copy it over")

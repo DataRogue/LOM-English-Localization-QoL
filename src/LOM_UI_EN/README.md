@@ -1,4 +1,4 @@
-# LOM_UI_EN source (recovered) - 1.0.0
+# LOM_UI_EN source (recovered) - 1.1.0
 
 LOM_UI_EN is the plugin of **LOM English Localization + QoL** (the public name since 1.0.0; the plugin keeps its name
 and GUID `lom.ui.english`, so configs carry over).
@@ -10,6 +10,8 @@ Comments from the original source are lost; behaviour is identical except for th
 Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Game <folder>] [-OutDir <folder>]` (Roslyn csc from Visual
 Studio 2022, else the newest installed; .NET Framework 4.7.1+ reference assemblies; game and BepInEx DLLs as references;
 deterministic since 1.0.0). Output: `bin\LOM_UI_EN.dll`; copy it over `BepInEx\plugins\LOM_UI_EN\LOM_UI_EN.dll`.
+Since 1.1.0 also `build.ps1 -BepInEx5` for `bin\LOM_UI_EN.BepInEx5.dll`, the same source for BepInEx 5 (see 1.1.0 below),
+which goes next to it.
 Release: also copy `PLAYER_README.txt` over `BepInEx\plugins\LOM_UI_EN\README.txt` (publish.py ships
 `THIRD_PARTY_NOTICES.txt` and the translation only), then package with `tools/release.py`; the whole checklist is in
 `docs/DEVELOPMENT.md`.
@@ -717,3 +719,288 @@ and a mod-only package.
   the missing-text log quotes whatever the screen showed, OverLlm's lines included; they never ship). New
   tools/release.py packages a release (gates: check passes, rebuild equals the installed DLL, README current, the
   in-game mark is this version's, every file accounted for). lom_paths.GAME honours `LOM_GAME`.
+
+## 1.1.0 changes: the OverLlm patch's llmkit-upgrade and its release 2026.09.28
+
+The OverLlm patch's branch `llmkit-upgrade` (joshfreitas1984/LegendOfMortalOverLlm; d94a13b of 2026-09-18, then ad14c3d)
+became its release `EnglishPatch-2026.09.28.13.56`. What an install holds changes:
+- `Mods/English/StringTable.csv` gives way to one CSV per game source file (44: `BattleSkill_zh-cn.csv` ...
+  `Story_1.csv` ... `Work_zh-cn.csv`), written by LlmKit's `CsvGameDataWorkflow.PackageAsync`. The keys are the same key
+  space (72,560 of the old table's 72,562; `Library/Award/30001` and `30019` are gone).
+- Its own plugin `FanslationStudio.LegendOfMortal.Plugin` ("Legend of Mortal English Patch", GUID = assembly name,
+  BepInEx 5) replaces Binarizer. `StringTableInjectionPatches` is a Normal-priority `GetString` prefix over a
+  `Dictionary<string,string> _translations`, filled on the first lookup by `LoadTranslations`: every `*.csv` of
+  `Mods/English` (`Directory.GetFiles` order), `\n` turned into a line break, a later row replacing an earlier one.
+  - The release reads each file whole (`File.ReadAllText`, `CsvUtility.ParseFile`: a quoted value may span lines). The
+    branch at d94a13b read line by line (`File.ReadAllLines`, `CsvUtility.ParseRow`) and cut each of the 3,353 values
+    that span lines at its first break.
+  - New in the release: `GetTranslation_Postfix`, a `LeanLocalization.GetTranslation` postfix. It writes the English
+    into the returned `LeanTranslation.Data`, the object Lean shares with every static label of that key.
+  - `StringTableDumpPatches` (a `LeanLanguageCSV.Compile` postfix) writes the ChineseSimplified sources to
+    `BepInEx/plugins/raw/*.csv` on every compile.
+- A plugin pack, `FanslationStudio.Plugins.dll` (its services in the Costura-embedded `FanslationStudio.Plugins.Shared`),
+  holds five plugins with GUIDs `FanslationStudio.Plugins.<name>`, set in `FanslationStudio.Plugins.UIEditor.cfg`:
+  - `PrefabTextReplacer`: an exact Chinese-to-English dictionary (`Mods/English/*prefabText*.yaml`, 111 texts) put on
+    texts as assets load, on `OnEnable` and through the text setters;
+  - `DynamicStringPatcher`: IL transpilers that swap Chinese literals in the game's code (`dynamicStrings.txt.yaml`,
+    121 strings grouped by `GroupedDynamicStringContracts`; the log says "61 successful");
+  - `TextResizer`: `BepInEx/resizers/*.yaml`, among them a global `/*` rule with `fontPercentage 0.8`, applied on
+    `OnEnable` and every text change (`ApplyResizing`, `ApplyResizingToLegacyText`);
+  - `UIEditor`, an in-game editor for its layouts, sprites and resizers (Alt with the mouse buttons, Alt+1,
+    PageUp/PageDown and the brackets; this mod's keys are F5, F8 to F12), and `DebugPlugin`.
+
+  The pack runs its per-frame work from `Canvas.willRenderCanvases`, since the game destroys BepInEx 5's manager
+  object.
+- The zip installs BepInEx 5.4.23.3 with Doorstop 4.4.0 (`winhttp.dll`, `doorstop_config.ini`) and a `BepInEx.cfg` with
+  `HideManagerGameObject = false`. It ships no Binarizer, no XUnity AutoTranslator (the pack takes over prefab and code
+  text) and no Newtonsoft.Json. Unpacked over an older install, it leaves that install's files in place: BepInEx 6's
+  core files and plugins, which BepInEx 5 ignores, and the old `StringTable.csv`, which the new plugin reads as one
+  more table.
+
+What this version does about it:
+- **BaseTables.cs** (no Unity or BepInEx types): `BaseTableSet.Find` tells the layouts apart. It picks per-file when
+  `Mods/English` holds a CSV named like a game source file (`Story_N.csv`, `*_zh-cn|zh-tw|kr.csv`); then every other
+  `*.csv` belongs to it, in the plugin's order. A `StringTable.csv` next to them is an older release's leftover, which
+  this mod leaves out. Otherwise the single table is used, including one in a folder Binarizer loads.
+  - `LlmKitCsv.ParseFile` is the release's `CsvUtility.ParseFile`, statement for statement. `LlmKitCsv.Read` reads a
+    file as `File.ReadAllText` does (UTF-8, a byte order mark honoured), with shared read access. So the table read is
+    the plugin's own, leftover aside.
+  - Before the release, `LlmKitCsv` ported the branch's `ParseRow`. It joined a line that left a quote open with the
+    following ones (up to 64 lines) to read whole what that plugin cut. The release made the difference moot.
+- `TextTable.LoadBase` (either layout) and `LoadOverlay(BaseTableSet, ...)`. `OriginalMod.BaseTable` replaces
+  `BaseTablePath`; detection refreshes it and logs a change on disk.
+- **OriginalMod** detects the new plugin: `LlmKitInstalled/Loaded/Hooked` (a `GetString` prefix from its assembly or
+  a `StringTableInjectionPatches` type), `LlmKitLabelsHooked` (its `GetTranslation` postfix), `LlmKitEntries` and
+  `LlmKitData`. Its table is read through `_translations`, and the `Translations` getter loads it when no lookup has
+  yet. `PackInstalled/Loaded/OtherBepInEx` do the same for the pack (`FanslationStudio.Plugins.dll`, a loaded GUID
+  that starts with `FanslationStudio.Plugins`).
+  - `HandBackTable` picks the plugin Original is left to: its own plugin for the per-file layout, Binarizer for the
+    single file. Binarizer holding a leftover `StringTable.csv` next to the new tables does not count.
+  - `TryGetHandBackLine` serves the wording fixes in hand-back mode (it was `PerfPatches.TryGetBase`, Binarizer only).
+  - `Summary` counts only a plugin that serves the layout on disk (`TablePluginServesLayout`).
+  - Per plugin, `*OtherBepInEx` says whether its DLL is built for the other BepInEx major, found by searching the
+    metadata strings for `\0BepInEx.Core\0` and cached per file. Such a plugin is expected not to run, so XUnity's
+    BepInEx 6 build on a BepInEx 5 install is not "partly installed".
+  - `TableLeftover`: a `StringTable.csv` next to the per-file tables. The new plugin reads it too, after the `Story_N`
+    tables and before `System_*`, and a later row wins. On the release that serves 16,236 keys from the old table.
+    The Translation status and a diagnosis ask the player to delete it.
+  - New diagnoses, and `DetachBaseMod` removes the new plugin's and the pack's patches too.
+  - `SameText`/`BinarizerForm`: MANIFEST sentinel and revision-record hashes are taken from Binarizer's parse, which
+    returns every line break inside a value as CRLF and drops empty lines. The per-file tables give LF and keep them,
+    so the vote and the fallback's "newer line" test compare either form.
+- **BaseGuards.cs** keeps this mod's text and layout in charge next to the release's plugins. Each guard patches the
+  other plugin's own method, found by name (as `PerfPatches` does with Binarizer), so a change on their side costs only
+  that guard. Together they are the Compat feature `basePlugins` ("Newer plugins of Lash's English Patch", Translation
+  group; 22 features now), not needed when neither the new plugin nor the pack runs. They install at Awake for the
+  plugins loaded by then (soft dependencies on all four GUIDs load those first), the rest once every plugin has
+  loaded (`Loader.WhenAllLoaded`).
+  - **Labels.** A `Priority.First` prefix on `GetTranslation_Postfix` skips it for the keys this mod's table serves.
+    The shared `Data` then keeps the game's Chinese, which this mod's scene lines, wording fixes and table fallback
+    work from. Without it, the patch's English would sit in the label before this mod's layers see the key's text.
+  - **Prefab and code text.** A postfix on `PrefabTextReplacerService.LoadReplacements` and a prefix on
+    `StringPatcherService.GroupedDynamicStringContracts` drop the entries this mod's scene lines cover as they load, so
+    this mod's line shows there. `Covers` asks the scene dictionary as the scene pass would (`Translate(text, true,
+    ...)`, plus a variant with ASCII commas for code literals, which the pack's dumper writes with fullwidth ones).
+    The rest stays the patch's: placeholder texts, battle shouts, the duel history log, effect tooltips. On the release,
+    63 of the 111 prefab texts are this mod's (63 of the 74 Traditional ones, none of the 37 Simplified), and 8 of the
+    121 code strings. The pack decides on its first frame, so switching the text layers later keeps that until a
+    restart.
+  - **Resizer.** `ApplyResizing` and `ApplyResizingToLegacyText` are skipped unless `[Translation]
+    LetBaseModResizeText` is on (Mod Settings > Advanced > "Resizer of Lash's English Patch") or the mod is off. This
+    mod's layout rules size its own text, and the pack's global 80% would shrink every label on top of them (the title
+    buttons went from 27 to 24 px with it on). Turning it off again takes a restart, as nothing undoes a resize.
+  - With `[Dev] DetachBaseMod` the pack's three `EnsurePatched` methods are skipped.
+  - Every guard body calls `F.BasePlugins.Probe()` inside its `try`, as the other features' hooks do, so `[Dev]
+    SimulateHookErrors = basePlugins` (or `all`) turns the feature off at runtime and Try again brings it back.
+  - `BaseGuards.Describe` (harness `invoke static`) prints the counts; About lists the pack with them. About's lines follow
+    the live state (`LabelsHolding`, `ResizerHolding`). While the feature is off, the mod is off or Original is handed
+    back, the labels line drops "its labels give way to this mod's text" and the resizer reads "on".
+- **The game's text.** The labels guard keeps the patch's English out of the keys this mod serves. The keys it lacks,
+  and every key while Original is handed back, still get that English written into Lean's data. So `TextTable` copies
+  `LeanLocalization.CurrentTranslations` after every `RegisterAndBuild` (a postfix, while `basePlugins` is live), which
+  rebuilds all of them before any label reads them. `GameSource` and `GameSources` read that copy first. The fallback's
+  game-text test, `srcdump` and `tget`'s "game:" still see the game's Chinese.
+  - The copy is hooked whenever the patch's own plugin is loaded (`OriginalMod.LlmKitPluginLoaded`), not only when its
+    `GetTranslation_Postfix` is found by name. If a later build renames that postfix, the labels guard is missing and
+    the feature is partly working ("... not found, so its labels may show over this mod's text"), but the fallback
+    still judges rows by the game's text.
+  - Without the copy, its English in Lean's data reads as a changed game text. With `FallBackToOriginal` on (the
+    default), the wording fixes and table rows of those keys then stand down (`OverrideFits`, `Decide`), and the
+    labels keep the patch's English. Seen with `[Dev] SimulateGameChange = basePlugins`, where every hook of the
+    feature is missing: the title read "Departure | Environment settings | Scripture Hall | Retiring to the mountains",
+    while `tget` still served "Set Out". A copy of the release's plugin with the postfix renamed (Mono.Cecil, its
+    attributes kept, so its `PatchAll` still applies it) left every title and story text as this mod's.
+- **Coexisting prefixes.** HarmonyX 2.10 runs every prefix and ANDs their results (`HarmonyManipulator.WritePrefixes`).
+  So our Low-priority `GetString` prefix still writes `__result` after the patch plugin's Normal-priority one returned
+  false, and a key we lack keeps the patch's line. `[BepInDependency]` on the new GUID and the pack's (soft) makes
+  their hooks exist at our Awake.
+- **BepInEx 5 build.** BepInEx 6 loads only assemblies that reference `BepInEx.Core` and whose plugin derives from
+  `BepInEx.Unity.Mono.BaseUnityPlugin`. BepInEx 5 (`Chainloader.HasBepinPlugins`, 5.4.21) loads only those that
+  reference `BepInEx`. So the new plugin never runs on be.692, and on the release's BepInEx 5 our be.692 build does not
+  either: 1.0.0 stops loading once the release is installed. The game's `BepInEx/core` held a complete BepInEx 5.4.21
+  from the OverLlm/KR package all along, so switching is a `doorstop_config.ini` change.
+  - `build.ps1 -BepInEx5` defines `BIE5`, references `BepInEx.dll` 5.4 and writes `LOM_UI_EN.BepInEx5.dll`.
+    `Loader.cs` wraps the two differences: the plugin list (`UnityChainloader.Instance.Plugins` / `Chainloader.PluginInfos`)
+    and "after every plugin loaded" (be.692's `Finished` event; on 5, `Plugin.Start`, which Unity runs after every
+    plugin's Awake of the chainloader pass).
+  - Under `BIE5` the file also defines stand-ins for the explicit `BepInEx*LogInterpolatedStringHandler` blocks the
+    decompiled source uses. BepInEx 5's `LogInfo(object)` logs their `ToString()`.
+  - Both DLLs ship; each BepInEx loads only its own. publish.py accepts both as plugin DLLs, and release.py ships both,
+    rebuilding and comparing each.
+  - **The manager object.** be.692 creates `BepInEx_Manager` with `hideFlags = HideAndDontSave` unconditionally
+    (`UnityChainloader`). BepInEx 5 does so only with `[Chainloader] HideManagerGameObject`, false by default and in
+    the release's own `BepInEx.cfg`. This game destroys the visible object. The plugins' Awake had run, but no Update
+    or coroutine ever did: the harness said "ready" and never read a batch, and F8, quick save, `Plugin.Update`'s
+    deferred work and the Compat ticks would be dead too. With the setting on, all ran. So the BIE5 build's
+    `Plugin.Awake` sets `HideAndDontSave` on its game object (the manager) when it is not set, which is be.692's
+    state, and logs it.
+  - `build.ps1 -CoreDir` references another BepInEx 6 core folder (for building while `BepInEx\core` holds BepInEx 5).
+    `LOM_BEPINEX5` names the BepInEx 5 reference folder for release.py. The BIE5 DLL records the BepInEx.dll version it
+    was built against (5.4.21), and loads on 5.4.23.5 and on the release's 5.4.23.3.
+- **Mod Settings.** Translation's status names a leftover `StringTable.csv` ("Installed, but a file of its older
+  version is still in Mods/English (StringTable.csv). Delete that file."). About lists the new plugin ("its labels give
+  way to this mod's text") and the pack (prefab and code counts, the resizer's state). Advanced has the resizer switch.
+- Offline checks (session scratchpad, not shipped):
+  - The branch's `Files/Converted/*.yaml` packaged with a port of `PackageAsync` gave 72,598 rows and no raw fallbacks.
+    Against the branch plugin's own `CsvUtility.cs` compiled in: 69,208 keys equal, and the 3,352 joined ones whole
+    where that plugin cut them.
+  - On the release's tables, `LlmKitCsv` against the release plugin's `CsvUtility` (decompiled, compiled in): the same
+    72,560 keys and values, 3,254 of them over several lines.
+  - This mod's 72,524 rows are served as they are over the old base and the new one, with 0 Chinese left. The MANIFEST
+    vote on the new tables is Pristine (24/24): about 77% of the "retranslation" is the old text, carried over by the
+    branch's `LegacyDataMigration`.
+  - The old `StringTable.csv` left next to the release's tables makes its plugin serve 16,236 keys from it.
+  - The filters on the release's pack files: 63 of 74 Traditional prefab texts and 0 of 37 Simplified ones, 8 of 121
+    code strings (the battle shouts stay the patch's).
+  - The detector's conclusions were checked for the current release, the new one on BepInEx 6 (with and without
+    leftovers) and on BepInEx 5, a table holding our edits, and detach. So were the dialect's edge cases and the BepInEx
+    version test on real DLLs (the patch's plugin compiled from the branch against BepInEx 5.4.21; ours; Binarizer). Each
+    was run against both builds.
+- Tools: `tools/lashtables.py` reads either layout the plugin's way (`parse_file`; `crlf=True` gives Binarizer's form,
+  for comparing with BASE_REF). `publish.py check` compares with the installed per-file tables. `publish.py rebase`
+  takes a per-file release, an unpacked zip included: its tables are stored in BASE_REF as one `StringTable.csv` with
+  the same map. A release without `_AutoGeneratedTranslations.txt` keeps BASE_REF's own. BASE_REF still holds the
+  2026-02-06 release. A dry run onto the release keeps all 72,524 rows:
+  - 16,168 conflicts (the patch changed a row we revised; ours kept), 4,323 of them rows the review kept as the patch's
+    line;
+  - 294 rows now equal to the patch's, 2 rows taken over, 2 removed;
+  - 33 wording overrides that no longer change anything;
+  - no scene change.
+
+  `ingame/overllm_aside.ps1` also moves the new plugins and `BepInEx/resizers` aside.
+  - `ingame/release_test.py` adds three scenarios:
+    - `l_setup TABLES PLUGIN [--leftover]` / `l_teardown`: the branch's tables and plugin in place of `Mods/English`.
+    - `l5_setup` / `l5_teardown`: the official `BepInEx_win_x86_5.4.*.zip` from `release/vendor` in place of be.692's
+      loader, with `BepInEx.cfg` and the chainloader cache held. The teardown also moves out the configs of plugins
+      only BepInEx 5 loaded (the first L5 run left `FanslationStudio.LegendOfMortal.Plugin.cfg` behind).
+    - `r_setup RELEASE_ZIP [--clean]` / `r_teardown`: a release zip of the patch extracted as a player's unzip does.
+      By default it goes over the current install, leftovers and all. With `--clean`, the BepInEx folder, `Mods` and
+      the loader's root files are held aside first, and this mod's plugin folder and settings go back in. The
+      teardown moves the release's install to the run folder and checks every file against the hashes taken before.
+
+    Every move is hash-checked. A dry run against a fake game folder (`LOM_GAME`, `LOM_RELEASE_TEST_DIR`,
+    `LOM_VENDOR_DIR`) left it byte-identical. `set_harness` now keeps the cfg's CRLF; it used to rewrite it with LF.
+    `prep` moves a finished run's `state.json` into that run's folder.
+- **Verified in game 2026-09-27** with the owner's go-ahead; saves and registry were backed up and restored, and every
+  move was verified.
+  - **B, the current release of the OverLlm patch.**
+    - Detected as installed and running (one table, Binarizer 72,576 keys, Pristine).
+    - All 21 features worked, and the 11 screens showed 0 Chinese.
+    - Mod Settings reads as in 1.0.0.
+  - **L, the branch's tables (packaged from Files/Converted) and its plugin (compiled from the branch) on be.692.**
+    - The detector said "partly installed", with its plugin "built for another BepInEx".
+    - The served table was 72,560 keys, 72,524 of them ours, with 3,353 multi-line rows read whole and 0 Chinese.
+    - All 21 features worked.
+    - Mod Settings: "Installed. Its newer version's plugin doesn't run with this game's BepInEx, so its text shows
+      through this mod."
+    - Lash's gave `OriginalFromFiles`: StartGame "Departure" and the whole multi-line intro. Revised went back.
+    - The 11 screens showed 0 Chinese. Their text equalled B's except the load panel's recent-save slot.
+  - **L5, the same on BepInEx 5.4.23.5.**
+    - 3 plugins loaded (the patch's, LOM_UI_EN from the BepInEx5 DLL, LOM_Strings_EN); every be.692 plugin was left
+      out.
+    - After the manager-object fix: installed and running, its plugin hooked, 72,560 keys, Pristine. 19 features
+      worked and 2 were not needed (the XUnity bridge, quiet Binarizer).
+    - Advanced lists each BepInEx 6 plugin as "built for BepInEx 6, which this game doesn't run".
+    - Lash's gave `OriginalHandBack` to the patch's own plugin. With the wording fixes off too, the title read its
+      "Environment settings / Scripture Hall / Retiring to the mountains". The start button is scene text.
+    - The 11 screens showed 0 Chinese. They equalled B's except the version line (no Binarizer, so no ", mods:
+      English") and the recent-save slot.
+- **Verified in game 2026-09-28 (night)** with the owner's go-ahead, with that night's build (`LOM_UI_EN.dll`
+  02C2C32E..., `LOM_UI_EN.BepInEx5.dll` AD57A274..., SHA-256; superseded by the ladder run below), the same safeguards
+  and `EnglishPatch-2026.09.28.13.56.zip`.
+  - **R over the current install** (as a player unpacks a new version over the old one):
+    - BepInEx 5.4.23.3 loaded 8 plugins: the patch's, its pack's five, LOM_UI_EN from the BepInEx5 DLL and
+      LOM_Strings_EN. The manager fix logged.
+    - Detected as installed and running: 44 tables plus the old `StringTable.csv` left out, its plugin hooked with the
+      label hook (72,562 keys, its reading of the leftover included), Pristine, the pack hooked; Binarizer, XUnity and
+      the KR plugin installed but not running. 20 features worked and 2 were not needed (the XUnity bridge, quiet
+      Binarizer).
+    - `BaseGuards`: labels held back (129 at the title), the snapshot hooked, 888 resizes held, prefab texts 63 of 111
+      and code strings 8 of 121 this mod's; the pack's patcher reported "61 successful".
+    - The 11 screens showed 0 Chinese and equalled B's except the version line and the animated WhiteRing.
+    - The Translation status asked to delete `StringTable.csv`; About listed the pack.
+    - Lash's (with the wording fixes off) gave the title "Departure | Environment settings | Scripture Hall | Retiring
+      to the mountains" from the patch's own plugins, and Revised went back to "Set Out | Settings | Records |
+      Retire". `tget` still read the game's Chinese after the hand-back (the snapshot).
+    - The resizer switch on took the title buttons from 27 to 24 px. A duel showed only the game's hidden `一二三`
+      placeholders.
+  - **R clean** (the release alone, then this mod's mod-only files): the same 8 plugins; installed and running, 44
+    tables, 72,560 keys, Pristine; 20 features worked and 2 were not needed; the same guard counts. Translation:
+    "Installed."; About as above; "This mod's 72,524 lines, Lash's English Patch for the rest (72,560 in all)". The 11
+    screens (but the load panel's save times), Lash's and back, and the duel equalled R over. Lash's story screen
+    showed the release's own lines ("Masked Doctor", "Heart Connection").
+  - **B again**, the owner's setup (be.692 and the 2026-02 release): 21 features worked and `basePlugins` was not
+    needed. The 11 screens equalled the 2026-09-27 B run's text and layout exactly, and Lash's and back worked through
+    Binarizer.
+  - The harness's `invoke static` logs a HarmonyX `GetTypesFromAssembly` warning per call on B: `AccessTools.TypeByName`
+    walks every assembly on a miss, and the NAudio a be.692 plugin loads throws. It only affects the harness.
+- **The release ladder, 2026-09-28 09:50-11:34** (the owner: "Rerun our full test ladder"), docs/DEVELOPMENT.md steps 2
+  to 5 in run `_release_test/run_20260928-095045`. The first pass found the three gaps below. Their fixes gave the final
+  build (`LOM_UI_EN.dll` 27B93D69..., `LOM_UI_EN.BepInEx5.dll` 4C2E0C9B..., SHA-256), and the whole ladder was run
+  again on it.
+  - Offline:
+    - the scratchpad harnesses passed on both builds: the branch reader 44 checks, and the release reader with the
+      guards' filters 32;
+    - `lashtables.py` matched the C# reader on the branch tables and on the release (0 differences, round trip 0);
+    - `publish.py check` passed;
+    - `release.py --candidate` rebuilt both DLLs byte for byte.
+  - A, the `-full` candidate on a clean game:
+    - 348 rules, 19 features working and 3 not needed;
+    - 0 Chinese on the 11 screens and the six Mod Settings pages;
+    - a name tip with its portrait (stock Addressables) for a line written with `say`;
+    - the duel's hidden `一二三` placeholders only;
+    - the extracted folder equal to the `-mod-only` zip;
+    - the screens equal to B's but the version line.
+  - R clean and R over, with the release zip:
+    - the checks of the night run, with the same results;
+    - `SimulateHookErrors = basePlugins` turned the feature off ("text sizes"; in L5 "labels"), and Try again brought
+      it back;
+    - `SimulateGameChange = basePlugins` gave "not working" with the patch's labels and sizes;
+    - the renamed-postfix plugin gave "partly working" with this mod's text kept.
+  - L with and without the old `StringTable.csv`, and L5, with the release's tables and plugin:
+    - as on 2026-09-27, 21 working (1 not needed) on be.692 and 20 (2) on BepInEx 5.4.23.5;
+    - the leftover left out;
+    - Lash's `OriginalFromFiles` / `OriginalHandBack` and back;
+    - the screens equal to those of 2026-09-27.
+  - B:
+    - all checks, 21 working;
+    - `SimulateHookErrors = all` turned 16 features off with their fallbacks (one Chinese numeral on the Status screen,
+      as the numerals fallback says), and Try again brought all 16 back;
+    - B logs the say dialogs' hidden placeholder texts to untranslated.txt through the XUnity bridge (unchanged since
+      1.0.0; never on screen).
+  - C, `SimulateGameChange = all`:
+    - 20 not working with their fallbacks;
+    - Mod Settings opened with 0 Chinese, and the text was Lash's;
+    - the one Chinese text left was the hidden `[內容]` placeholder of the time-progress result panel.
+  - Then Mark as checked on B: `compat_verified.json` records 1.1.0, 2026-09-28, 21 working and `basePlugins` not
+    needed. `release.py --candidate` passes every gate.
+  - The gaps found:
+    - the guards never called `Probe`, so the ladder's hook-error step could not reach them;
+    - About's pack and label lines ignored whether the guards were live;
+    - the game-text copy depended on finding the label postfix by name (see "The game's text").
+  - Tool fixes:
+    - `release_test.py`: repeated L / L5 teardowns in one run go to `L-2_*`, `L5-2_*` (the second L refused before);
+    - `set_harness` accepts a harness already on (`r_setup` after `b_setup` stopped after moving the files, before
+      saving its record; that record was rebuilt from `R3_before`, and the teardown verified 181 files);
+    - `l_teardown` removes the empty holding folder.
+    - While R is set up, `BepInEx\core` holds BepInEx 5: build then with `-CoreDir` (as in L5), or after `r_teardown`.

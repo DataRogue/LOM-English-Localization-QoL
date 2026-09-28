@@ -3,6 +3,35 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
+## 1.1.0 (2026-09-28)
+
+Works with Lash's English Patch of 2026-09-28 (`EnglishPatch-2026.09.28.13.56`, the first release of its
+`llmkit-upgrade` branch) as well as its earlier versions. Tested in game with that release unpacked over an older
+install and on a clean install, and with the earlier version 1.0.0 was tested with.
+
+- **Update this mod when you update Lash's English Patch.** Its 2026-09-28 release moves the game to BepInEx 5.
+  Version 1.0.0 of this mod is built for BepInEx 6 only, so it stops loading. From 1.1.0 the mod ships
+  `LOM_UI_EN.BepInEx5.dll` next to `LOM_UI_EN.dll`, and each BepInEx loads only its own. With that release installed,
+  use the `-mod-only.zip`.
+- **Lash's new tables.** The new version drops the single `Mods/English/StringTable.csv` for one table per game file
+  (`Story_1.csv`, `System_zh-cn.csv` and so on). Its own plugins replace Binarizer and XUnity AutoTranslator. The mod
+  reads either layout exactly as that patch's plugin does, under its own lines. The "Lash's" choice in Mod Settings and
+  the fallback show that patch's current text.
+- **This mod's text stays on screen.** The new version also writes its English into the game's fixed labels, and its
+  plugin pack replaces text on the game's screens and in its code. Wherever this mod has its own line, that line
+  shows. Everything else shows Lash's text, as before. The mod also keeps its own copy of the game's Chinese text,
+  because the new plugin overwrites it, and the mod's checks need the original.
+- **Text sizes.** That plugin pack shrinks the game's text (to 80% on most screens). This mod's layout fixes are sized
+  for its own text, so the mod holds that resizer back. Mod Settings > Advanced > "Resizer of Lash's English Patch"
+  lets it run.
+- **BepInEx 5's hidden manager.** On BepInEx 5 with default settings, this game destroys BepInEx's manager object. Every
+  plugin's per-frame work stops with it: here the hotkeys, quick save and the text passes. The mod hides that object
+  the way BepInEx 6 always does.
+- **Mod Settings says what it found.** Each part of that patch is listed in Mod Settings, and a part built for the
+  other BepInEx is named as such. Unpacking the new version over an older one leaves the old
+  `Mods/English/StringTable.csv` in place. The new plugin then reads it over about 16,000 of its new lines, so Mod
+  Settings asks you to delete it.
+
 ## 1.0.0 (2026-09-27)
 
 First public release, tested with game version `release_1.0.5000.13` (Steam build 20337760). It was tested in game on a
