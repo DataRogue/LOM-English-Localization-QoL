@@ -717,3 +717,23 @@ and a mod-only package.
   the missing-text log quotes whatever the screen showed, OverLlm's lines included; they never ship). New
   tools/release.py packages a release (gates: check passes, rebuild equals the installed DLL, README current, the
   in-game mark is this version's, every file accounted for). lom_paths.GAME honours `LOM_GAME`.
+
+## 1.0.1 changes: Attributes tooltips no longer open empty
+
+The 1.0 line (branch `1.0.x`, from `v1.0.0`) gets the fix that 1.1.1 ships on main; nothing else from 1.1 comes along.
+- **Cause.** `rules/11_status_property.json`: `prop-tip-frame-grow-vertically` lets each `StatTipPanel/Frame` set its
+  text box to exactly the text's preferred height. Only the seven long descriptions also had `prop-tip-text-wrap`
+  (vertical Overflow). The six short ones (Stamina, Blade and Sword, Scholarship, and the Martial Points, Forging and
+  Alchemy counters) kept the prefab's Truncate, and Unity dropped their only line.
+- **Fix.** `prop-tip-text-one-line` (cherry-picked from main a03a6d4) on all 13 tooltip texts: bestFit off,
+  horizontal and vertical Overflow, 20px, MiddleLeft, line spacing 1. The long ones still wrap at 440px. The shipped
+  rules file is byte for byte 1.1.1's; the DLL differs from 1.0.0 by `VERSION` alone.
+- **Built and packaged outside the game folder**, so the installed 1.1.1 stayed in place: a folder shaped like the game
+  (a copy of `Mortal_Data/Managed`, `BepInEx/core`, `base_ref` and the pinned BepInEx zip, the 1.0.0 plugin folder
+  unpacked from the shipped 1.0.0 mod-only zip), this branch as a worktree in it, and `LOM_GAME` pointing there.
+  There the untouched v1.0.0 source rebuilt to the shipped 1.0.0 DLL byte for byte. The zip carries no publish state,
+  so the first `publish.py build` needed `--force`. It overwrote only the rules file, and `publish.py check` passed.
+- **Tested in game** (run `_release_test/run_20260928-220349`): A, the candidate full zip on a clean install: 19
+  features working, 2 not needed; no Chinese on the 11 screens; all 13 tooltips show. Marked as checked there. The
+  extracted folder matched the mod-only zip except that mark. B was not run again: apart from `VERSION`, the code is
+  1.0.0's, tested alongside Lash's English Patch on 2026-09-27, and the rule change was tested alongside it for 1.1.1.

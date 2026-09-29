@@ -3,12 +3,16 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
-## Unreleased
+## 1.0.1 (2026-09-28)
+
+A fix for the Attributes screen, on the 1.0 line: BepInEx 6 only, for a clean install or alongside the older
+releases of Lash's English Patch. Nothing else changed. With Lash's English Patch of 2026-09-28 (BepInEx 5), use
+1.1.1.
 
 - **Attributes tooltips no longer open empty.** On the Attributes screen, the tooltips of Stamina, Blade and Sword,
   Scholarship and the three point counters (Martial Points, Forging, Alchemy) showed an empty box. The mod sizes each
   tooltip to its text, and these short descriptions were still clipped, which removed their only line. All 13
-  tooltips now show their text.
+  tooltips now show their text. Tested in game on a clean install of the full package.
 
 ## 1.0.0 (2026-09-27)
 

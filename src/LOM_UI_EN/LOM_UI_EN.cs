@@ -2020,7 +2020,7 @@ namespace LOM_UI_EN
 
 		public const string NAME = "LOM_UI_EN";
 
-		public const string VERSION = "1.0.0";
+		public const string VERSION = "1.0.1";
 
 		/// <summary>The mod's public name (the plugin keeps NAME and GUID, so configs and logs stay the same).</summary>
 		public const string DisplayName = "LOM English Localization + QoL";
