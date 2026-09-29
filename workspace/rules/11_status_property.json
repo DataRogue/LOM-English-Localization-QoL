@@ -214,6 +214,13 @@
     "fitter": { "horizontal": "PreferredSize", "vertical": "PreferredSize" }
   },
   {
+    "id": "prop-tip-text-one-line",
+    "comment": "Every tooltip text under the frames above: the frame now sets the text box to exactly the text's own height, and the prefab's vertical Truncate can then drop the only line (tooltip opens empty: Stamina, Blade and Sword, Scholarship and the Learn/Forge/Alchemy points, player report 2026-09-28, reproduced in game at 1600x900 with the text box at exactly its preferred height; with this rule all 13 show at 1280x720, 1600x900 and 1920x1080). Never truncate, and keep short descriptions on one line so the frame hugs them; the long ones wrap at 440px in the next rule.",
+    "paths": ["**/Panels/Property/StatRadarChart/StatPanel_1_*/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_*/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/PointPanel/*/StatTipPanel/Frame/Text"],
+    "onTextChange": true,
+    "text": { "fontSize": 20, "bestFit": false, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft", "lineSpacing": 1.0 }
+  },
+  {
     "id": "prop-tip-text-wrap",
     "comment": "Long stat descriptions (up to 116 chars): cap the line at 440px so they wrap to two lines inside the window.",
     "paths": ["**/Panels/Property/StatRadarChart/StatPanel_1_Dex/StatTipPanel/Frame/Text", "**/Panels/Property/StatRadarChart/StatPanel_1_Stamina/StatTipPanel/Frame/Text", "**/Panels/Property/StatRadarChart/StatPanel_1_Fist/StatTipPanel/Frame/Text", "**/Panels/Property/StatRadarChart/StatPanel_1_Weapon/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_Talk/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_Poison/StatTipPanel/Frame/Text", "**/Panels/Property/Panels/PropertyPanel/StatPanel (1)/StatPanel_Paralysis/StatTipPanel/Frame/Text"],
