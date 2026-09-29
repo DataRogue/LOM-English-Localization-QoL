@@ -1004,3 +1004,36 @@ What this version does about it:
       saving its record; that record was rebuilt from `R3_before`, and the teardown verified 181 files);
     - `l_teardown` removes the empty holding folder.
     - While R is set up, `BepInEx\core` holds BepInEx 5: build then with `-CoreDir` (as in L5), or after `r_teardown`.
+
+## 1.1.1 changes: Attributes tooltips no longer open empty
+
+A player (clean install, without Lash's English Patch) reported six Attributes tooltips as blank: Stamina, Blade and
+Sword, Scholarship, and the Martial Points, Forging and Alchemy counters.
+- **Cause.** `rules/11_status_property.json`: `prop-tip-frame-grow-vertically` gives each `StatTipPanel/Frame` its
+  `HorizontalLayoutGroup` with `childControlHeight` and a vertical `PreferredSize` fitter, so the text box gets exactly
+  the text's preferred height. Only the seven long descriptions also had `prop-tip-text-wrap` (vertical Overflow). The
+  six short ones kept the prefab's Wrap + Truncate, and Unity dropped their only line. Reproduced at 1600x900: the
+  frame (its sliced image) is 50 units high, the text 25 = its preferred height, and nothing is drawn.
+  - The node names mislead: `StatPanel_1_Str` shows "Stamina" (`PlayerStat/life`), `StatPanel_1_Stamina` shows
+    "Internal Force".
+- **Fix.** `prop-tip-text-one-line`, before the wrap rule, on all 13 tooltip texts: bestFit off, horizontal and vertical
+  Overflow, 20px, MiddleLeft, line spacing 1. The long ones still wrap at 440px. Only the rules file changes; both DLLs
+  differ from 1.1.0 by `VERSION` alone.
+- **Lash's English Patch 2026.09.28.** Its `TextResizer` restores each text's original overflow when a contract has no
+  `OverflowMode`, and its `zzAddedResizers.yaml` has a contract for the right-column tooltips. It is held back by
+  default. With `LetBaseModResizeText` on, the tooltips still show, because onTextChange rules are applied again on every
+  `Text.OnEnable` (the tooltip panel is activated on hover), after anything that ran before.
+- **Tested in game** (harness `hover` on each stat, screenshots; `_release_test/run_20260928-201010`, `-202940`,
+  `-213550`):
+  - before the fix: the six empty at 1600x900 on B; on R, the 1.1.0 settings put back live on five open tooltips
+    (`invoke <tip Text> Text.set_verticalOverflow Truncate`) emptied all five;
+  - the fix on B at 1280x720, 1600x900 and 1920x1080, and on R with the resizer held back and allowed: all 13 show;
+  - the 1.1.1 build: A (the candidate full zip on a clean install: 19 working, 3 not needed), B (21 working, 1 not
+    needed) and R over (its BepInEx 5 DLL: 20 working, 2 not needed). No Chinese on the 11 screens in A and B, and all
+    13 tooltips show in A, B and R. Marked as checked on B.
+- **Tool notes.**
+  - `r_teardown` moves `BepInEx/cache/LOM_UI_EN` first. A shell whose working directory is inside that folder makes the
+    move stop half-way: copied, source partly deleted. To recover, check the leftovers against the copy, move them into
+    the run folder, and run `r_teardown` again.
+  - The harness `dump NAME PATH` and `invoke` split their arguments on spaces, so a path with a space
+    (`StatPanel (1)`, `Scroll View`) only works with `hover`, `active` and `show`.

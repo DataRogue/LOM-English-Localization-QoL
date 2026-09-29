@@ -3,7 +3,9 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
-## Unreleased
+## 1.1.1 (2026-09-28)
+
+A fix for the Attributes screen. Nothing else changed.
 
 - **Attributes tooltips no longer open empty.** On the Attributes screen, the tooltips of Stamina, Blade and Sword,
   Scholarship and the three point counters (Martial Points, Forging, Alchemy) showed an empty box. The mod sizes each
