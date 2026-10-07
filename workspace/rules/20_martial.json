@@ -197,5 +197,17 @@
    "vOverflow": "Truncate",
    "lineSpacing": 0.95
   }
+ },
+ {
+  "id": "martial-desc-every-line",
+  "comment": "Book description under the selected book (Detail/Scroll View/Viewport/DescText, 350 wide, 20px, line spacing 1.1, the Scroll View's content). Its ContentSizeFitter (vertical PreferredSize) makes the box exactly the text's preferred height while the prefab keeps vertical Truncate, so Unity dropped the last line of some English descriptions (a player saw book descriptions as fragments; the 1.1.1 tooltip lesson). Overflow keeps every line; the viewport still clips and scrolls. onTextChange: the game sets the text on every selection.",
+  "paths": [
+   "**/MartialPanel/Container/Panel/Detail/Scroll View/Viewport/DescText"
+  ],
+  "onTextChange": true,
+  "text": {
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow"
+  }
  }
 ]

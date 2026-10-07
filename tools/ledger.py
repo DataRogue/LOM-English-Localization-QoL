@@ -4,21 +4,21 @@ OverLlm, so a reviewed line ships even when its text stays OverLlm's own line; a
   workspace/translation/reviewed.tsv               table keys (lom_paths.WS_LEDGER)
   workspace/translation/scene/reviewed_scene.tsv   scene lines, by their raw XUnity key as written in the workspace scene file
                                                    (the line's text before its first unescaped '=', escapes as written:
-                                                   scene_key(line)), and 'resize/<file>' for a resizer of this mod's own,
-                                                   workspace/translation/scene/resize/<file> (e.g. a reviewed copy of one of
-                                                   OverLlm's) (lom_paths.WS_SCENE_LEDGER)
+                                                   scene_key(line)) (lom_paths.WS_SCENE_LEDGER). Up to 1.1.x it also held
+                                                   'resize/<file>' for a resizer of this mod's own; since 1.2.0 the plugin
+                                                   reads no resizer files and publish.py check fails on one, so those
+                                                   entries are retired (resize_entry stays for reading old ledgers)
 
 Format: one entry per line, 'key TAB pass-name TAB date' (date YYYY-MM-DD), UTF-8 without a BOM, LF line ends, sorted by key
 (code-point order), each key once. A key may hold a TAB (a scene key can: the last two TABs of a line separate the fields),
 never a CR or LF; a pass name holds no TAB, CR or LF. An existing entry is kept as it is when a later pass adds the same key
-(the first review is what the ledger records). publish.py reads both files: build ships every listed row and line (and
-listed resizer) whatever its text, and check fails on a listed key the workspace does not have. Only this module writes
+(the first review is what the ledger records). publish.py reads both files: build ships every listed row and line
+whatever its text, and check fails on a listed key the workspace does not have. Only this module writes
 them (lom_paths.assert_ledger_writable: the two files, inside the workspace, and inside the stage in stage mode).
 
   import ledger
   ledger.add(keys, "fullpass-2026-09")                          # table keys
   ledger.add(raw_keys, "fullpass-2026-09", scene=True)          # scene lines: ledger.scene_key(line) is a line's raw key
-  ledger.add([ledger.resize_entry("story.resizer.txt")], "resize-review", scene=True)
   table, scene = ledger.load()                                  # {key: (pass name, date)} each; load(scene=True) for one
   ledger.remove(keys, scene=False)                              # e.g. a line a later pass removed from the workspace
 

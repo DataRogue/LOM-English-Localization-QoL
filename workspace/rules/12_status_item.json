@@ -62,9 +62,9 @@
   },
   {
     "id": "item-desc-fit",
-    "comment": "Long English item descriptions overran the 330x241 masked box and the last line was sliced through the middle. 19px with 1.0 line spacing fits the longest Book/Misc description in the box.",
+    "comment": "Long English item descriptions overran the 330x241 masked box and the last line was sliced through the middle. 19px with 1.0 line spacing fits most Book/Misc descriptions in the box; longer ones scroll. DescText is the Scroll View's content and its ContentSizeFitter (vertical PreferredSize) makes the box exactly the text's preferred height, so vertical Truncate let Unity drop the last line of some descriptions (a player saw book descriptions as fragments; the 1.1.1 tooltip lesson): Overflow keeps every line, the viewport still clips. bestFit off: a best-fit size against a box the fitter sizes is circular.",
     "paths": ["**/StatusPanel/Container/Panels/Item/**/DescText"],
     "onTextChange": true,
-    "text": { "fontSize": 19, "lineSpacing": 1.0, "hOverflow": "Wrap", "vOverflow": "Truncate" }
+    "text": { "bestFit": false, "fontSize": 19, "lineSpacing": 1.0, "hOverflow": "Wrap", "vOverflow": "Overflow" }
   }
 ]

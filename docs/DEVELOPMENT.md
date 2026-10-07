@@ -41,6 +41,17 @@ still holds the 2026-02-06 release. A dry run onto `EnglishPatch-2026.09.28.13.5
 - 33 wording overrides that no longer change anything;
 - no scene change.
 
+From its 2026.09.29 release on, Lash's English Patch is installed by its own installer (`Installer-win-x64.exe`, a
+GitHub pre-release named `installer`; source in the sibling repo `FanslationStudio.LlmKit`, `FanslationStudio.Installer.*`).
+The installer puts BepInEx 5.4.23.3 in place (the official `BepInEx_win_x86_5.4.23.3.zip`, pinned by SHA-256, with
+`dll_search_path_override = "BepInEx\core"` written into `doorstop_config.ini` and a marker
+`BepInEx/installer-bepinex.sha256`), then the release zip's files as its `release-manifest.json` lists them, and keeps
+that manifest in `BepInEx/release-manifest.json`. The zip itself no longer holds BepInEx. An update removes only the
+files the previous manifest listed, so it never touches this mod's folder. The pack's `UiEditor` plugin checks GitHub
+at every start and offers a newer release in a small window ("Update available"), then hands over to the installer and
+quits the game. Since 1.2.0 this mod runs on the same BepInEx 5.4.23.3, and its full package bundles that zip with the
+same `doorstop_config.ini` line (`tools/release.py`).
+
 ## Updating in a fork
 
 Forks are welcome (see the README). Without `base_ref/`, the maintainer pipeline (`publish.py`, `release.py`) will not
@@ -64,31 +75,38 @@ run, but you don't need it to keep the mod working:
    - Play-test the screens you touched. Mod Settings > Advanced > *Mark as checked* records the game version you
      tested.
    - Zip `BepInEx/plugins/LOM_UI_EN` (leave out `translation/untranslated.txt` and `compat_report.txt`). For a full
-     package, add BepInEx 6.0.0-be.692 as in the table below.
+     package, add BepInEx 5.4.23.3 as in the table below, with `dll_search_path_override = "BepInEx\core"` in its
+     `doorstop_config.ini`.
 
 ## Requirements
 
-- The game with BepInEx 6.0.0-be.692 installed (the full release package installs it), or with BepInEx 5 (Lash's
-  English Patch installs it from its 2026.09.28 release on; building the BepInEx 6 DLL then needs `-CoreDir`, below).
+- The game. Its installed BepInEx does not matter for building; to run the build, BepInEx 5.4.23.3 (the full release
+  package or the installer of Lash's English Patch installs it).
+- `release/vendor/BepInEx_win_x86_5.4.23.3.zip` (see the table below): the build references its core files.
+- Unity's AOT `Newtonsoft.Json.dll` in `release/vendor/unity-newtonsoft/Runtime-AOT/` (see the table below), which the
+  build references too; without it, the build falls back to the copy in the game's `BepInEx/plugins/LOM_UI_EN/`.
 - Visual Studio 2022 or later, or its Build Tools, with the .NET Framework 4.7.1+ targeting pack.
 - Python 3.10 or later.
 
 ## Build the plugin
 
 ```
-powershell -ExecutionPolicy Bypass -File src/LOM_UI_EN/build.ps1 [-Game <game folder>] [-OutDir <folder>]
-powershell -ExecutionPolicy Bypass -File src/LOM_UI_EN/build.ps1 -BepInEx5 [-BepInEx5Dir <folder with BepInEx.dll 5.4>]
+powershell -ExecutionPolicy Bypass -File src/LOM_UI_EN/build.ps1 [-Game <game folder>] [-OutDir <folder>] [-BepInExCore <folder>]
 ```
 
-The output is `src/LOM_UI_EN/bin/LOM_UI_EN.dll`, and with `-BepInEx5` `LOM_UI_EN.BepInEx5.dll`: the same source built
-for BepInEx 5 (`BIE5`, see `Loader.cs`). That is the loader of Lash's English Patch's own plugins from its 2026.09.28
-release on. `-BepInEx5Dir` defaults to the game's `BepInEx/core`, which holds a BepInEx 5 `BepInEx.dll` either way:
-5.4.21 next to BepInEx 6 from that patch's older package, 5.4.23.3 alone from its new release. Without BepInEx 6 in
-`BepInEx/core`, pass `-CoreDir <a be.692 core folder>` for the BepInEx 6 DLL. Both DLLs ship, and each BepInEx loads
-only its own. Copy them into `BepInEx/plugins/LOM_UI_EN/`
-while the game is closed, and keep the previous ones in `BepInEx/backup_stock/`. The build is deterministic: the same
-source, compiler and references give the same bytes. `release.py` relies on that to prove that each release DLL is the
-build of the tagged source.
+The output is `src/LOM_UI_EN/bin/LOM_UI_EN.dll`, for BepInEx 5.4.23.3, the version Lash's English Patch installs. Since
+1.2.0 there is one DLL; the 1.0.x and 1.1.x branches also build the BepInEx 6 (be.692) one. The build references
+BepInEx's `BepInEx.dll` and `0Harmony.dll` from `release/vendor/BepInEx_win_x86_5.4.23.3.zip` (checked against its
+SHA-256 and extracted once under `%TEMP%`), or from `-BepInExCore` / `LOM_BEPINEX_CORE`; whatever the game folder has
+installed does not matter. Copy the DLL into `BepInEx/plugins/LOM_UI_EN/` while the game is closed, and keep the
+previous one in `BepInEx/backup_stock/`. The build is deterministic: the same source, compiler and references give the
+same bytes. `release.py` relies on that to prove that each release DLL is the build of the tagged source.
+
+Text sizes are layout rules (`workspace/rules`). Up to 1.1.x the plugin also applied XUnity-format resizer files
+(`translation/scene/resize/*.resizer.txt`, Lash's from the patch's XUnity days); 1.2.0 retired them, and
+`rules/05_text_sizes.json` carries their sizes as `translatedOnly` rules, which the scene text layer applies when it
+translates a text (where the resizer applied) and the normal rule passes skip. `publish.py check` fails on a resizer file
+in the workspace. The harness `textfit [PATH-PREFIX]` lists, per visible text, whether Unity drew all of it.
 
 ## Change the translation
 
@@ -109,7 +127,7 @@ Lash's English Patch has.
 
 | File | From | SHA-256 |
 |---|---|---|
-| `BepInEx-Unity.Mono-win-x86-6.0.0-be.692+851521c.zip` | https://builds.bepinex.dev/projects/bepinex_be/692/BepInEx-Unity.Mono-win-x86-6.0.0-be.692%2B851521c.zip | `97720c5f5c70abfb2ae19dba6000529049ae67f053303b3ce2b49e6ad6c0eca6` |
+| `BepInEx_win_x86_5.4.23.3.zip` | https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.3/BepInEx_win_x86_5.4.23.3.zip | `275bc94fa582ba0ddeb5dca1241fd657d5f101563c3a8dd3a4a6c27ca28e2376` (the pin of Lash's installer too) |
 | `unity-newtonsoft/com.unity.nuget.newtonsoft-json-3.2.2.tgz` | https://download.packages.unity.com/com.unity.nuget.newtonsoft-json/-/com.unity.nuget.newtonsoft-json-3.2.2.tgz | `5db19a6ec4478ab974922d155aa32b952bc34abadaa78afc7973cf049b62db41` |
 
 The plugin folder ships `package/Runtime/AOT/Newtonsoft.Json.dll` from Unity's package (SHA-256
@@ -128,51 +146,42 @@ plugin marks those data parts as not working in Compatibility (`Plugin.CheckLayo
 1. **Version and notes.** Set `VERSION` in `src/LOM_UI_EN/LOM_UI_EN.cs`, then add the version to `CHANGELOG.md` (for
    players) and to `src/LOM_UI_EN/README.md` (engineering notes).
 2. **Build and install.**
-   - Run `build.ps1` and `build.ps1 -BepInEx5`, and install both DLLs.
+   - Run `build.ps1` and install the DLL (a 1.1.x install also has `LOM_UI_EN.BepInEx5.dll`: move it to
+     `BepInEx/backup_stock/`, `publish.py check` fails while it is there).
    - Copy `src/LOM_UI_EN/PLAYER_README.txt` over the plugin's `README.txt`.
    - Run `publish.py build`, then `publish.py check`.
 3. **Candidate packages.** `python tools/release.py --candidate` writes `release/dist/<version>-candidate/`.
-   Besides A, B and C below, the scenarios for the releases of Lash's English Patch from 2026.09.28 on (its
-   `llmkit-upgrade`) run between `prep` and `final`:
-   - `release_test.py r_setup <its release zip>`, then `r_teardown`, and again with `--clean`. The zip is extracted
-     the way a player unzips it. Without `--clean` it goes over the current install and keeps what the older version
-     leaves (its `StringTable.csv`, its BepInEx 6 plugins). With `--clean` the BepInEx folder, `Mods` and the loader
-     files are held aside first, and this mod's plugin folder and settings go back in. Check:
-     - `detect`, `compat`, `invoke static LOM_UI_EN.BaseGuards.Describe`;
-     - the 11 screens, compared with B's;
-     - Mod Settings > Translation and About, and Which translation set to Lash's and back;
-     - a duel;
-     - once, the newer plugins' guards failing. First `cfg Dev/SimulateHookErrors=basePlugins`: it turns off with its
-       fallback, and About reads "text resizer on". Clear it (`cfg Dev/SimulateHookErrors=`), then `invoke static
-       LOM_UI_EN.Compat.TryAgain`. Then `SimulateGameChange = basePlugins` in the cfg and a restart: not working, with
-       the patch's labels and text sizes.
-
-     While R is set up, `BepInEx\core` holds BepInEx 5: build with `-CoreDir` (a be.692 core folder), or after
-     `r_teardown`.
-   - For tables and a plugin built from the branch before a release, `release_test.py l_setup <its Mods/English> <its
-     FanslationStudio.LegendOfMortal.Plugin.dll>` (add `--leftover` for an older StringTable.csv left next to the new
-     tables), then `l_teardown`;
-   - on top of L, `release_test.py l5_setup` / `l5_teardown` puts BepInEx 5 in place of 6. It needs the official
-     `BepInEx_win_x86_5.4.*.zip` in `release/vendor`. While it is set up, `BepInEx\core` holds BepInEx 5: build with
-     `build.ps1 -CoreDir BepInEx\_lom_release_test\L5_core` (both DLLs).
 4. **Test in game** with `tools/ingame/release_test.py`. It sets up and undoes each scenario exactly: every move is
    hash-checked, and the saves and registry key are backed up and restored. Drive the game with `run_batch.ps1` and
-   `screens05.ps1`.
+   `screens05.ps1`. The mod runs on BepInEx 5.4.23.3 only, so every scenario installs it.
    1. `release_test.py prep`
-   2. **A, clean install:** `release_test.py a_setup`. This moves aside Lash's English Patch, the core files the official
-      BepInEx zip lacks and the patched `Unity.Addressables.dll`, then extracts the `-full` candidate. Launch
-      `Mortal.exe` and check:
+   2. **A, clean install:** `release_test.py a_setup`. This holds the whole install aside (BepInEx, `Mods`, the loader's
+      root files) and the patched `Unity.Addressables.dll`, then extracts the `-full` candidate onto the bare game.
+      Launch `Mortal.exe` and check:
       - `detect`, `compat`, the log's "loaded: N rules, N sprite replacements";
       - the 11 screens, Mod Settings, a Story scene with name tips, a duel.
 
       Then `release_test.py a_teardown`, which also checks the extracted plugin folder against the `-mod-only` zip.
-   3. **B, alongside Lash's English Patch:** `release_test.py b_setup`, launch, the same checks.
-      - Switch Which translation to Lash's and back.
-      - Mark as checked (step 5).
-      - `cfg Dev/SimulateHookErrors=all`, then `invoke static LOM_UI_EN.Compat.TryAgain`.
-   4. **C, a simulated game update:** `SimulateGameChange = all` in the cfg, then restart. Mod Settings must still open,
-      and the text must fall back to Lash's English Patch.
-   5. `release_test.py b_teardown`, then `release_test.py final`.
+   3. **R, with Lash's English Patch:** `release_test.py r_setup <its release zip> --clean --installer` installs it as its
+      installer does (BepInEx 5.4.23.3, the manifest's files, `BepInEx/release-manifest.json`) next to this mod's
+      plugin folder and settings; without `--installer` the zip is unpacked as a player would (its releases up to
+      2026.09.28 carry BepInEx 5 themselves); without `--clean` it goes over the current install. Check:
+      - `detect`, `compat`, `invoke static LOM_UI_EN.BaseGuards.Describe` (the resizer held back, its hooks found);
+      - the 11 screens, compared with A's;
+      - Mod Settings > Translation and About, and Which translation set to Lash's and back;
+      - a duel;
+      - Mark as checked (step 5);
+      - `cfg Dev/SimulateHookErrors=all`, then `invoke static LOM_UI_EN.Compat.TryAgain`;
+      - once, the newer plugins' guards failing: `cfg Dev/SimulateHookErrors=basePlugins` turns them off with their
+        fallback (About reads "text resizer on"); clear it and Try again.
+
+      Then `release_test.py r_teardown`. With `--clean` the mark went into the test install's plugin folder: copy
+      `compat_verified.json` from the run folder's `R<n>_after/BepInEx/plugins/LOM_UI_EN/` into the plugin folder.
+   4. **C, a simulated game update:** on R, `SimulateGameChange = all` in the cfg, then restart. Mod Settings must still
+      open, and the text must fall back to Lash's English Patch.
+   5. **B, the current install as it is** (the maintainer's own): `release_test.py b_setup` / `b_teardown` only switch
+      the harness.
+   6. `release_test.py final`.
 
    Harness tips:
    - Slots 001 and 002 may hold the maintainer's own play.

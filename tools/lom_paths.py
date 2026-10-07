@@ -6,7 +6,8 @@ script. Three places, only one of which is shipped:
   WORKSPACE  LOM_Localization/workspace/            maintainer only, never shipped
              translation/StringTable.csv              the full working string table   (TABLE)
              translation/scene/scene_text.txt         the full working scene file     (SCENE)
-             translation/scene/resize/*.resizer.txt   this mod's own resizers, if any (WS_RESIZE_DIR)
+             translation/scene/resize/*.resizer.txt   retired since 1.2.0: must stay empty (WS_RESIZE_DIR; publish.py check
+                                                      fails on a resizer; text sizes are rules)
              strings/*.csv                            wording overrides with full notes (STRINGS_DIR)
              rules/*.json                             layout rules with their comments (WS_RULES_DIR)
              sentinels.json                           the data-check sentinel keys (hashes only)
@@ -21,7 +22,7 @@ script. Three places, only one of which is shipped:
              translation/reviewed.tsv                 the review ledger: table keys a line-by-line review pass reviewed
                                                       (WS_LEDGER; key TAB pass TAB date, written through ledger.py)
              translation/scene/reviewed_scene.tsv     the same for scene lines, by their raw XUnity key as written in the
-                                                      scene file, and 'resize/<file>' for this mod's own resizers
+                                                      scene file ('resize/<file>' entries retired since 1.2.0)
                                                       (WS_SCENE_LEDGER). A reviewed line ships even when its text is OverLlm's
   BASE_REF   LOM_Localization/base_ref/             maintainer only, never shipped: the OverLlm release the workspace
              StringTable.csv                          diverged from (BASE_REF_TABLE, BASE_REF_SCENE)
@@ -35,8 +36,8 @@ script. Three places, only one of which is shipped:
              translation/StringTable.meta.tsv         per shipped row: hashes of the game text and of BASE_REF's line
              translation/scene/scene_text.txt         lines whose value differs or that the ledger lists, plus "key=" removals
                                                       (SHIP_SCENE)
-             translation/scene/resize/*.resizer.txt   this mod's own resizers (copied from the workspace; a reviewed copy of
-                                                      OverLlm's ships too when the scene ledger lists it)
+             translation/scene/resize/*.resizer.txt   none since 1.2.0 (the plugin reads no resizer files; build removes
+                                                      the ones an earlier publish wrote)
              translation/MANIFEST.json                hashes only (SHIP_MANIFEST)
              strings/*.csv                            the overrides with notes stripped of quoted wording (SHIP_STRINGS_DIR)
              rules/*.json                             the rules without comments (SHIP_RULES_DIR)

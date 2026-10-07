@@ -396,7 +396,7 @@ namespace LOM_UI_EN
 
 		/// <summary>
 		/// The first time the menu shows, give each label of the clone the final text settings of the matching label on the Settings
-		/// button (font, size, best fit, alignment, wrapping). By then XUnity's resizers, the font map and the layout rules have all run
+		/// button (font, size, best fit, alignment, wrapping). By then the font map and the layout rules have all run
 		/// on the original, so the clone reads exactly like its neighbours whichever of them touched it. Colours stay with the button
 		/// scripts, which drive normal / hover states.
 		/// </summary>

@@ -1,0 +1,3436 @@
+[
+ // Text sizes that the XUnity-format resizer files (translation/scene/resize/*.resizer.txt, from the original English
+ // patch's XUnity AutoTranslator days) set until 1.1.x, as layout rules. 1.2.0 retires that resizer; these rules carry its
+ // sizes over. Each rule is one resizer path: it matches that object and everything under it (the resizer's ancestor
+ // matching), shallow paths first, so a deeper path wins as it did there. translatedOnly: the scene text layer applies them
+ // when it translates a text, before the text is set (RuleApplier.ApplyOnTranslation), never the normal rule passes, which
+ // is when and where the resizer applied: texts the game data table fills (numbers among them) keep their own sizes, as
+ // they did, and the hand-written rules' passes come after, as before. The comments name 1.1.1's resizer lines.
+ {
+  "id": "size-ui-layer-1-buttons",
+  "comment": "From mainmenu.resizer.txt:1, mainmenu.resizer.txt:2.",
+  "paths": [
+   "/UI/Layer_1/Buttons",
+   "/UI/Layer_1/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-dicemenudialog-header",
+  "comment": "From story.resizer.txt:18.",
+  "paths": [
+   "/StoryCore/MenuDialogs/DiceMenuDialog/Header",
+   "/StoryCore/MenuDialogs/DiceMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 18,
+   "maxSize": 32
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 18,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-dicemenudialog-buttongroup",
+  "comment": "From story.resizer.txt:19.",
+  "paths": [
+   "/StoryCore/MenuDialogs/DiceMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/DiceMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 22
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-header",
+  "comment": "From story.resizer.txt:22.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/Header",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup",
+  "comment": "From story.resizer.txt:23, story.resizer.txt:24.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-header",
+  "comment": "From story.resizer.txt:32.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/Header",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup",
+  "comment": "From story.resizer.txt:33, story.resizer.txt:34.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-header",
+  "comment": "From story.resizer.txt:42.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/Header",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup",
+  "comment": "From story.resizer.txt:43, story.resizer.txt:44.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-header",
+  "comment": "From story.resizer.txt:52.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/Header",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup",
+  "comment": "From story.resizer.txt:53, story.resizer.txt:54.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-header",
+  "comment": "From story.resizer.txt:62.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/Header",
+   "/StoryCore/MenuDialogs/MallMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup",
+  "comment": "From story.resizer.txt:63, story.resizer.txt:64.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-header",
+  "comment": "From story.resizer.txt:72.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/Header",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup",
+  "comment": "From story.resizer.txt:73, story.resizer.txt:74.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-header",
+  "comment": "From story.resizer.txt:83.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/Header",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup",
+  "comment": "From story.resizer.txt:84, story.resizer.txt:85.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-header",
+  "comment": "From story.resizer.txt:93.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/Header",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup",
+  "comment": "From story.resizer.txt:94, story.resizer.txt:95.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-header",
+  "comment": "From story.resizer.txt:103.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/Header",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup",
+  "comment": "From story.resizer.txt:104, story.resizer.txt:105.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-actionbuttonpanel",
+  "comment": "From story.resizer.txt:234, story.resizer.txt:235, story.resizer.txt:236, story.resizer.txt:237.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel",
+   "/[UI]/MainUI/Layer_3/ActionButtonPanel/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 13,
+   "maxSize": 28,
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 13,
+   "maxSize": 28
+  }
+ },
+ {
+  "id": "size-ui-layer-3-systemsettingpanel-header",
+  "comment": "From mainmenu.resizer.txt:11.",
+  "paths": [
+   "/UI/Layer_3/SystemSettingPanel/Header",
+   "/UI/Layer_3/SystemSettingPanel/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-layer-3-librarypanel-buttons",
+  "comment": "From mainmenu.resizer.txt:20, mainmenu.resizer.txt:21.",
+  "paths": [
+   "/UI/Layer_3/LibraryPanel/Buttons",
+   "/UI/Layer_3/LibraryPanel/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 30,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 30
+  }
+ },
+ {
+  "id": "size-storycore-saydialogs-charactersaydialog-panel-name",
+  "comment": "From story.resizer.txt:2.",
+  "paths": [
+   "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name",
+   "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "fontScale": 0.7
+  },
+  "tmp": {
+   "fontScale": 0.7
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-menubuttons-log",
+  "comment": "From story.resizer.txt:4, story.resizer.txt:5.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/MenuButtons/Log",
+   "/[UI]/MainUI/Layer_3/MenuButtons/Log/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 16,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-menubuttons-auto",
+  "comment": "From story.resizer.txt:6, story.resizer.txt:7.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/MenuButtons/Auto",
+   "/[UI]/MainUI/Layer_3/MenuButtons/Auto/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 16,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-info-text",
+  "comment": "From story.resizer.txt:8.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/Info/Text",
+   "/[UI]/MainUI/Layer_3/Info/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 14
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-characterintropanel-frame-name",
+  "comment": "From story.resizer.txt:10, story.resizer.txt:11.",
+  "paths": [
+   "/[UI]/TopPanel/CharacterIntroPanel/Frame/Name",
+   "/[UI]/TopPanel/CharacterIntroPanel/Frame/Name/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 24,
+   "maxSize": 42,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 24,
+   "maxSize": 42
+  }
+ },
+ {
+  "id": "size-ui-toppanel-characterintropanel-frame-title",
+  "comment": "From story.resizer.txt:12, story.resizer.txt:13.",
+  "paths": [
+   "/[UI]/TopPanel/CharacterIntroPanel/Frame/Title",
+   "/[UI]/TopPanel/CharacterIntroPanel/Frame/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 20,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-characterintropanel-frame-intro",
+  "comment": "From story.resizer.txt:14.",
+  "paths": [
+   "/[UI]/TopPanel/CharacterIntroPanel/Frame/Intro",
+   "/[UI]/TopPanel/CharacterIntroPanel/Frame/Intro/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-dicemenudialog-roll-basemaxdice",
+  "comment": "From story.resizer.txt:20.",
+  "paths": [
+   "/StoryCore/MenuDialogs/DiceMenuDialog/Roll/BaseMaxDice",
+   "/StoryCore/MenuDialogs/DiceMenuDialog/Roll/BaseMaxDice/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 26
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 26
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-5-picture-text",
+  "comment": "From story.resizer.txt:113.",
+  "paths": [
+   "/[UI]/MainUI/Layer_5/Picture/Text",
+   "/[UI]/MainUI/Layer_5/Picture/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-header-text",
+  "comment": "From story.resizer.txt:158, story.resizer.txt:159.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Header/Text",
+   "/[UI]/TopPanel/ShopPanel/Header/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 18,
+   "maxSize": 58,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 18,
+   "maxSize": 58
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-container-panels",
+  "comment": "From story.resizer.txt:161, story.resizer.txt:162.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Container/Panels",
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 22,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-buttons-statusbutton-buy",
+  "comment": "From story.resizer.txt:183.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Buttons/StatusButton_Buy",
+   "/[UI]/TopPanel/ShopPanel/Buttons/StatusButton_Buy/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-buttons-statusbutton-sell",
+  "comment": "From story.resizer.txt:184.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Buttons/StatusButton_Sell",
+   "/[UI]/TopPanel/ShopPanel/Buttons/StatusButton_Sell/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-buttons",
+  "comment": "From story.resizer.txt:243, story.resizer.txt:244.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Buttons",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 32,
+   "vOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-readytext-left",
+  "comment": "From story.resizer.txt:282, story.resizer.txt:283, story.resizer.txt:284.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/ReadyText/Left",
+   "/[UI]/MainUI/Layer_1/ReadyText/Left/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 38,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 38,
+   "overflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-readytext-right",
+  "comment": "From story.resizer.txt:286, story.resizer.txt:287, story.resizer.txt:288.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/ReadyText/Right",
+   "/[UI]/MainUI/Layer_1/ReadyText/Right/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 38,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 38,
+   "overflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-time-text",
+  "comment": "From status.resizer.txt:2.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/Time/Text",
+   "/[UI]/MainUI/Layer_3/Time/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 34
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 34
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-actioninfo-contributiontext",
+  "comment": "From status.resizer.txt:13, status.resizer.txt:14.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/ActionInfo/ContributionText",
+   "/[UI]/MainUI/Layer_1/ActionInfo/ContributionText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-actioninfo-contributiontext",
+  "comment": "From status.resizer.txt:15, status.resizer.txt:16.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionInfo/ContributionText",
+   "/[UI]/MainUI/Layer_3/ActionInfo/ContributionText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-layer-3-systemsettingpanel-panel-game",
+  "comment": "From mainmenu.resizer.txt:17.",
+  "paths": [
+   "/UI/Layer_3/SystemSettingPanel/Panel/Game",
+   "/UI/Layer_3/SystemSettingPanel/Panel/Game/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-layer-3-systemsettingpanel-panel-buttons",
+  "comment": "From mainmenu.resizer.txt:22.",
+  "paths": [
+   "/UI/Layer_3/SystemSettingPanel/Panel/Buttons",
+   "/UI/Layer_3/SystemSettingPanel/Panel/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 36
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 36
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave",
+  "comment": "From mainmenu.resizer.txt:25.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-saydialogs-charactersaydialog-panel-background-storytext",
+  "comment": "From story.resizer.txt:1.",
+  "paths": [
+   "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/StoryText",
+   "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/StoryText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-titleflag-training-title",
+  "comment": "From story.resizer.txt:131.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/TitleFlag_Training/Title",
+   "/[UI]/TopPanel/MartialPanel/Container/TitleFlag_Training/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 44
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 44
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-buttons",
+  "comment": "From story.resizer.txt:133, story.resizer.txt:134.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Buttons",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 14,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-avatar-dialog-title",
+  "comment": "From story.resizer.txt:164, story.resizer.txt:165, story.resizer.txt:166.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Avatar/Dialog/Title",
+   "/[UI]/TopPanel/ShopPanel/Avatar/Dialog/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 22,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-avatar-dialog-text",
+  "comment": "From story.resizer.txt:167, story.resizer.txt:168.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Avatar/Dialog/Text",
+   "/[UI]/TopPanel/ShopPanel/Avatar/Dialog/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18,
+   "lineSpacing": 1.1
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-titleflag-alchemy-title",
+  "comment": "From story.resizer.txt:188, story.resizer.txt:189.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/TitleFlag_Alchemy/Title",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/TitleFlag_Alchemy/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 52,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 52
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-name",
+  "comment": "From story.resizer.txt:194, story.resizer.txt:195, story.resizer.txt:196.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/Name",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/Name/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 28,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 28
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-alchemybutton",
+  "comment": "From story.resizer.txt:198, story.resizer.txt:199.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/AlchemyButton",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/AlchemyButton/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 32,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-developbutton",
+  "comment": "From story.resizer.txt:201, story.resizer.txt:202.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/DevelopButton",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/DevelopButton/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 32,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-combatdesc",
+  "comment": "From story.resizer.txt:204, story.resizer.txt:205, story.resizer.txt:206.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/CombatDesc",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/CombatDesc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 22,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-battledesc",
+  "comment": "From story.resizer.txt:208, story.resizer.txt:209, story.resizer.txt:210.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/BattleDesc",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/BattleDesc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 22,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-developpanel-titleflag-develop-title",
+  "comment": "From story.resizer.txt:223, story.resizer.txt:224.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/TitleFlag_Develop/Title",
+   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/TitleFlag_Develop/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 52,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 52
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-round-container-value",
+  "comment": "From story.resizer.txt:232.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/Round/Container/Value",
+   "/[UI]/MainUI/Layer_1/Round/Container/Value/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-titleflag-forge-title",
+  "comment": "From story.resizer.txt:240, story.resizer.txt:241.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/TitleFlag_Forge/Title",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/TitleFlag_Forge/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 52,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 52
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-detail-forgebutton",
+  "comment": "From story.resizer.txt:252, story.resizer.txt:253.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/ForgeButton",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/ForgeButton/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 32,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-developpanel-titleflag-develop-title",
+  "comment": "From story.resizer.txt:271, story.resizer.txt:272.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/TitleFlag_Develop/Title",
+   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/TitleFlag_Develop/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 38,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 38
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-5-statmodplaceholder-normalstat-clone-title",
+  "comment": "From status.resizer.txt:4, status.resizer.txt:5.",
+  "paths": [
+   "/[UI]/MainUI/Layer_5/StatModPlaceholder/NormalStat(Clone)/Title",
+   "/[UI]/MainUI/Layer_5/StatModPlaceholder/NormalStat(Clone)/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 6,
+   "maxSize": 10,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 6,
+   "maxSize": 10
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-5-statmodplaceholder-negativepositivestat-clone-value",
+  "comment": "From status.resizer.txt:7, status.resizer.txt:8.",
+  "paths": [
+   "/[UI]/MainUI/Layer_5/StatModPlaceholder/NegativePositiveStat(Clone)/Value",
+   "/[UI]/MainUI/Layer_5/StatModPlaceholder/NegativePositiveStat(Clone)/Value/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 6,
+   "maxSize": 16,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 6,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-actioninfo-action-actiontext",
+  "comment": "From status.resizer.txt:10.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/ActionInfo/Action/ActionText",
+   "/[UI]/MainUI/Layer_1/ActionInfo/Action/ActionText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-actioninfo-mentalbar-header",
+  "comment": "From status.resizer.txt:11, status.resizer.txt:12.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/ActionInfo/MentalBar/Header",
+   "/[UI]/MainUI/Layer_1/ActionInfo/MentalBar/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Wrap"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-actioninfo-mentalbar-header",
+  "comment": "From status.resizer.txt:17, status.resizer.txt:18.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionInfo/MentalBar/Header",
+   "/[UI]/MainUI/Layer_3/ActionInfo/MentalBar/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Wrap"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-3-actioninfo-action-actiontext",
+  "comment": "From status.resizer.txt:19.",
+  "paths": [
+   "/[UI]/MainUI/Layer_3/ActionInfo/Action/ActionText",
+   "/[UI]/MainUI/Layer_3/ActionInfo/Action/ActionText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-titleflag-title",
+  "comment": "From status.resizer.txt:26.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/TitleFlag/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/TitleFlag/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 60
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 60
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-buttons-leftbuttons",
+  "comment": "From status.resizer.txt:32, status.resizer.txt:33, status.resizer.txt:34, status.resizer.txt:35.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons",
+   "/[UI]/TopPanel/StatusPanel/Container/Buttons/LeftButtons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 24,
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 24,
+   "overflow": "Overflow",
+   "alignment": "CaplineFlush"
+  }
+ },
+ {
+  "id": "size-ui-mainui-layer-1-actioninfo-mental-value",
+  "comment": "From status.resizer.txt:58, status.resizer.txt:59, status.resizer.txt:60.",
+  "paths": [
+   "/[UI]/MainUI/Layer_1/ActionInfo/Mental/Value",
+   "/[UI]/MainUI/Layer_1/ActionInfo/Mental/Value/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 5,
+   "maxSize": 12,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 5,
+   "maxSize": 12
+  }
+ },
+ {
+  "id": "size-ui-layer-3-systemsettingpanel-panel-buttons-menubutton-savesetting",
+  "comment": "From mainmenu.resizer.txt:12.",
+  "paths": [
+   "/UI/Layer_3/SystemSettingPanel/Panel/Buttons/MenuButton_SaveSetting",
+   "/UI/Layer_3/SystemSettingPanel/Panel/Buttons/MenuButton_SaveSetting/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:25.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:26.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:27.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:28.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:29.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-studymenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:30.",
+  "paths": [
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/StudyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:35.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:36.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:37.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:38.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:39.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-forgemenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:40.",
+  "paths": [
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/ForgeMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:45.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:46.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:47.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:48.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:49.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-kitchenmenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:50.",
+  "paths": [
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/KitchenMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:55.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:56.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:57.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:58.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:59.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-alchemymenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:60.",
+  "paths": [
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/AlchemyMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:65.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:66.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:67.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:68.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:69.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-mallmenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:70.",
+  "paths": [
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/MallMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:75.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:76.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:77.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:78.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:79.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-girlroommenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:80.",
+  "paths": [
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/GirlRoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:86.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:87.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:88.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:89.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:90.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-backmountainmenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:91.",
+  "paths": [
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/BackMountainMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:96.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:97.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:98.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:99.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:100.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-roommenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:101.",
+  "paths": [
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/RoomMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup-positionoptionbutton0-normal-type",
+  "comment": "From story.resizer.txt:106.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup-positionoptionbutton0-normal-title",
+  "comment": "From story.resizer.txt:107.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup-positionoptionbutton0-normal-desc",
+  "comment": "From story.resizer.txt:108.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton0/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup-positionoptionbutton1-normal-type",
+  "comment": "From story.resizer.txt:109.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Type/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup-positionoptionbutton1-normal-title",
+  "comment": "From story.resizer.txt:110.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-centermenudialog-buttongroup-positionoptionbutton1-normal-desc",
+  "comment": "From story.resizer.txt:111.",
+  "paths": [
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc",
+   "/StoryCore/MenuDialogs/CenterMenuDialog/ButtonGroup/PositionOptionButton1/Normal/Desc/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-detail-statrelation",
+  "comment": "From story.resizer.txt:141, story.resizer.txt:142, story.resizer.txt:143.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/StatRelation",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/StatRelation/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 16,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-detail-name",
+  "comment": "From story.resizer.txt:145, story.resizer.txt:146.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/Name",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/Name/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 22,
+   "vOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-container-panels-sell-selllist",
+  "comment": "From story.resizer.txt:172, story.resizer.txt:173, story.resizer.txt:174.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Sell/SellList",
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Sell/SellList/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 20,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-container-panels-sell-sellbutton",
+  "comment": "From story.resizer.txt:175, story.resizer.txt:176, story.resizer.txt:177.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Sell/SellButton",
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Sell/SellButton/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 18,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-panels-poison-buttons",
+  "comment": "From story.resizer.txt:191, story.resizer.txt:192.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Panels/Poison/Buttons",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Panels/Poison/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 20,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-level-text",
+  "comment": "From story.resizer.txt:212, story.resizer.txt:213.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/Level/Text",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/Level/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 32,
+   "vOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-combatdesc-info",
+  "comment": "From story.resizer.txt:215, story.resizer.txt:216, story.resizer.txt:217.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/CombatDesc/Info",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/CombatDesc/Info/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 18,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-container-detail-battledesc-info",
+  "comment": "From story.resizer.txt:219, story.resizer.txt:220, story.resizer.txt:221.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/BattleDesc/Info",
+   "/[UI]/TopPanel/PoisonUpgradePanel/Container/Detail/BattleDesc/Info/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 18,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-panels-equip-buttons",
+  "comment": "From story.resizer.txt:246, story.resizer.txt:247.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Panels/Equip/Buttons",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Panels/Equip/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-panels-weapon-buttons",
+  "comment": "From story.resizer.txt:249, story.resizer.txt:250.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Panels/Weapon/Buttons",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Panels/Weapon/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-detail-developbutton-normal",
+  "comment": "From story.resizer.txt:255, story.resizer.txt:256.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/DevelopButton/Normal",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/DevelopButton/Normal/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 32,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-detail-combatdesc-info",
+  "comment": "From story.resizer.txt:258, story.resizer.txt:259, story.resizer.txt:260.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/CombatDesc/Info",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/CombatDesc/Info/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 18,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-container-detail-battledesc-info",
+  "comment": "From story.resizer.txt:262, story.resizer.txt:263, story.resizer.txt:264.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/BattleDesc/Info",
+   "/[UI]/TopPanel/WeaponUpgradePanel/Container/Detail/BattleDesc/Info/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 18,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-home-assetlist",
+  "comment": "From status.resizer.txt:37, status.resizer.txt:38.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/AssetList",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/AssetList/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 18,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-buttons",
+  "comment": "From status.resizer.txt:41, status.resizer.txt:42.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Buttons",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 24,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-combatstat-1",
+  "comment": "From status.resizer.txt:43, status.resizer.txt:44, status.resizer.txt:45.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (1)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (1)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 6,
+   "maxSize": 16,
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 6,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-combatstat-2",
+  "comment": "From status.resizer.txt:46, status.resizer.txt:47, status.resizer.txt:48.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (2)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/CombatStat (2)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 6,
+   "maxSize": 12,
+   "hOverflow": "Wrap",
+   "vOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 6,
+   "maxSize": 12
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-upgradeinfopanel-container-content",
+  "comment": "From status.resizer.txt:167, status.resizer.txt:168, status.resizer.txt:169.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/UpgradeInfoPanel/Container/Content",
+   "/[UI]/TopPanel/StatusPanel/Container/UpgradeInfoPanel/Container/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 20,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-layer-3-systemsettingpanel-panel-game-language-header",
+  "comment": "From mainmenu.resizer.txt:16.",
+  "paths": [
+   "/UI/Layer_3/SystemSettingPanel/Panel/Game/Language/Header",
+   "/UI/Layer_3/SystemSettingPanel/Panel/Game/Language/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Wrap"
+  }
+ },
+ {
+  "id": "size-ui-layer-3-systemsettingpanel-panel-game-language-dropdow",
+  "comment": "From mainmenu.resizer.txt:18.",
+  "paths": [
+   "/UI/Layer_3/SystemSettingPanel/Panel/Game/Language/Dropdow",
+   "/UI/Layer_3/SystemSettingPanel/Panel/Game/Language/Dropdow/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-story-slot",
+  "comment": "From mainmenu.resizer.txt:26.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Story/Slot",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Story/Slot/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-free-slot",
+  "comment": "From mainmenu.resizer.txt:27.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Free/Slot",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Free/Slot/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-battle-slot",
+  "comment": "From mainmenu.resizer.txt:28.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Battle/Slot",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Battle/Slot/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-story-delete",
+  "comment": "From mainmenu.resizer.txt:30.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Story/Delete",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Story/Delete/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-battle-delete",
+  "comment": "From mainmenu.resizer.txt:31.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Battle/Delete",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Battle/Delete/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-free-delete",
+  "comment": "From mainmenu.resizer.txt:32.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Free/Delete",
+   "/UI/Layer_2/LoadGamePanel/Container/AutoSave/GameAutoSaveSlot_Free/Delete/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-storycore-menudialogs-talkmenudialog-container-window-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:154, story.resizer.txt:155, story.resizer.txt:156.",
+  "paths": [
+   "/StoryCore/MenuDialogs/TalkMenuDialog/Container/Window/Scroll View/Viewport/Content",
+   "/StoryCore/MenuDialogs/TalkMenuDialog/Container/Window/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 18,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-container-panels-sell-selllist-total",
+  "comment": "From story.resizer.txt:179, story.resizer.txt:180.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Sell/SellList/Total",
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Sell/SellList/Total/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-developpanel-list-developitempanel-clone-requirelevel-level",
+  "comment": "From story.resizer.txt:226.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level",
+   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-poisonupgradepanel-developpanel-list-developitempanel-clone-public-name",
+  "comment": "From story.resizer.txt:227, story.resizer.txt:228, story.resizer.txt:229.",
+  "paths": [
+   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name",
+   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-developpanel-list-developitempanel-clone-requirelevel-level",
+  "comment": "From story.resizer.txt:266.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level",
+   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-weaponupgradepanel-developpanel-list-developitempanel-clone-public-name",
+  "comment": "From story.resizer.txt:267, story.resizer.txt:268, story.resizer.txt:269.",
+  "paths": [
+   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name",
+   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 14,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-home-title-text",
+  "comment": "From status.resizer.txt:27.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Title/Text",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Title/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-hoverpanel-fate",
+  "comment": "From status.resizer.txt:50, status.resizer.txt:51, status.resizer.txt:52.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Fate",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Fate/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 16,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-hoverpanel-mental",
+  "comment": "From status.resizer.txt:54, status.resizer.txt:55, status.resizer.txt:57, status.resizer.txt:64.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Mental/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 5,
+   "maxSize": 8,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 5,
+   "maxSize": 8
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-hoverpanel-lover",
+  "comment": "From status.resizer.txt:62, status.resizer.txt:63.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Lover",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/HoverPanel/Lover/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 16,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-home-asset-text",
+  "comment": "From status.resizer.txt:103, status.resizer.txt:104.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 24,
+   "vOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-home-asset-text-1",
+  "comment": "From status.resizer.txt:105.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text (1)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/Asset/Text (1)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-type-grouptype",
+  "comment": "From status.resizer.txt:107, status.resizer.txt:108.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Type/GroupType",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Type/GroupType/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-social-description-buttons",
+  "comment": "From status.resizer.txt:132.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Buttons",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Buttons/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-social-description-title",
+  "comment": "From status.resizer.txt:133, status.resizer.txt:134.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 32,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 32
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-home-upgradeinfobutton-title",
+  "comment": "From status.resizer.txt:137.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/UpgradeInfoButton/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Home/UpgradeInfoButton/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-detail-traningbutton-disable-text-1",
+  "comment": "From story.resizer.txt:136, story.resizer.txt:137.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/TraningButton/Disable/Text(1)",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/TraningButton/Disable/Text(1)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 42,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 42
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-detail-traningbutton-disable-text-2",
+  "comment": "From story.resizer.txt:138, story.resizer.txt:139.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/TraningButton/Disable/Text(2)",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Detail/TraningButton/Disable/Text(2)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 42,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 42
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-panels-propertypanel-header",
+  "comment": "From status.resizer.txt:40.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/Header",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/Header/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "hOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-statradarchart-statpanel-1-stamina-title",
+  "comment": "From status.resizer.txt:67, status.resizer.txt:74, status.resizer.txt:81.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Stamina/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Stamina/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-statradarchart-statpanel-1-sword-title",
+  "comment": "From status.resizer.txt:68, status.resizer.txt:75, status.resizer.txt:82.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Sword/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Sword/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-statradarchart-statpanel-1-dex-title",
+  "comment": "From status.resizer.txt:69, status.resizer.txt:76, status.resizer.txt:83.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Dex/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Dex/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-statradarchart-statpanel-1-fist-title",
+  "comment": "From status.resizer.txt:70, status.resizer.txt:77, status.resizer.txt:84.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Fist/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Fist/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-statradarchart-statpanel-1-str-title",
+  "comment": "From status.resizer.txt:71, status.resizer.txt:78, status.resizer.txt:85.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Str/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Str/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-statradarchart-statpanel-1-weapon-title",
+  "comment": "From status.resizer.txt:72, status.resizer.txt:79, status.resizer.txt:86.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Weapon/Title",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/StatRadarChart/StatPanel_1_Weapon/Title/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 20,
+   "hOverflow": "Overflow",
+   "lineSpacing": 1.3
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-panels-propertypanel-statpanel-1",
+  "comment": "From status.resizer.txt:91, status.resizer.txt:92, status.resizer.txt:93.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (1)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (1)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 12,
+   "hOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 12
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-panels-propertypanel-statpanel-2",
+  "comment": "From status.resizer.txt:94, status.resizer.txt:95, status.resizer.txt:96.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/PropertyPanel/StatPanel (2)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 8,
+   "maxSize": 12,
+   "hOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 8,
+   "maxSize": 12
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-detail-title-text",
+  "comment": "From status.resizer.txt:139, status.resizer.txt:140.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Title/Text",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Title/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 26,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 26
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-scroll-view-viewport-slots-loadgameslot-clone-slote",
+  "comment": "From mainmenu.resizer.txt:29.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/Scroll View/Viewport/Slots/LoadGameSlot(Clone)/Slote",
+   "/UI/Layer_2/LoadGamePanel/Container/Scroll View/Viewport/Slots/LoadGameSlot(Clone)/Slote/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 18
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 18
+  }
+ },
+ {
+  "id": "size-ui-layer-2-loadgamepanel-container-scroll-view-viewport-slots-loadgameslot-clone-delete",
+  "comment": "From mainmenu.resizer.txt:33, mainmenu.resizer.txt:34.",
+  "paths": [
+   "/UI/Layer_2/LoadGamePanel/Container/Scroll View/Viewport/Slots/LoadGameSlot(Clone)/Delete",
+   "/UI/Layer_2/LoadGamePanel/Container/Scroll View/Viewport/Slots/LoadGameSlot(Clone)/Delete/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24,
+   "hOverflow": "Overflow"
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-panels-martiallistpanel-internal-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:148.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Internal/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Internal/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-panels-martiallistpanel-weapon-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:149.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Weapon/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Weapon/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-panels-martiallistpanel-etc-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:150.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Etc/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Etc/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-panels-martiallistpanel-fist-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:151.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Fist/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Fist/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-martialpanel-container-panel-panels-martiallistpanel-sword-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:152.",
+  "paths": [
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Sword/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/MartialPanel/Container/Panel/Panels/MartialListPanel_Sword/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "vOverflow": "Overflow"
+  }
+ },
+ {
+  "id": "size-ui-toppanel-shoppanel-container-panels-buy-buylist-scroll-view-viewport-content",
+  "comment": "From story.resizer.txt:169, story.resizer.txt:170, story.resizer.txt:171.",
+  "paths": [
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Buy/BuyList/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/ShopPanel/Container/Panels/Buy/BuyList/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 20,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-detail-item-type-text",
+  "comment": "From status.resizer.txt:141.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Item/Type/Text",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Item/Type/Text/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 14,
+   "maxSize": 22
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 14,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-detail-scroll-view-viewport-desctext",
+  "comment": "From status.resizer.txt:142.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Scroll View/Viewport/DescText",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/Scroll View/Viewport/DescText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 16
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 16
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-social-description-desc-scroll-view-viewport-desctext",
+  "comment": "From status.resizer.txt:164, status.resizer.txt:165.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Desc Scroll View/Viewport/DescText",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Social/Description/Desc Scroll View/Viewport/DescText/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 20,
+   "lineSpacing": 1.1
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 20
+  }
+ },
+ {
+  "id": "size-ui-layer-3-librarypanel-panels-endgame-scroll-view-viewport-content-libraryenditem-clone-index",
+  "comment": "From mainmenu.resizer.txt:23.",
+  "paths": [
+   "/UI/Layer_3/LibraryPanel/Panels/EndGame/Scroll View/Viewport/Content/LibraryEndItem(Clone)/Index",
+   "/UI/Layer_3/LibraryPanel/Panels/EndGame/Scroll View/Viewport/Content/LibraryEndItem(Clone)/Index/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 12,
+   "maxSize": 24
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 12,
+   "maxSize": 24
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-legend-mask-scroll-view-viewport-content-legendtext-clone",
+  "comment": "From status.resizer.txt:161, status.resizer.txt:162.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Legend/Mask/Scroll View/Viewport/Content/LegendText(Clone)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Legend/Mask/Scroll View/Viewport/Content/LegendText(Clone)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 16,
+   "maxSize": 22,
+   "lineSpacing": 1.2
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 16,
+   "maxSize": 22
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-detail-list-book-scroll-view-viewport-content",
+  "comment": "From status.resizer.txt:144, status.resizer.txt:145, status.resizer.txt:146.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Book/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Book/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 14,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-detail-list-special-scroll-view-viewport-content",
+  "comment": "From status.resizer.txt:148, status.resizer.txt:149, status.resizer.txt:150.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Special/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Special/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 14,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-item-detail-list-misc-scroll-view-viewport-content",
+  "comment": "From status.resizer.txt:152, status.resizer.txt:153, status.resizer.txt:154.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Misc/Scroll View/Viewport/Content",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Item/Detail/List/Misc/Scroll View/Viewport/Content/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 14,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.9
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 14
+  }
+ },
+ {
+  "id": "size-ui-toppanel-statuspanel-container-panels-property-panels-skillpanel-scroll-view-viewport-content-skill-item-clone",
+  "comment": "From status.resizer.txt:156, status.resizer.txt:157, status.resizer.txt:158.",
+  "paths": [
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/SkillPanel/Scroll View/Viewport/Content/Skill_Item(Clone)",
+   "/[UI]/TopPanel/StatusPanel/Container/Panels/Property/Panels/SkillPanel/Scroll View/Viewport/Content/Skill_Item(Clone)/**"
+  ],
+  "translatedOnly": true,
+  "text": {
+   "bestFit": true,
+   "minSize": 10,
+   "maxSize": 16,
+   "vOverflow": "Overflow",
+   "lineSpacing": 0.8
+  },
+  "tmp": {
+   "autoSize": true,
+   "minSize": 10,
+   "maxSize": 16
+  }
+ }
+]

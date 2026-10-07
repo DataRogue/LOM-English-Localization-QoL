@@ -10,7 +10,8 @@ The model (see lom_paths.py): WORKSPACE holds the full working tables, BASE_REF 
 from. The plugin folder ships only this mod's own work ("overlay-1"), and the plugin lays it over the OverLlm patch's own
 installed files at run time (without them, the shipped lines alone are served). This mod's own work is every line it revised
 and every line a line-by-line review pass reviewed: the review ledger (ledger.py; workspace/translation/reviewed.tsv for table
-keys, workspace/translation/scene/reviewed_scene.tsv for scene lines by their raw key and 'resize/<file>' for resizers) lists
+keys, workspace/translation/scene/reviewed_scene.tsv for scene lines by their raw key; its 'resize/<file>' entries for
+resizers are retired since 1.2.0, the plugin reads no resizer files) lists
 the reviewed ones, which ship even when their text is OverLlm's own line (owner ruling 2026-09-24):
   translation/StringTable.csv       rows whose value (TextTable semantics) differs from BASE_REF's, or keys BASE_REF lacks, and
                                     the rows the ledger lists, as key,"value" ('"' doubled), CRLF, UTF-8 without BOM
@@ -30,8 +31,9 @@ the reviewed ones, which ship even when their text is OverLlm's own line (owner 
                                     removes that OverLlm line), then an explicit line for each trimmed-variant key the overlay
                                     would otherwise take from a different line than the workspace does; BOM and CRLF like the
                                     workspace file
-  translation/scene/resize/*.resizer.txt   this mod's own resizers (workspace/translation/scene/resize), byte for byte; one
-                                    the scene ledger lists ('resize/<file>') may be a reviewed copy of OverLlm's
+  (translation/scene/resize/*.resizer.txt  no longer: since 1.2.0 the plugin reads no XUnity-format resizer files, their sizes
+                                    are layout rules; check fails on a resizer in workspace/translation/scene/resize, and the
+                                    next build removes the resizers an earlier publish wrote)
   translation/MANIFEST.json         format overlay-1: counts (reviewed_table, reviewed_scene, reviewed_same_as_overllm among
                                     them), with a ledger 'standalone' {table_rows, table_total, scene_lines, scene_total}
                                     (shipped against the full working copy: the plugin plays a layer without OverLlm, and
@@ -65,12 +67,12 @@ check   verifies DIR: BASE_REF overlaid with DIR's files is exactly the workspac
         key -> value map, tombstones applied, trimmed variants and known values included, as SceneDictionary.LoadOverlay
         builds it); no shipped row or line equals BASE_REF's or the installed OverLlm files' for the same key unless the
         review ledger lists it (every key the ledger lists must be in the workspace, and shipped: the shipped files alone
-        hold its workspace text; a listed resizer ships as the workspace's, byte for byte); the files are
+        hold its workspace text; resize/<file> entries are retired since 1.2.0, and a resizer file fails); the files are
         exactly what build would write now; no unknown files under translation/; and no text file in DIR (harness/ and the
         files the game writes while it runs aside: translation/untranslated.txt and compat_report.txt, which release.py
         never packages) holds a whole OverLlm value of 12+ characters or a run of 4+ words that only OverLlm's
         text has (UTF-8, UTF-16 and stray bytes read; each file's scan stops at its first 20 hits); no binary file other than
-        a well-formed PE file LOM_UI_EN.dll (and LOM_UI_EN.BepInEx5.dll) at the folder's root (nothing after its last section), the pinned
+        a well-formed PE file LOM_UI_EN.dll at the folder's root (nothing after its last section), the pinned
         Newtonsoft.Json.dll there (PINNED_LIBS, byte for byte; a missing one fails too) and well-formed
         sprites/*.png (signature, every chunk's CRC, a sprite's chunk types only, the image data the size its header says,
         IEND last with nothing after it; their text chunks are scanned), no other file over 16 MB, no link or junction, no
@@ -154,6 +156,9 @@ MIN_PLUGIN_VERSION = (0, 5, 0)
 HYGIENE_CMD = 'python "%s"' % os.path.join(P.TOOLS, "hygiene", "scene_hygiene.py")
 # a literal "[...]" / "[...unchanged...]" left in an override by a review pass: players would see it
 PLACEHOLDER = re.compile(r"\[(?:\.\.\.|" + chr(0x2026) + r")[^\]\n]*\]")
+# one ellipsis, however written: "...", "......", "…", "……", "⋯"
+_ELLIPSIS_RUN = re.compile(r"(?:\.{3,}|[" + chr(0x2026) + chr(0x22EF) + r"]+)")
+_DESC_KEY = re.compile(r"/(Desc|Intro)/|^CharacterIntro")
 _HAS_LETTER = re.compile("[a-z]")
 _CJK = re.compile("[%s-%s%s-%s]" % (chr(0x3400), chr(0x4DBF), chr(0x4E00), chr(0x9FFF)))
 
@@ -989,9 +994,9 @@ def text_segments(rel, data, base_keys=None):
 
 HITS_PER_FILE = 20
 MAX_TEXT_FILE = 16 << 20
-# the plugin DLL for BepInEx 6, and the same source built for BepInEx 5 (build.ps1 -BepInEx5; Lash's English Patch runs on
-# BepInEx 5 since its llmkit-upgrade)
-_DLL_NAME = re.compile(r"^LOM_UI_EN(\.BepInEx5)?\.dll$", re.I)
+# the plugin DLL: since 1.2.0 one build, for BepInEx 5.4.23.3 (the version Lash's English Patch installs); 1.1.x also shipped
+# LOM_UI_EN.BepInEx5.dll next to a BepInEx 6 LOM_UI_EN.dll, so a leftover of that name fails the check
+_DLL_NAME = re.compile(r"^LOM_UI_EN\.dll$", re.I)
 _SPRITE_NAME = re.compile(r"^sprites/[^/]+\.png$", re.I)
 # third-party libraries the plugin folder ships, pinned by SHA-256 (a known file, byte for byte, cannot hide anything):
 # Newtonsoft.Json 13.0.2, Unity's AOT build: Runtime/AOT/Newtonsoft.Json.dll of Unity's com.unity.nuget.newtonsoft-json 3.2.2
@@ -1154,7 +1159,7 @@ def binary_problem(rel, data):
     if rel in PINNED_LIBS:
         return None if hashlib.sha256(data).hexdigest() == PINNED_LIBS[rel] else (
             "named like the shipped %s, but not the pinned official file" % rel)
-    return "a plugin folder holds text files, LOM_UI_EN.dll, LOM_UI_EN.BepInEx5.dll, %s and sprites/*.png only" % ", ".join(sorted(PINNED_LIBS))
+    return "a plugin folder holds text files, LOM_UI_EN.dll, %s and sprites/*.png only (LOM_UI_EN.BepInEx5.dll is 1.1.x's: delete it)" % ", ".join(sorted(PINNED_LIBS))
 
 
 def expected_binary(rel, data=None):
@@ -2672,8 +2677,8 @@ def manifest_note(ledger):
             "rows this mod's line-by-line review kept as they are (counts: reviewed_*); translation/StringTable.meta.tsv "
             "records per row the hashes of the game text and of the release line it was revised against; "
             "translation/scene/scene_text.txt has the scene lines whose English differs, that the release lacks or that the "
-            "review kept, plus one 'key=' line (empty value) per release line this mod removes; translation/scene/resize "
-            "holds this mod's own resizers (reviewed copies included). The plugin lays them over the OverLlm patch's own "
+            "review kept, plus one 'key=' line (empty value) per release line this mod removes (text sizes are layout rules: "
+            "since 1.2.0 the plugin reads no resizer files). The plugin lays them over the OverLlm patch's own "
             "installed files, or serves them alone when that patch is not installed. Sentinels keep only hashes (first 16 hex "
             "digits of SHA-1 over the UTF-8 text) of the release's English (original_sha1) and of this mod's pre-0.4 edits of "
             "the patch's files (revised_sha1), for the check of what the installed patch's files hold.")
@@ -2913,6 +2918,14 @@ def _verify_strings(inp, files, tt, ours, probs, info):
         for k, t, note, _ in rows:
             if PLACEHOLDER.search(t):
                 probs.append("strings/%s %s: the text holds a placeholder %r (players would see it)" % (name, k, PLACEHOLDER.search(t).group(0)))
+            # an override replaces the whole row on screen: a description that elides with an ellipsis the table row and the
+            # game's own text do not have shows a fragment (1.2.0 found 44 book descriptions like "...but this book was
+            # compiled ..."); dialogue keeps its ellipses, which are pauses there
+            ell = len(_ELLIPSIS_RUN.findall(t)) if _DESC_KEY.search(k) else 0
+            if ell and ell > len(_ELLIPSIS_RUN.findall(inp.ws_tt.get(k, ""))) and (
+                    inp.game_src is None or ell > len(_ELLIPSIS_RUN.findall(inp.game_src.get(k, "")))):
+                probs.append("strings/%s %s: the text elides with an ellipsis that the table row and the game's text do not have; "
+                             "an override replaces the whole row, so players would see a fragment: %r" % (name, k, t[:80]))
             if inp.base_tt.get(k) == t:
                 if len(_words(t)) > 3:
                     probs.append("strings/%s %s: the text is OverLlm's own %d-word line for the key" % (name, k, len(_words(t))))
@@ -2967,6 +2980,11 @@ def _verify_rules(inp, files, probs, info):
 
 
 def _verify_resize(inp, files, probs, info):
+    # Since 1.2.0 the plugin reads no XUnity-format resizer files (the legacy resizer is retired; its sizes are the layout
+    # rules of rules/05_text_sizes.json): a resizer in the workspace or the shipped folder would do nothing.
+    if inp.ws_resize:
+        probs.append("%s holds resizer files (%s): the plugin no longer reads *.resizer.txt (since 1.2.0); write text sizes "
+                     "as layout rules (workspace/rules) instead" % (P.WS_RESIZE_DIR, ", ".join(sorted(inp.ws_resize))))
     sh = {r[len(REL_RESIZE) + 1:]: d for r, d in files.items() if r.startswith(REL_RESIZE + "/")}
     if sorted(sh) != sorted(inp.ws_resize):
         probs.append("translation/scene/resize: shipped %s != workspace %s" % (sorted(sh), sorted(inp.ws_resize)))

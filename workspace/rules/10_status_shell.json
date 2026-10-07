@@ -181,5 +181,20 @@
    "vOverflow": "Truncate",
    "alignment": "UpperCenter"
   }
+ },
+ {
+  "id": "status-home-facility-income",
+  "comment": "Facility income under each card ('+50 taels', 25px, wrap + truncate in a box one line high): the unit wrapped to a second line and was cut, so the cards read '+50', '+30' (found by the harness textfit in the 1.2.0 test; the same in 1.1.1). The XUnity resizer line meant for it (AssetList: AutoResize 16-18 + horizontal overflow) never applied in this mod, because the game builds the text in English from the table. One line at a fixed 20px, overflowing its box rather than wrapping: '+50 taels' is ~86px on a 100px card with 20px gaps.",
+  "paths": [
+   "**/StatusPanel/Container/Panels/Home/AssetList/AssetItem_*/Value"
+  ],
+  "onTextChange": true,
+  "text": {
+   "bestFit": false,
+   "fontSize": 20,
+   "hOverflow": "Overflow",
+   "vOverflow": "Overflow",
+   "alignment": "UpperCenter"
+  }
  }
 ]

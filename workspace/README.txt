@@ -2,7 +2,8 @@ LOM_UI_EN maintainer workspace (never shipped)
 
   translation/StringTable.csv       the full working string table (lom_paths.TABLE)
   translation/scene/scene_text.txt  the full working scene file (lom_paths.SCENE)
-  translation/scene/resize/         this mod's own *.resizer.txt, if any (shipped as they are)
+  (translation/scene/resize/        retired in 1.2.0: the plugin reads no *.resizer.txt; text sizes are rules/*.json, and
+                                    publish.py check fails on a resizer here)
   strings/*.csv                     wording overrides with their full review notes (lom_paths.STRINGS_DIR)
   rules/*.json                      layout rules with their comments (shipped without them)
   sentinels.json                    the data-check sentinel keys (hashes only)

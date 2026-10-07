@@ -109,6 +109,13 @@
     "text": { "bestFit": false, "fontSize": 16, "lineSpacing": 0.9, "alignment": "UpperLeft", "hOverflow": "Wrap", "vOverflow": "Overflow" }
   },
   {
+    "id": "social-desc-every-line",
+    "comment": "Character biography (Description/Desc Scroll View/Viewport/DescText, prefab 22px, line spacing 1.1, the Scroll View's content). Its ContentSizeFitter (vertical PreferredSize) makes the box exactly the text's preferred height while the prefab keeps vertical Truncate, which can drop the last line (the book-description fragments, the 1.1.1 tooltip lesson): Overflow keeps every line; the viewport still clips and scrolls. A fixed 20px replaces the old resizer's best fit 12-20, which a box the fitter sizes makes circular.",
+    "paths": ["**/StatusPanel/Container/Panels/Social/Description/Desc Scroll View/Viewport/DescText"],
+    "onTextChange": true,
+    "text": { "bestFit": false, "fontSize": 20, "lineSpacing": 1.1, "hOverflow": "Wrap", "vOverflow": "Overflow" }
+  },
+  {
     "id": "social-description-clear-of-tabs",
     "comment": "The 'Relationships' tab label runs to x=492 while the biography block started at x=472, so the bio text ran across the label. Shift the description group 45px right (it ended at x=896 with room to spare).",
     "path": "**/StatusPanel/Container/Panels/Social/Description",

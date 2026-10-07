@@ -24,20 +24,18 @@ namespace LOM_UI_EN
 	/// ever see English, the game's own "text unchanged" checks see the final string, and our layout rules run afterwards as
 	/// before. When SceneText hands the layer back (Original with a running base patch) the prefixes only record the source.
 	///
-	/// The resizer files (XUnity *.resizer.txt) are applied exactly when XUnity would have applied them: to a component whose text
-	/// this layer has just translated, before the text is set (SceneResizeTable). Chinese that has no line is written once per
+	/// Text sizes are the layout rules' alone: since 1.2.0 this layer reads no XUnity resizer files. Their sizes became
+	/// rules/05_text_sizes.json, whose translatedOnly rules this layer has applied (RuleApplier.ApplyOnTranslation) when it
+	/// translates a text, before the text is set, where the resizer applied. Chinese that has no line is written once per
 	/// session to translation/untranslated.txt, which replaces XUnity's machine-translation append as the way gaps show up.
 	/// </summary>
 	public static class SceneText
 	{
 		public static ConfigEntry<bool> CfgLogUntranslated;
-		public static ConfigEntry<bool> CfgApplyResizers;
-		public static ConfigEntry<bool> CfgWideTextOverflow;
 		public static ConfigEntry<bool> CfgLetBaseFillGaps;
 		public static ConfigEntry<string> CfgSkipPaths;
 
 		private static SceneDictionary _dict;
-		private static SceneResizeTable _resize = new SceneResizeTable();
 		private static bool _inside;
 		private static readonly Dictionary<int, Component> _recordComponent = new Dictionary<int, Component>();
 		private static readonly Dictionary<int, string> _recordSource = new Dictionary<int, string>();
@@ -62,7 +60,6 @@ namespace LOM_UI_EN
 		private static Regex[] _skipPatterns = new Regex[0];
 		private static string _skipPatternsSource;
 		private static int _maxLength;
-		private static string _resizeDir;
 		private static int _setDepth;
 		private static Component _outerChinese;
 
@@ -84,15 +81,11 @@ namespace LOM_UI_EN
 		/// <summary>This layer translates right now. False while its hooks are missing or turned off: the original patch's XUnity (if installed) then translates on its own.</summary>
 		public static bool Serving => _dict != null && F.SceneText.Live && EnglishLanguage.Active;
 
-		public static int ResizeNodes => _resize.Nodes;
-
 		public static string UntranslatedPath => Path.Combine(TranslationProfiles.TranslationDir, "untranslated.txt");
 
 		public static void Bind(ConfigFile cfg)
 		{
 			CfgLogUntranslated = cfg.Bind("Translation", "LogUntranslated", true, "Write Chinese scene text that has no English line to plugins/LOM_UI_EN/translation/untranslated.txt (once per text per session), so gaps can be translated.");
-			CfgApplyResizers = cfg.Bind("Translation", "ApplyResizers", true, "Apply the resizer files (translation/scene/resize/*.resizer.txt, XUnity format) to text this mod translates, the way XUnity AutoTranslator applied them.");
-			CfgWideTextOverflow = cfg.Bind("Translation", "WideTextOverflow", true, "XUnity's implicit resize: a translated Text wider than a quarter of the screen, without best fit, may wrap and overflow vertically; a TextMeshPro in Masking overflow switches to Truncate.");
 			CfgLetBaseFillGaps = cfg.Bind("Translation", "LetBaseModFillGaps", false, "When the XUnity AutoTranslator of " + Plugin.BaseModName + " is running: let it translate scene text this mod has no line for (from its own file or its online machine translation, which it appends to its file). Off = such text stays Chinese and is logged to untranslated.txt.");
 			CfgSkipPaths = cfg.Bind("Translation", "SceneTextSkipPaths", "", "Object paths (glob, ';'-separated, '*' and '**' like the layout rules) whose text this mod never translates.");
 		}
@@ -148,33 +141,14 @@ namespace LOM_UI_EN
 			}
 		}
 
-		/// <summary>Installs a dictionary (null = hand back / off) and the resizers that go with it.</summary>
-		public static void Use(SceneDictionary dict, string label, string resizeDir)
+		/// <summary>Installs a dictionary (null = hand back / off).</summary>
+		public static void Use(SceneDictionary dict, string label)
 		{
 			_dict = dict;
 			ActiveLabel = label;
 			_missPlain.Clear();
 			_missRich.Clear();
 			_maxLength = (dict != null) ? (2 * Math.Max(dict.MaxKeyLength, 64)) : 0;
-			if (dict == null)
-			{
-				// Handed back or off: put back the font sizes and line spacings the resizers changed, so the base patch (or the
-				// game) starts from the component's own values, as XUnity's UnresizeUI does.
-				SceneResizeTable.Unresize();
-				_resize = new SceneResizeTable();
-				_resizeDir = null;
-			}
-			else if (_resizeDir == null || !string.Equals(_resizeDir, resizeDir ?? "", StringComparison.OrdinalIgnoreCase))
-			{
-				_resize = SceneResizeTable.Load(resizeDir);
-				_resizeDir = resizeDir ?? "";
-			}
-		}
-
-		/// <summary>Re-read the resizer files on the next Use (Reload translation files).</summary>
-		public static void ReloadResizersOnNextUse()
-		{
-			_resizeDir = null;
 		}
 
 		// ---- hooks ----------------------------------------------------------------------------------------------
@@ -365,10 +339,7 @@ namespace LOM_UI_EN
 					Hits++;
 					Remember(c, value);
 					_recordResult[c.GetInstanceID()] = result;
-					if (CfgApplyResizers.Value)
-					{
-						_resize.Apply(c, CfgWideTextOverflow.Value);
-					}
+					RuleApplier.ApplyOnTranslation(c.gameObject);
 					value = result;
 					Ticks += Stopwatch.GetTimestamp() - t0;
 					return;
@@ -385,10 +356,7 @@ namespace LOM_UI_EN
 				BaseFills++;
 				Remember(c, value);
 				_recordResult[c.GetInstanceID()] = filled;
-				if (CfgApplyResizers.Value)
-				{
-					_resize.Apply(c, CfgWideTextOverflow.Value);
-				}
+				RuleApplier.ApplyOnTranslation(c.gameObject);
 				value = filled;
 				Ticks += Stopwatch.GetTimestamp() - t0;
 				return;
@@ -455,7 +423,6 @@ namespace LOM_UI_EN
 			_recordComponent[id] = c;
 			_recordSource[id] = source;
 			_recordResult.Remove(id);
-			SceneResizeTable.NoteOriginal(c, id);
 		}
 
 		private static void Forget(Component c)
@@ -486,7 +453,6 @@ namespace LOM_UI_EN
 					_recordSource.Remove(id);
 					_recordResult.Remove(id);
 					_skip.Remove(id);
-					SceneResizeTable.Forget(id);
 				}
 			}
 			if (_skip.Count > 20000)
@@ -496,9 +462,9 @@ namespace LOM_UI_EN
 		}
 
 		/// <summary>
-		/// Turned off: with the original patch's XUnity running, undo this layer's resizes and give the texts it translated their
-		/// Chinese back, which XUnity then translates as it would without this mod. Without XUnity the English stays on screen
-		/// (better than Chinese); new text shows as the game writes it.
+		/// Turned off: with the original patch's XUnity running, give the texts this layer translated their Chinese back, which
+		/// XUnity then translates as it would without this mod. Without XUnity the English stays on screen (better than
+		/// Chinese); new text shows as the game writes it.
 		/// </summary>
 		private static void OnTurnedOff()
 		{
@@ -506,7 +472,6 @@ namespace LOM_UI_EN
 			{
 				return;
 			}
-			SceneResizeTable.Unresize();
 			Retranslate(force: true);
 		}
 
@@ -785,524 +750,6 @@ namespace LOM_UI_EN
 		{
 			double ms = Ticks * 1000.0 / Stopwatch.Frequency;
 			return $"scene text {ActiveLabel}: {Calls} text sets, {Candidates} candidates, {Hits} translated, {Misses} without a line, {ms:F1} ms total, {Recorded} recorded, {SessionUntranslated} logged as untranslated";
-		}
-	}
-
-	/// <summary>
-	/// XUnity's UI resizer (UIResizeCache / UIResizeAttachment / DefaultTextComponentManipulator.ResizeUI), for the
-	/// *.resizer.txt files the English patch ships. Lines are 'path=Command(args);Command(args)'; a path matches from the scene
-	/// root down, and every matching ancestor contributes its commands (a deeper node overrides per command slot). Files load
-	/// in reverse name order, later ones overriding. Applied only to components this mod translated, as XUnity did.
-	/// </summary>
-	public sealed class SceneResizeTable
-	{
-		private sealed class Node
-		{
-			public readonly Dictionary<string, Node> Children = new Dictionary<string, Node>(StringComparer.Ordinal);
-			public Result Result;
-		}
-
-		private sealed class Result
-		{
-			public Func<int, int?> FontSize;       // ChangeFontSize / ByPercentage / IgnoreFontSize
-			public bool HasAutoResize;
-			public bool AutoResize;
-			public double? MinSize;
-			public double? MaxSize;
-			public Func<float, float?> LineSpacing;
-			public int? HOverflow;
-			public int? VOverflow;
-			public int? TmpOverflow;
-			public int? TmpAlignment;
-
-			public Result Copy()
-			{
-				return (Result)MemberwiseClone();
-			}
-
-			public void MergeInto(Result o)
-			{
-				if (o == null)
-				{
-					return;
-				}
-				if (o.FontSize != null) FontSize = o.FontSize;
-				if (o.HasAutoResize) { HasAutoResize = true; AutoResize = o.AutoResize; MinSize = o.MinSize; MaxSize = o.MaxSize; }
-				if (o.LineSpacing != null) LineSpacing = o.LineSpacing;
-				if (o.HOverflow.HasValue) HOverflow = o.HOverflow;
-				if (o.VOverflow.HasValue) VOverflow = o.VOverflow;
-				if (o.TmpOverflow.HasValue) TmpOverflow = o.TmpOverflow;
-				if (o.TmpAlignment.HasValue) TmpAlignment = o.TmpAlignment;
-			}
-		}
-
-		private static readonly Regex CommandRegex = new Regex("^\\s*(.+)\\s*\\(([\\s\\S]*)\\)\\s*$", RegexOptions.CultureInvariant);
-		private static readonly char[] ArgSplitters = new char[2] { ',', ' ' };
-		private readonly Node _root = new Node();
-		// Per component, across table reloads and profile switches (a new SceneResizeTable must not shrink a label twice):
-		// the size and spacing a component had before any resize (noted when its Chinese source is first recorded, before
-		// our prefix or XUnity's postfix resizes it), and the values this mod last wrote, as XUnity's _alteredFontSize.
-		private static readonly Dictionary<int, int> _originalFontSize = new Dictionary<int, int>();
-		private static readonly Dictionary<int, float> _originalLineSpacing = new Dictionary<int, float>();
-		private static readonly Dictionary<int, int> _alteredFontSize = new Dictionary<int, int>();
-		private static readonly Dictionary<int, float> _alteredLineSpacing = new Dictionary<int, float>();
-		private static readonly Dictionary<int, Component> _resized = new Dictionary<int, Component>();
-		private static readonly Stack<Transform> _pathStack = new Stack<Transform>(32);
-
-		public int Nodes { get; private set; }
-		public int Commands { get; private set; }
-		public int BadCommands { get; private set; }
-
-		/// <summary>Called when a component's Chinese source is recorded: keep its own font size and line spacing once.</summary>
-		public static void NoteOriginal(Component c, int id)
-		{
-			if (_originalFontSize.ContainsKey(id))
-			{
-				return;
-			}
-			if (c is Text t)
-			{
-				_originalFontSize[id] = t.fontSize;
-				_originalLineSpacing[id] = t.lineSpacing;
-			}
-			else if (c is TMP_Text tmp)
-			{
-				_originalFontSize[id] = (int)tmp.fontSize;
-			}
-		}
-
-		public static void Forget(int id)
-		{
-			_originalFontSize.Remove(id);
-			_originalLineSpacing.Remove(id);
-			_alteredFontSize.Remove(id);
-			_alteredLineSpacing.Remove(id);
-			_resized.Remove(id);
-		}
-
-		/// <summary>XUnity's UnresizeUI for every component this mod resized: the original size and spacing come back where ours still show.</summary>
-		public static void Unresize()
-		{
-			foreach (KeyValuePair<int, Component> kv in _resized)
-			{
-				try
-				{
-					int orig;
-					int altered;
-					float origLs;
-					float alteredLs;
-					if (kv.Value is Text t && t != null)
-					{
-						if (_alteredFontSize.TryGetValue(kv.Key, out altered) && t.fontSize == altered && _originalFontSize.TryGetValue(kv.Key, out orig))
-						{
-							t.fontSize = orig;
-						}
-						if (_alteredLineSpacing.TryGetValue(kv.Key, out alteredLs) && t.lineSpacing == alteredLs && _originalLineSpacing.TryGetValue(kv.Key, out origLs))
-						{
-							t.lineSpacing = origLs;
-						}
-					}
-					else if (kv.Value is TMP_Text tmp && tmp != null)
-					{
-						if (_alteredFontSize.TryGetValue(kv.Key, out altered) && (int)tmp.fontSize == altered && _originalFontSize.TryGetValue(kv.Key, out orig))
-						{
-							tmp.fontSize = orig;
-						}
-					}
-				}
-				catch (Exception)
-				{
-				}
-			}
-			_resized.Clear();
-			_alteredFontSize.Clear();
-			_alteredLineSpacing.Clear();
-		}
-
-		/// <summary>The base a size command works from: the component's own size when it is known and ours (or XUnity's) is showing.</summary>
-		private static int FontBase(int id, int current)
-		{
-			int orig;
-			int altered;
-			if (_originalFontSize.TryGetValue(id, out orig) && (!_alteredFontSize.TryGetValue(id, out altered) || altered != current))
-			{
-				return orig;
-			}
-			return current;
-		}
-
-		/// <summary>The resizer files of one folder, or of several separated by ';' in that order (a later folder's lines win: the original patch's first, this mod's own after).</summary>
-		public static SceneResizeTable Load(string dirs)
-		{
-			SceneResizeTable t = new SceneResizeTable();
-			if (string.IsNullOrEmpty(dirs))
-			{
-				return t;
-			}
-			foreach (string dir in dirs.Split(new char[1] { ';' }, StringSplitOptions.RemoveEmptyEntries))
-			{
-				if (!Directory.Exists(dir))
-				{
-					continue;
-				}
-				string[] files = Directory.GetFiles(dir, "*resizer.txt", SearchOption.AllDirectories);
-				Array.Sort(files, StringComparer.OrdinalIgnoreCase);
-				Array.Reverse(files);
-				foreach (string f in files)
-				{
-					try
-					{
-						t.LoadFile(f);
-						t.FileCount++;
-					}
-					catch (Exception ex)
-					{
-						Plugin.Log?.LogWarning("resizer file " + Path.GetFileName(f) + ": " + ex.Message);
-					}
-				}
-			}
-			return t;
-		}
-
-		public int FileCount { get; private set; }
-
-		private void LoadFile(string path)
-		{
-			string all;
-			using (StreamReader r = new StreamReader(path, Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
-			{
-				all = r.ReadToEnd();
-			}
-			foreach (string line in all.Split(new char[2] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
-			{
-				if (line.StartsWith("#set ", StringComparison.Ordinal) || line.StartsWith("#unset ", StringComparison.Ordinal) || line.StartsWith("#enable ", StringComparison.Ordinal))
-				{
-					continue;
-				}
-				string[] kv;
-				try
-				{
-					kv = SceneDictionary.ReadTranslationLineAndDecode(line);
-				}
-				catch (Exception)
-				{
-					continue;
-				}
-				if (kv == null || string.IsNullOrEmpty(kv[0]) || string.IsNullOrEmpty(kv[1]))
-				{
-					continue;
-				}
-				Add(kv[0], kv[1]);
-			}
-		}
-
-		private void Add(string path, string commands)
-		{
-			Node node = _root;
-			foreach (string seg in path.Split(new char[1] { '/' }, StringSplitOptions.RemoveEmptyEntries))
-			{
-				Node next;
-				if (!node.Children.TryGetValue(seg, out next))
-				{
-					next = new Node();
-					node.Children[seg] = next;
-					Nodes++;
-				}
-				node = next;
-			}
-			foreach (string cmd in commands.Split(new char[1] { ';' }, StringSplitOptions.RemoveEmptyEntries))
-			{
-				Match m = CommandRegex.Match(cmd);
-				if (!m.Success)
-				{
-					BadCommands++;
-					continue;
-				}
-				try
-				{
-					string name = m.Groups[1].Value.Trim();
-					string[] args = m.Groups[2].Value.Split(ArgSplitters, StringSplitOptions.RemoveEmptyEntries);
-					Result r = node.Result ?? (node.Result = new Result());
-					Apply(r, name, args);
-					Commands++;
-				}
-				catch (Exception)
-				{
-					// Invalid arguments (e.g. TMP_Alignment(Middle), which is not a TextAlignmentOptions name): XUnity skips the command too.
-					BadCommands++;
-				}
-			}
-		}
-
-		private static void Apply(Result r, string name, string[] args)
-		{
-			switch (name.ToLowerInvariant())
-			{
-			case "changefontsize":
-			{
-				Need(args, 1);
-				int size = int.Parse(args[0], CultureInfo.InvariantCulture);
-				r.FontSize = (int current) => size;
-				break;
-			}
-			case "changefontsizebypercentage":
-			{
-				Need(args, 1);
-				double perc = double.Parse(args[0], CultureInfo.InvariantCulture);
-				r.FontSize = (int current) => (int)(current * perc);
-				break;
-			}
-			case "ignorefontsize":
-				r.FontSize = (int current) => null;
-				break;
-			case "autoresize":
-				if (args.Length < 1)
-				{
-					throw new ArgumentException("AutoResize needs arguments");
-				}
-				r.HasAutoResize = true;
-				r.AutoResize = bool.Parse(args[0]);
-				r.MinSize = (args.Length >= 2) ? ParseMinMax(args[1]) : null;
-				r.MaxSize = (args.Length >= 3) ? ParseMinMax(args[2]) : null;
-				break;
-			case "ugui_changelinespacing":
-			{
-				Need(args, 1);
-				float v = float.Parse(args[0], CultureInfo.InvariantCulture);
-				r.LineSpacing = (float current) => v;
-				break;
-			}
-			case "ugui_changelinespacingbypercentage":
-			{
-				Need(args, 1);
-				float p = float.Parse(args[0], CultureInfo.InvariantCulture);
-				r.LineSpacing = (float current) => current * p;
-				break;
-			}
-			case "ugui_horizontaloverflow":
-				Need(args, 1);
-				r.HOverflow = (int)Enum.Parse(typeof(HorizontalWrapMode), args[0], ignoreCase: true);
-				break;
-			case "ugui_verticaloverflow":
-				Need(args, 1);
-				r.VOverflow = (int)Enum.Parse(typeof(VerticalWrapMode), args[0], ignoreCase: true);
-				break;
-			case "tmp_overflow":
-				Need(args, 1);
-				r.TmpOverflow = (int)Enum.Parse(typeof(TextOverflowModes), args[0], ignoreCase: true);
-				break;
-			case "tmp_alignment":
-				Need(args, 1);
-				r.TmpAlignment = (int)Enum.Parse(typeof(TextAlignmentOptions), args[0], ignoreCase: true);
-				break;
-			default:
-				throw new ArgumentException("unknown command " + name);
-			}
-		}
-
-		private static void Need(string[] args, int n)
-		{
-			if (args.Length != n)
-			{
-				throw new ArgumentException("wrong argument count");
-			}
-		}
-
-		private static double? ParseMinMax(string arg)
-		{
-			if (string.Equals(arg, "keep", StringComparison.OrdinalIgnoreCase))
-			{
-				return null;
-			}
-			if (string.Equals(arg, "none", StringComparison.OrdinalIgnoreCase))
-			{
-				return double.NaN;
-			}
-			return double.Parse(arg, CultureInfo.InvariantCulture);
-		}
-
-		private Result Lookup(Transform t)
-		{
-			if (_root.Children.Count == 0)
-			{
-				return null;
-			}
-			_pathStack.Clear();
-			for (Transform x = t; x != null; x = x.parent)
-			{
-				_pathStack.Push(x);
-			}
-			Node node = _root;
-			Result result = null;
-			while (_pathStack.Count > 0)
-			{
-				Transform seg = _pathStack.Pop();
-				Node next;
-				if (!node.Children.TryGetValue(seg.name, out next))
-				{
-					break;
-				}
-				if (result == null)
-				{
-					result = next.Result?.Copy();
-				}
-				else
-				{
-					result.MergeInto(next.Result);
-				}
-				node = next;
-			}
-			_pathStack.Clear();
-			return result;
-		}
-
-		/// <summary>DefaultTextComponentManipulator.ResizeUI for UGUI Text and TextMeshPro.</summary>
-		public void Apply(Component c, bool implicitEffects)
-		{
-			try
-			{
-				if (c is Text text)
-				{
-					ApplyText(text, implicitEffects);
-				}
-				else if (c is TMP_Text tmp)
-				{
-					ApplyTmp(tmp, implicitEffects);
-				}
-			}
-			catch (Exception ex)
-			{
-				Plugin.Log.LogWarning("resize failed on " + PathUtil.GetPath(c.transform) + ": " + ex.Message);
-			}
-		}
-
-		private void ApplyText(Text t, bool implicitEffects)
-		{
-			float width = t.rectTransform.rect.width;
-			bool wide = width > (float)(Screen.width / 4);
-			bool setLineSpacing = false;
-			bool setH = false;
-			bool setV = false;
-			Result r = Lookup(t.transform);
-			int id = t.GetInstanceID();
-			if (r != null)
-			{
-				if (r.HasAutoResize)
-				{
-					double min = r.MinSize ?? 1.0;
-					t.resizeTextMinSize = double.IsNaN(min) ? 1 : (int)min;
-					if (r.MaxSize.HasValue)
-					{
-						t.resizeTextMaxSize = double.IsNaN(r.MaxSize.Value) ? 1 : (int)r.MaxSize.Value;
-					}
-					t.resizeTextForBestFit = r.AutoResize;
-				}
-				if (r.FontSize != null)
-				{
-					int current = t.fontSize;
-					int altered;
-					if (!_alteredFontSize.TryGetValue(id, out altered) || altered != current)
-					{
-						int? size = r.FontSize(FontBase(id, current));
-						if (size.HasValue)
-						{
-							t.fontSize = size.Value;
-							_alteredFontSize[id] = size.Value;
-							_resized[id] = t;
-						}
-					}
-				}
-				if (r.LineSpacing != null)
-				{
-					float current = t.lineSpacing;
-					float altered;
-					if (!_alteredLineSpacing.TryGetValue(id, out altered) || altered != current)
-					{
-						float orig;
-						float? ls = r.LineSpacing(_originalLineSpacing.TryGetValue(id, out orig) ? orig : current);
-						if (ls.HasValue)
-						{
-							setLineSpacing = true;
-							t.lineSpacing = ls.Value;
-							_alteredLineSpacing[id] = ls.Value;
-							_resized[id] = t;
-						}
-					}
-				}
-				if (r.HOverflow.HasValue)
-				{
-					setH = true;
-					t.horizontalOverflow = (HorizontalWrapMode)r.HOverflow.Value;
-				}
-				if (r.VOverflow.HasValue)
-				{
-					setV = true;
-					t.verticalOverflow = (VerticalWrapMode)r.VOverflow.Value;
-				}
-			}
-			if (!implicitEffects || !wide || t.resizeTextForBestFit)
-			{
-				return;
-			}
-			if (!setV)
-			{
-				t.verticalOverflow = VerticalWrapMode.Overflow;
-			}
-			if (!setH)
-			{
-				t.horizontalOverflow = HorizontalWrapMode.Wrap;
-			}
-		}
-
-		private void ApplyTmp(TMP_Text t, bool implicitEffects)
-		{
-			TextOverflowModes originalOverflow = t.overflowMode;
-			bool setOverflow = false;
-			Result r = Lookup(t.transform);
-			int id = t.GetInstanceID();
-			if (r != null)
-			{
-				if (r.TmpOverflow.HasValue)
-				{
-					setOverflow = true;
-					t.overflowMode = (TextOverflowModes)r.TmpOverflow.Value;
-				}
-				if (r.TmpAlignment.HasValue)
-				{
-					t.alignment = (TextAlignmentOptions)r.TmpAlignment.Value;
-				}
-				if (r.HasAutoResize)
-				{
-					if (r.MinSize.HasValue)
-					{
-						t.fontSizeMin = double.IsNaN(r.MinSize.Value) ? 0f : (float)r.MinSize.Value;
-					}
-					if (r.MaxSize.HasValue)
-					{
-						t.fontSizeMax = double.IsNaN(r.MaxSize.Value) ? float.MaxValue : (float)r.MaxSize.Value;
-					}
-					t.enableAutoSizing = r.AutoResize;
-				}
-				if (r.FontSize != null)
-				{
-					int current = (int)t.fontSize;
-					int altered;
-					if (!_alteredFontSize.TryGetValue(id, out altered) || altered != current)
-					{
-						int? size = r.FontSize(FontBase(id, current));
-						if (size.HasValue)
-						{
-							t.fontSize = size.Value;
-							_alteredFontSize[id] = size.Value;
-							_resized[id] = t;
-						}
-					}
-				}
-			}
-			if (implicitEffects && !setOverflow && originalOverflow == TextOverflowModes.Masking)
-			{
-				t.overflowMode = TextOverflowModes.Truncate;
-			}
 		}
 	}
 

@@ -10,16 +10,22 @@ Advanced (technical settings most players never need) and About.
 INSTALL
 Keep the game's language on Traditional Chinese (the default): this mod shows that language in English.
  - Full package (LOM-English-Localization-QoL-<version>-full.zip): extract it into the game folder, the one that holds
-   Mortal.exe, and start the game. It includes BepInEx 6.0.0-be.692, the mod loader this mod runs on.
- - Mod-only package (LOM-English-Localization-QoL-<version>-mod-only.zip): for updating, or when BepInEx is already
-   installed (Lash's English Patch below includes it). Extract it into the game folder.
-The mod runs on BepInEx 6 (LOM_UI_EN.dll) and on BepInEx 5 (LOM_UI_EN.BepInEx5.dll); each BepInEx loads only its own.
-From its 2026-09-28 release, Lash's English Patch runs on BepInEx 5. If you have that release or a later one, use the
-mod-only package. The full package would switch the game back to BepInEx 6, where that patch's own plugins do not run
-(this mod then still reads its text). Version 1.0.0 of this mod runs on BepInEx 6 only, so update this mod when you
-update that patch.
-To update, delete the folder BepInEx/plugins/LOM_UI_EN first, then extract the new version; your settings are kept
-(they are saved in BepInEx/config).
+   Mortal.exe, and start the game. It includes BepInEx 5.4.23.3, the mod loader this mod runs on, the same version
+   Lash's English Patch installs.
+ - Mod-only package (LOM-English-Localization-QoL-<version>-mod-only.zip): for updating, or when BepInEx 5.4.23.3 is
+   already installed (the installer of Lash's English Patch installs it). Extract it into the game folder.
+Since version 1.2.0 this mod runs on BepInEx 5.4.23.3 only. An older setup on BepInEx 6 (this mod's full package up to
+1.1.x, or Lash's English Patch up to its 2026-02 releases) does not load it. Version 1.1.x of this mod still runs on
+BepInEx 6.
+To update, delete the folder BepInEx/plugins/LOM_UI_EN first; your settings are kept (they are saved in
+BepInEx/config), and 1.1.x's LOM_UI_EN.BepInEx5.dll, no longer used, goes with the folder. Then:
+ - the game already runs BepInEx 5.4.23.3 (this mod's 1.2.0 full package, or Lash's English Patch set up by its
+   installer): extract the new mod-only package;
+ - you installed this mod's full package of 1.1.x or older (BepInEx 6): extract the new full package, which moves the
+   game to BepInEx 5.4.23.3;
+ - you use Lash's English Patch from before its installer (its 2026-02 releases): run Lash's installer first (it
+   updates the patch and moves the game to BepInEx 5.4.23.3), then extract the mod-only package, and delete
+   Mods/English/StringTable.csv (the new patch reads that old file over part of its new text).
 This mod carries its own complete translation: every line of the game was reviewed in its scene for fidelity and the
 wuxia voice of the original, with a ruled glossary, corrected names and choice lines checked against the story. It
 grew from Lash's English Patch (https://github.com/joshfreitas1984/LegendOfMortalOverLlm), which is optional.
@@ -34,6 +40,8 @@ when it matters).
 Where this mod has its own line, it shows over the newer versions' labels, screen text and code text too. Their text
 resizer shrinks the game's text (to 80% on most screens); this mod's layout fixes size the text without it, so it is
 held back. Mod Settings > Advanced > "Resizer of Lash's English Patch" lets it run.
+Lash's English Patch now updates itself: when a newer version is out, the game offers it at start. Its updates change
+only that patch's own files, never this mod's folder.
 
 UNINSTALL
 Delete the folder BepInEx/plugins/LOM_UI_EN (and BepInEx/config/lom.ui.english.cfg and lom.strings.english.cfg for its
@@ -76,10 +84,9 @@ USING LASH'S ENGLISH PATCH ON ITS OWN (needs that patch installed)
    fixes, translated images, fonts, quick save and the rest.
 
 FILES
- LOM_UI_EN.dll           the mod, for BepInEx 6
- LOM_UI_EN.BepInEx5.dll  the same mod built for BepInEx 5 (each BepInEx loads only the one built for it)
- translation/            this mod's translation (StringTable.csv = game data rows, scene/ = scene lines and resize/
-                         layout files; a scene line with nothing after '=' hides that line of Lash's English Patch)
+ LOM_UI_EN.dll           the mod, for BepInEx 5.4.23.3
+ translation/            this mod's translation (StringTable.csv = game data rows, scene/ = scene lines; a scene line
+                         with nothing after '=' hides that line of Lash's English Patch)
  translation/untranslated.txt   Chinese seen in game that had no English (for translators; written by the game)
  rules/, sprites/, strings/     layout fixes, translated images, wording fixes
  nametips.tsv            the characters whose names in dialogue show a tooltip, and the name forms matched

@@ -125,8 +125,8 @@ namespace LOM_UI_EN
 					{
 						priority = Priority.First
 					};
-					bool a = Compat.Hook(F.BasePlugins, _h, AccessTools.Method(resizer, "ApplyResizing"), "TextResizerService.ApplyResizing", hold);
-					bool b = Compat.Hook(F.BasePlugins, _h, AccessTools.Method(resizer, "ApplyResizingToLegacyText"), "TextResizerService.ApplyResizingToLegacyText", hold);
+					bool a = HookAll(ResizerTargets(resizer, "ApplyResizing"), "TextResizerService.ApplyResizing", hold);
+					bool b = HookAll(ResizerTargets(resizer, "ApplyResizingToLegacyText"), "TextResizerService.ApplyResizingToLegacyText", hold);
 					ResizerGuarded = a && b;
 				});
 			}
@@ -191,6 +191,36 @@ namespace LOM_UI_EN
 			{
 				Compat.Part(F.BasePlugins, what, a);
 			}
+		}
+
+		/// <summary>
+		/// The methods through which the pack's resizer sizes one text type. Its release 2026.09.28 has one public
+		/// ApplyResizing (TMP) and one ApplyResizingToLegacyText (Text); from 2026.10 each has a private overload as well, which
+		/// the pack's own refresh calls directly, and both overloads end in ApplyResizingCore / ApplyResizingToLegacyTextCore.
+		/// So: the Core method where there is one (every way in passes through it), else every overload of the name. Looking a
+		/// name up without its parameter types finds nothing once it is overloaded (an ambiguous match).
+		/// </summary>
+		internal static List<MethodInfo> ResizerTargets(Type resizer, string name)
+		{
+			List<MethodInfo> all = AccessTools.GetDeclaredMethods(resizer);
+			List<MethodInfo> core = all.Where((MethodInfo m) => m.Name == name + "Core").ToList();
+			return (core.Count > 0) ? core : all.Where((MethodInfo m) => m.Name == name).ToList();
+		}
+
+		/// <summary>Hooks each method with the same prefix; true when there was at least one and every one took.</summary>
+		private static bool HookAll(List<MethodInfo> targets, string what, HarmonyMethod prefix)
+		{
+			if (targets.Count == 0)
+			{
+				return Compat.Hook(F.BasePlugins, _h, null, what, prefix);
+			}
+			bool all = true;
+			foreach (MethodInfo m in targets)
+			{
+				string sig = m.Name + "(" + string.Join(", ", m.GetParameters().Select((ParameterInfo p) => p.ParameterType.Name).ToArray()) + ")";
+				all &= Compat.Hook(F.BasePlugins, _h, m, "TextResizerService." + sig, prefix);
+			}
+			return all;
 		}
 
 		/// <summary>The type holding the patch plugin's GetTranslation postfix (by its GetString prefix, else by name).</summary>

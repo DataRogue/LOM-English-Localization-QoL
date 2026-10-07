@@ -3,6 +3,37 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
+## 1.2.0 (2026-10-06)
+
+Works with Lash's English Patch of 2026-10-05 (`EnglishPatch-2026.10.05.09.58`) and its new installer, and moves to
+the same BepInEx it installs.
+
+- **BepInEx 5.4.23.3.** The mod now runs on BepInEx 5.4.23.3 only, the version Lash's English Patch installs. The full
+  package bundles it, set up the way that patch's installer sets it up, and there is one `LOM_UI_EN.dll` again. When
+  updating, delete `BepInEx/plugins/LOM_UI_EN` first (1.1.x's `LOM_UI_EN.BepInEx5.dll` is no longer used). A game still
+  on BepInEx 6 needs BepInEx 5.4.23.3 first: from this mod's full package up to 1.1.x, extract the 1.2.0 full package;
+  with Lash's patch from its 2026-02 releases, run that patch's installer, then add the mod-only package. 1.1.x still
+  runs on BepInEx 6.
+- **Lash's text resizer stays held back.** From its 2026-10-04 release on, that patch reworked its text resizer, and
+  1.1.x no longer finds it: with 1.1.x its 80% shrink applies on top of this mod's layout. This version holds it back again
+  (Mod Settings > Advanced > "Resizer of Lash's English Patch" still lets it run). Its updates, which it now offers
+  when the game starts, never touch this mod's folder.
+- **The old resizer files are gone.** Up to 1.1.x the mod still sized some text with resizer files from the patch's
+  XUnity days (`translation/scene/resize`). Their sizes are now ordinary layout rules, applied to the same texts at the
+  same moment, so screens look as they did (checked screen by screen against 1.1.1). The mod no longer reads any
+  resizer file, its own or the patch's. Mod Settings > Advanced loses "Text sizes of Lash's English Patch" and "Wide
+  text overflow".
+- **Mod Settings switches put the screen back exactly.** Switching "Layout fixes" or "Translated images", or
+  Compatibility's "Try again", now redraws every text as the screen first drew it. Before, some text could come back
+  about 10% larger, or lose its size, until the next screen.
+- **Sect tab income.** The facility cards read "+50", "+30": the word "taels" was cut off. It now shows on one line.
+- **Book descriptions show in full.** 44 book descriptions showed a fragment ("...but this book was compiled by
+  later scholars from the Shanghan Lun and the Jingui Yaolue.") instead of the whole text: an early fix kept only the
+  sentences it corrected and replaced the rest with "...", and that fix showed over the full, reviewed description.
+  Each now shows the whole description with its corrections. The description boxes in the Bag, under a selected
+  martial art and in the Relationships biographies also no longer risk losing their last line.
+- **The duel splash reads "Fight Their Mother"**, closer to the original joke (戰你娘親), instead of "Duel Start".
+
 ## 1.1.1 (2026-09-28)
 
 A fix for the Attributes screen. Nothing else changed.

@@ -9,8 +9,8 @@ of the library under 3 is also under the Unity Companion License (see there).
 Translation origin: this mod's English grew from Lash's English Patch by joshfreitas1984
 (https://github.com/joshfreitas1984/LegendOfMortalOverLlm), a machine translation of the game. Since
 0.6 every line has been reviewed in its scene and many rewritten; the reviewed lines that kept that
-patch's wording, and the three layout files in translation/scene/resize/ (copies of that patch's
-resizers), are that patch's work. When the patch is installed, the plugin also reads the player's own
+patch's wording, and the text sizes in rules/05_text_sizes.json (carried over from that patch's
+resizer files), are that patch's work. When the patch is installed, the plugin also reads the player's own
 copy at runtime (the fallback and the "Lash's" option); it never changes it.
 
 ==============================================================================
@@ -18,7 +18,7 @@ copy at runtime (the fallback and the "Lash's" option); it never changes it.
    https://github.com/bbepis/XUnity.AutoTranslator
    Licence file: LICENSE at tag v5.3.1 (identical on master)
 
-Ported in SceneDictionary.cs (translation-file parsing, TextTranslationCache loading and lookup, text trimming/normalization, rich-text and Chinese-text rules) and SceneText.cs (SceneResizeTable: the UI resizer and its undo, plus the text-component ignore rule).
+Ported in SceneDictionary.cs (translation-file parsing, TextTranslationCache loading and lookup, text trimming/normalization, rich-text and Chinese-text rules) and SceneText.cs (the text-component ignore rule).
 
 MIT License
 

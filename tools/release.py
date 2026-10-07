@@ -6,10 +6,10 @@ in game, nothing the game or the tools wrote there, checked before and after.
 Gates (any failure refuses to package):
   1. publish.py check passes on the plugin folder (the translation is what the workspace says, no OverLlm text beyond the
      review ledger, only the expected binary files).
-  2. src/LOM_UI_EN/build.ps1 (deterministic) rebuilt into a temporary folder gives the installed LOM_UI_EN.dll byte for byte,
-     and build.ps1 -BepInEx5 the installed LOM_UI_EN.BepInEx5.dll (the same source for BepInEx 5, which Lash's English Patch
-     runs on since its llmkit-upgrade; each BepInEx loads only its own), so the published source is the shipped binary
-     (--skip-rebuild-check skips this, and says so in the listing).
+  2. src/LOM_UI_EN/build.ps1 (deterministic, against BepInEx 5.4.23.3) rebuilt into a temporary folder gives the installed
+     LOM_UI_EN.dll byte for byte, so the published source is the shipped binary (--skip-rebuild-check skips this, and says
+     so in the listing). Since 1.2.0 there is one DLL, for BepInEx 5.4.23.3 (the 1.0.x and 1.1.x branches package their own
+     BepInEx 6 builds); a leftover LOM_UI_EN.BepInEx5.dll in the plugin folder is refused (step 5).
   3. The plugin folder's README.txt is src/LOM_UI_EN/PLAYER_README.txt byte for byte.
   4. compat_verified.json was written by this version (Mod Settings > Advanced > Mark as checked, or the harness
      `invoke static LOM_UI_EN.Compat.MarkVerified`, after the in-game test). --candidate lets an unverified build through and
@@ -20,8 +20,11 @@ Gates (any failure refuses to package):
 
 Writes into DIR (default LOM_Localization/release/dist/<version>[-candidate]/):
   LOM-English-Localization-QoL-<version>-mod-only.zip   BepInEx/plugins/LOM_UI_EN/... only
-  LOM-English-Localization-QoL-<version>-full.zip       the same plus BepInEx 6.0.0-be.692 (Unity Mono, x86) exactly as in the
-                                                        official zip (release/vendor, pinned by SHA-256) and
+  LOM-English-Localization-QoL-<version>-full.zip       the same plus BepInEx 5.4.23.3 (Unity Mono, x86), the version Lash's
+                                                        English Patch installs: the official zip (release/vendor, pinned by
+                                                        SHA-256, the same pin as that patch's installer) with one line of
+                                                        doorstop_config.ini set as that installer sets it
+                                                        (dll_search_path_override = "BepInEx\\core"), and
                                                         BepInEx/THIRD_PARTY_NOTICES-BepInEx.txt (its components, sources and
                                                         licences)
   SHA256SUMS.txt, and FILES.txt (every packaged file with its size and SHA-256)
@@ -39,42 +42,50 @@ SLUG = "LOM-English-Localization-QoL"
 SRC = os.path.join(P.REAL_LOCALIZATION, "src", "LOM_UI_EN")
 RELEASE = os.path.join(P.REAL_LOCALIZATION, "release")
 VENDOR = os.path.join(RELEASE, "vendor")
-BEPINEX_ZIP = "BepInEx-Unity.Mono-win-x86-6.0.0-be.692+851521c.zip"
-BEPINEX_SHA256 = "97720c5f5c70abfb2ae19dba6000529049ae67f053303b3ce2b49e6ad6c0eca6"
-BEPINEX_SOURCE = "https://builds.bepinex.dev/projects/bepinex_be/692/BepInEx-Unity.Mono-win-x86-6.0.0-be.692%2B851521c.zip"
+BEPINEX_ZIP = "BepInEx_win_x86_5.4.23.3.zip"
+BEPINEX_SHA256 = "275bc94fa582ba0ddeb5dca1241fd657d5f101563c3a8dd3a4a6c27ca28e2376"
+BEPINEX_SOURCE = "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.3/BepInEx_win_x86_5.4.23.3.zip"
+# Lash's English Patch's installer (FanslationStudio.Installer.Core BepInExInstaller.ApplyDoorstopSettings, pin
+# "dllSearchPathOverride": "BepInEx\\core" in its installer.json) rewrites this line after extracting the same zip: the game
+# ships its own MonoMod in Managed, and BepInEx must load its own copies from BepInEx\core first.
+DOORSTOP_INI = "doorstop_config.ini"
+DOORSTOP_OVERRIDE = re.compile(r"(?m)^dll_search_path_override[ \t]*=[^\r\n]*")
+DOORSTOP_OVERRIDE_LINE = 'dll_search_path_override = "BepInEx\\core"'
 PLUGIN_PREFIX = "BepInEx/plugins/LOM_UI_EN/"
 
 # what ships from the plugin folder (paths relative to it, '/' separated)
-SHIP = re.compile(r"^(LOM_UI_EN\.dll|LOM_UI_EN\.BepInEx5\.dll|Newtonsoft\.Json\.dll|README\.txt|THIRD_PARTY_NOTICES\.txt|compat_verified\.json|fonts\.json"
+SHIP = re.compile(r"^(LOM_UI_EN\.dll|Newtonsoft\.Json\.dll|README\.txt|THIRD_PARTY_NOTICES\.txt|compat_verified\.json|fonts\.json"
                   r"|nametips\.tsv|factiontips\.tsv|rules/[^/]+\.json|sprites/[^/]+\.png|sprites/spritemap\.json|strings/[^/]+\.csv"
-                  r"|translation/(StringTable\.csv|StringTable\.meta\.tsv|MANIFEST\.json|scene/scene_text\.txt"
-                  r"|scene/resize/[^/]+\.resizer\.txt))$")
+                  r"|translation/(StringTable\.csv|StringTable\.meta\.tsv|MANIFEST\.json|scene/scene_text\.txt))$")
 # what never ships: the files the game writes while it runs, publish.py's own state, a harness folder
 NOT_SHIPPED = set(publish.RUNTIME_FILES) | {publish.REL_STATE}
 NOT_SHIPPED_PREFIX = ("harness/",)
 
 BEPINEX_NOTICE_HEAD = """LOM English Localization + QoL - the bundled mod loader
 
-The full package bundles BepInEx 6.0.0-be.692 (Unity Mono, x86) unmodified: doorstop_config.ini, winhttp.dll,
+The full package bundles BepInEx 5.4.23.3 (Unity Mono, x86), the version Lash's English Patch installs: winhttp.dll,
 .doorstop_version, changelog.txt and everything in BepInEx/core are byte for byte the files of
 %(zip)s
 (SHA-256 %(sha)s), downloaded from
 %(url)s
-BepInEx: https://github.com/BepInEx/BepInEx, source of this build:
-https://github.com/BepInEx/BepInEx/tree/851521cc126e4f9d841d2d9bfe857558f0395939
+doorstop_config.ini is that zip's file with one line changed, as the installer of Lash's English Patch changes it:
+  %(override)s
+(the game ships its own MonoMod; BepInEx must load its own copies from BepInEx\\core first).
+BepInEx: https://github.com/BepInEx/BepInEx, source of this build (tag v5.4.23.3):
+https://github.com/BepInEx/BepInEx/tree/0d627cdcf46a732579db6761009749c1e0436327
 Licence: GNU Lesser General Public License 2.1 (the full text is below).
 
 BepInEx includes:
-  UnityDoorstop 4 (winhttp.dll)                     https://github.com/NeighTools/UnityDoorstop         LGPL-2.1
+  UnityDoorstop 4.4.0 (winhttp.dll)                 https://github.com/NeighTools/UnityDoorstop         LGPL-2.1
   HarmonyX (0Harmony.dll)                           https://github.com/BepInEx/HarmonyX                 MIT
+  BepInEx.Harmony (BepInEx.Harmony.dll,             https://github.com/BepInEx/BepInEx.Harmony          MIT
+    HarmonyXInterop.dll, 0Harmony20.dll)            (the submodule commit d4cdcb4 of BepInEx v5.4.23.3)
   MonoMod (MonoMod.Utils, MonoMod.RuntimeDetour)    https://github.com/MonoMod/MonoMod                  MIT
   Mono.Cecil (Mono.Cecil*.dll)                      https://github.com/jbevain/cecil                    MIT
-  SemanticVersioning (SemanticVersioning.dll)       https://github.com/adamreeve/semver.net             MIT
-  AssetRipper.Primitives                            https://github.com/AssetRipper/AssetRipper.Primitives  MIT
 Their licence texts follow, then the LGPL-2.1.
 """
-LICENSE_FILES = [("HarmonyX", "HarmonyX-LICENSE.txt"), ("MonoMod", "MonoMod-LICENSE.txt"), ("Mono.Cecil", "cecil-LICENSE.txt"),
-                 ("SemanticVersioning", "semver.net-LICENSE.txt"), ("AssetRipper.Primitives", "AssetRipper.Primitives-LICENSE.txt"),
+LICENSE_FILES = [("HarmonyX", "HarmonyX-LICENSE.txt"), ("BepInEx.Harmony", "BepInEx.Harmony-LICENSE.txt"),
+                 ("MonoMod", "MonoMod-LICENSE.txt"), ("Mono.Cecil", "cecil-LICENSE.txt"),
                  ("BepInEx and UnityDoorstop: GNU Lesser General Public License 2.1", "BepInEx-LICENSE.txt")]
 
 
@@ -119,8 +130,8 @@ def classify(files):
     return ship, skipped, unknown
 
 
-# the plugin DLLs and the build.ps1 switches that make them
-DLLS = (("LOM_UI_EN.dll", []), ("LOM_UI_EN.BepInEx5.dll", ["-BepInEx5"]))
+# the plugin DLL and the build.ps1 switches that make it (one since 1.2.0: BepInEx 5.4.23.3)
+DLLS = (("LOM_UI_EN.dll", []),)
 
 
 def rebuild_matches(installed_dll, name="LOM_UI_EN.dll"):
@@ -130,8 +141,9 @@ def rebuild_matches(installed_dll, name="LOM_UI_EN.dll"):
         r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", os.path.join(SRC, "build.ps1"),
                             "-Game", P.GAME, "-OutDir", tmp] + switches, capture_output=True, text=True)
         if r.returncode != 0:
-            raise ReleaseError("build.ps1 %s failed (for -BepInEx5, a BepInEx.dll 5.4.21 must be in the game's BepInEx\\core "
-                               "or the folder LOM_BEPINEX5 names):\n%s%s" % (" ".join(switches), r.stdout, r.stderr))
+            raise ReleaseError("build.ps1 %s failed (it needs release/vendor/%s, or LOM_BEPINEX_CORE naming BepInEx 5.4.23.3's "
+                               "core folder, and the pinned Newtonsoft.Json.dll in release/vendor/unity-newtonsoft/Runtime-AOT "
+                               "or the plugin folder):\n%s%s" % (" ".join(switches), BEPINEX_ZIP, r.stdout, r.stderr))
         built = read(os.path.join(tmp, name))
         return sha256(built) == sha256(read(installed_dll)), sha256(built)
     finally:
@@ -152,12 +164,26 @@ def bepinex_entries():
             name = i.filename.replace("\\", "/")
             if name.startswith(PLUGIN_PREFIX) or "/../" in "/" + name:
                 raise ReleaseError("unexpected entry in the BepInEx zip: %s" % name)
-            out.append((name, None if i.is_dir() else z.read(i)))
+            body = None if i.is_dir() else z.read(i)
+            if name == DOORSTOP_INI:
+                body = doorstop_ini(body)
+            out.append((name, body))
+    if DOORSTOP_INI not in {n for n, _ in out}:
+        raise ReleaseError("the BepInEx zip has no %s" % DOORSTOP_INI)
     return out
 
 
+def doorstop_ini(data):
+    """The zip's doorstop_config.ini with dll_search_path_override set as Lash's English Patch's installer sets it (its
+    ApplyDoorstopSettings: the same regex, the same replacement), bytes otherwise unchanged."""
+    text = data.decode("utf-8")
+    if len(DOORSTOP_OVERRIDE.findall(text)) != 1:
+        raise ReleaseError("%s: expected one dll_search_path_override line" % DOORSTOP_INI)
+    return DOORSTOP_OVERRIDE.sub(lambda m: DOORSTOP_OVERRIDE_LINE, text).encode("utf-8")
+
+
 def bepinex_notice():
-    parts = [BEPINEX_NOTICE_HEAD % {"zip": BEPINEX_ZIP, "sha": BEPINEX_SHA256, "url": BEPINEX_SOURCE}]
+    parts = [BEPINEX_NOTICE_HEAD % {"zip": BEPINEX_ZIP, "sha": BEPINEX_SHA256, "url": BEPINEX_SOURCE, "override": DOORSTOP_OVERRIDE_LINE}]
     for title, name in LICENSE_FILES:
         p = os.path.join(VENDOR, "licenses", name)
         if not os.path.exists(p):
@@ -213,12 +239,12 @@ def main(argv=None):
     if unknown:
         probs.append("files in the plugin folder that are neither shipped nor known not to be (add them to SHIP or move "
                      "them out): %s" % unknown[:10])
-    for need in ("LOM_UI_EN.dll", "LOM_UI_EN.BepInEx5.dll", "Newtonsoft.Json.dll", "README.txt", "THIRD_PARTY_NOTICES.txt",
+    for need in ("LOM_UI_EN.dll", "Newtonsoft.Json.dll", "README.txt", "THIRD_PARTY_NOTICES.txt",
                  "compat_verified.json", "translation/StringTable.csv", "translation/scene/scene_text.txt",
                  "translation/MANIFEST.json"):
         if need not in ship:
             probs.append("missing from the plugin folder: %s" % need)
-    # 2. source == binary, for both BepInEx versions
+    # 2. source == binary
     for name, switches in DLLS:
         if name not in ship:
             continue

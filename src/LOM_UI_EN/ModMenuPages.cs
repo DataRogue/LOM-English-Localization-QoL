@@ -1226,13 +1226,10 @@ namespace LOM_UI_EN
 				return XUnityBridge.Registered ? null : Warn("Couldn't connect to the scene translator of " + BaseName + " (see Compatibility).");
 			};
 			adv.Items[adv.Items.Count - 1].Feature = F.XUnityBridge;
-			adv.Items.Add(OnOff(SceneText.CfgApplyResizers, "Text sizes of " + BaseName, "Uses the text-size adjustments of " + BaseName + "."));
-			adv.Items[adv.Items.Count - 1].Status = () => N(SceneText.ResizeNodes) + " adjustments loaded.";
 			adv.Items.Add(OnOff(BaseGuards.CfgLetResize, "Resizer of " + BaseName, "Lets the text resizer of its newer versions change text sizes too; this mod's layout fixes size the text without it."));
 			adv.Items[adv.Items.Count - 1].IsEnabled = () => BaseGuards.ResizerGuarded;
 			adv.Items[adv.Items.Count - 1].Status = () => !BaseGuards.ResizerGuarded ? (BaseName + "'s resizer isn't running.") : (BaseGuards.CfgLetResize.Value ? "On. Turning it off again takes a restart." : (N(BaseGuards.ResizesHeld) + " resizes held back this session."));
 			adv.Items[adv.Items.Count - 1].Feature = F.BasePlugins;
-			adv.Items.Add(OnOff(SceneText.CfgWideTextOverflow, "Wide text overflow", "Very wide text may wrap past its box, as with " + BaseName + "."));
 			adv.Items.Add(OnOff(Plugin.CfgQuietBinarizer, "Quiet " + BaseName + " lookups", "Stops " + BaseName + " logging every text lookup."));
 			adv.Items[adv.Items.Count - 1].IsEnabled = () => PerfPatches.Hooked;
 			adv.Items[adv.Items.Count - 1].Status = () => PerfPatches.Hooked ? ("Matters only when showing " + BaseName + ".") : (BaseName + " isn't running.");

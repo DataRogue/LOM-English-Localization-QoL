@@ -14,9 +14,6 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Core.Logging.Interpolation;
 using BepInEx.Logging;
-#if !BIE5
-using BepInEx.Unity.Mono;
-#endif
 using DG.Tweening;
 using Fungus;
 using HarmonyLib;
@@ -303,6 +300,9 @@ namespace LOM_UI_EN
 					}
 					case "textstat":
 						Log(SceneText.StatsLine() + $"; table served {TextTable.Served}, missed {TextTable.Missed}");
+						break;
+					case "textfit":
+						TextFitCmd(text3);
 						break;
 					case "tabledump":
 						// tabledump NAME: the served game data table (after the overlay) to BepInEx/cache/LOM_UI_EN/NAME.tsv, for offline comparison.
@@ -854,6 +854,51 @@ namespace LOM_UI_EN
 				component.Show(flag);
 				Log($"show {text} {flag}");
 			}
+		}
+
+		/// <summary>
+		/// textfit [PATH-PREFIX]: for each active Text (whose path starts with the prefix), how much of its text Unity drew: the
+		/// text's length, the characters the generator made (characterCountVisible) and its lines, with the box against the
+		/// preferred height. CUT marks a text the generator stopped short of (a dropped last line under vertical Truncate); n/a one
+		/// Unity has not generated (off screen inside a mask, or a box of no size).
+		/// </summary>
+		private void TextFitCmd(string prefix)
+		{
+			prefix = (prefix ?? "").Trim();
+			int n = 0;
+			int cut = 0;
+			foreach (Text t in UnityEngine.Object.FindObjectsOfType<Text>())
+			{
+				if (t == null || !t.isActiveAndEnabled || string.IsNullOrEmpty(t.text))
+				{
+					continue;
+				}
+				string path = PathUtil.GetPath(t.transform);
+				if (prefix.Length > 0 && !path.StartsWith(prefix, StringComparison.Ordinal))
+				{
+					continue;
+				}
+				// A visible character is any but whitespace; rich-text tags count as text here, so compare plain texts only.
+				TextGenerator g = t.cachedTextGenerator;
+				int len = t.text.Length;
+				int drawn = g.characterCountVisible;
+				int nonBlankTail = len;
+				while (nonBlankTail > 0 && char.IsWhiteSpace(t.text[nonBlankTail - 1]))
+				{
+					nonBlankTail--;
+				}
+				// no lines at all: Unity has not generated this text (off screen in a mask, or a box of no size), so it says nothing
+				bool generated = g.lineCount > 0;
+				bool isCut = generated && (!t.supportRichText || t.text.IndexOf('<') < 0) && drawn < nonBlankTail;
+				Rect r = t.rectTransform.rect;
+				Log($"textfit {(isCut ? "CUT " : (generated ? "ok  " : "n/a "))}{path} len={len} drawn={drawn} lines={g.lineCount} box={r.width:F0}x{r.height:F1} pref={t.preferredHeight:F1} fs={t.fontSize}{(t.resizeTextForBestFit ? (" bf=" + t.resizeTextMinSize + "-" + t.resizeTextMaxSize) : "")} v={t.verticalOverflow} tail='{Esc(t.text.Substring(Math.Max(0, nonBlankTail - 24), Math.Min(24, nonBlankTail)))}'");
+				n++;
+				if (isCut)
+				{
+					cut++;
+				}
+			}
+			Log($"textfit: {n} texts, {cut} cut");
 		}
 
 		private void SetTextCmd(string arg)
@@ -2026,7 +2071,7 @@ namespace LOM_UI_EN
 
 		public const string NAME = "LOM_UI_EN";
 
-		public const string VERSION = "1.1.1";
+		public const string VERSION = "1.2.0";
 
 		/// <summary>The mod's public name (the plugin keeps NAME and GUID, so configs and logs stay the same).</summary>
 		public const string DisplayName = "LOM English Localization + QoL";
@@ -2093,17 +2138,15 @@ namespace LOM_UI_EN
 		{
 			Instance = this;
 			Log = base.Logger;
-#if BIE5
-			// BepInEx 6 always creates its manager object hidden (HideAndDontSave); BepInEx 5 only with [Chainloader]
-			// HideManagerGameObject, off by default. This game then destroys the visible object, and every plugin's Update and
-			// coroutines stop with it (found in the 1.1.0 test: the harness never ran, nor would F8, quick save or the deferred
-			// text passes). Hide it as BepInEx 6 does, before the first scene loads.
+			// BepInEx 5 creates its manager object hidden (HideAndDontSave) only with [Chainloader] HideManagerGameObject, off by
+			// default (and in the BepInEx.cfg Lash's English Patch installs). This game then destroys the visible object, and every
+			// plugin's Update and coroutines stop with it (found in the 1.1.0 test: the harness never ran, nor would F8, quick save
+			// or the deferred text passes). Hide it as BepInEx 6 does, before the first scene loads.
 			if ((base.gameObject.hideFlags & HideFlags.HideAndDontSave) != HideFlags.HideAndDontSave)
 			{
 				base.gameObject.hideFlags = HideFlags.HideAndDontSave;
 				Log.LogInfo("BepInEx 5: the BepInEx manager object is now hidden from the game, as BepInEx 6 creates it, so the mod's per-frame work keeps running");
 			}
-#endif
 			PluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			Compat.Bind(base.Config);
 			CfgEnabled = base.Config.Bind("General", "Enabled", defaultValue: true, "Master switch for the UI fix rules.");
@@ -2249,7 +2292,11 @@ namespace LOM_UI_EN
 				{
 					return;
 				}
+				// The reset also undid the translatedOnly sizes (rules/05_text_sizes.json), which only a translation applies: give
+				// them back where a translation applied them, before or after the normal pass as each object first got them.
+				RuleApplier.ReapplyOnTranslation(afterRules: false);
 				RuleApplier.ApplyToAll(includeInactive: true);
+				RuleApplier.ReapplyOnTranslation(afterRules: true);
 				foreach (Text text in Resources.FindObjectsOfTypeAll<Text>())
 				{
 					if (text != null && text.gameObject.scene.IsValid())
@@ -2365,13 +2412,11 @@ namespace LOM_UI_EN
 			}
 		}
 
-#if BIE5
 		/// <summary>BepInEx 5 has no chainloader Finished event: Start comes after every plugin's Awake (Loader.WhenAllLoaded).</summary>
 		private void Start()
 		{
 			Loader.AllLoaded();
 		}
-#endif
 
 		private void Update()
 		{
@@ -2432,7 +2477,9 @@ namespace LOM_UI_EN
 				StringOverrides.Refresh();
 				NameTips.Reload();
 				RuleApplier.ResetAllMarkers();
+				RuleApplier.ReapplyOnTranslation(afterRules: false);
 				RuleApplier.ApplyToAll(includeInactive: true);
+				RuleApplier.ReapplyOnTranslation(afterRules: true);
 				Text[] array = Resources.FindObjectsOfTypeAll<Text>();
 				foreach (Text text in array)
 				{
@@ -2701,6 +2748,9 @@ namespace LOM_UI_EN
 					component2.horizontalOverflow = OHWrap;
 					component2.verticalOverflow = OVWrap;
 					component2.lineSpacing = OLineSpacing;
+					// Cleared before the font goes back: with the layout live, the Text.font hook maps it again at once, and the
+					// font map's size scale must apply again with it (cleared afterwards, the text kept the unscaled size).
+					FontScaleApplied = false;
 					if (OFont != null)
 					{
 						component2.font = OFont;
@@ -2771,7 +2821,10 @@ namespace LOM_UI_EN
 			AppliedOnce.Clear();
 			Matches = null;
 			MatchesResolved = false;
-			FontScaleApplied = false;
+			if (!HasTextOriginal)
+			{
+				FontScaleApplied = false;
+			}
 			RulesVersion = -1;
 			TouchedTextColor = false;
 			TouchedTmpColor = false;
@@ -2817,6 +2870,95 @@ namespace LOM_UI_EN
 			}
 		}
 
+		/// <summary>
+		/// The scene text layer is translating this object's text (SceneText, before the text is set): the rules marked
+		/// translatedOnly apply now and only now, as the XUnity-format resizer files did up to 1.1.x.
+		/// </summary>
+		public static void ApplyOnTranslation(GameObject go)
+		{
+			if (!Rules.HasTranslatedOnly || go == null || !Plugin.CfgEnabled.Value || !F.Layout.Live)
+			{
+				return;
+			}
+			try
+			{
+				// Did the normal passes reach this object first? Then these sizes came after them and won where both set a property.
+				// (The marker's matches and applied set belong together even from an older rule set: Reload re-translates the
+				// labels before its marker reset.)
+				UIFixMarker m = go.GetComponent<UIFixMarker>();
+				bool afterRules = m != null && m.Matches != null && m.Matches.Any((Rule r) => !r.translatedOnly && m.AppliedOnce.Contains(r.Index));
+				int before = Applications;
+				ProcessSingle(go, fromTextChange: false, ancestorsOnly: false, onTranslation: true);
+				if (Applications != before)
+				{
+					if (_sizedOnTranslation.Count > 20000)
+					{
+						PruneSizedOnTranslation();
+					}
+					_sizedOnTranslation[go.GetInstanceID()] = new SizedOnTranslation { Go = go, AfterRules = afterRules };
+				}
+			}
+			catch (Exception t)
+			{
+				F.Layout.Fail(t, "rules on " + SafePath(go));
+			}
+		}
+
+		private sealed class SizedOnTranslation
+		{
+			public GameObject Go;
+
+			public bool AfterRules;
+		}
+
+		/// <summary>The objects a translation gave translatedOnly rules to (their sizes outlive the text that brought them), and
+		/// whether the normal passes had reached the object before that translation.</summary>
+		private static readonly Dictionary<int, SizedOnTranslation> _sizedOnTranslation = new Dictionary<int, SizedOnTranslation>();
+
+		/// <summary>
+		/// After ResetAllMarkers (Plugin.Reapply / Reload, layout's Try again), which also undid the translatedOnly sizes: they go
+		/// back on every live object a translation gave them to, as the old resizer's sizes outlived a marker reset. The text
+		/// that brought them may be gone by now (a Lean label shows the table's English after its translated placeholder).
+		/// Called twice around the normal pass (ApplyToAll), so each object gets them in the order it first did:
+		/// afterRules false before that pass, true after it, followed then by the object's onTextChange rules, as the text set
+		/// that follows a translation runs them.
+		/// </summary>
+		public static int ReapplyOnTranslation(bool afterRules)
+		{
+			PruneSizedOnTranslation();
+			if (!Rules.HasTranslatedOnly || !Plugin.CfgEnabled.Value || !F.Layout.Live)
+			{
+				return 0;
+			}
+			int n = 0;
+			foreach (SizedOnTranslation s in _sizedOnTranslation.Values.Where((SizedOnTranslation s) => s.AfterRules == afterRules).ToList())
+			{
+				try
+				{
+					ProcessSingle(s.Go, fromTextChange: false, ancestorsOnly: false, onTranslation: true);
+					if (afterRules)
+					{
+						ProcessSingle(s.Go, fromTextChange: true);
+					}
+					n++;
+				}
+				catch (Exception t)
+				{
+					F.Layout.Fail(t, "rules on " + SafePath(s.Go));
+				}
+			}
+			return n;
+		}
+
+		private static void PruneSizedOnTranslation()
+		{
+			List<int> dead = _sizedOnTranslation.Where((KeyValuePair<int, SizedOnTranslation> kv) => kv.Value.Go == null).Select((KeyValuePair<int, SizedOnTranslation> kv) => kv.Key).ToList();
+			foreach (int id in dead)
+			{
+				_sizedOnTranslation.Remove(id);
+			}
+		}
+
 		private static string SafePath(GameObject go)
 		{
 			try
@@ -2829,7 +2971,7 @@ namespace LOM_UI_EN
 			}
 		}
 
-		private static void ProcessSingle(GameObject go, bool fromTextChange, bool ancestorsOnly = false)
+		private static void ProcessSingle(GameObject go, bool fromTextChange, bool ancestorsOnly = false, bool onTranslation = false)
 		{
 			UIFixMarker uIFixMarker = go.GetComponent<UIFixMarker>();
 			if (uIFixMarker != null && uIFixMarker.RulesVersion == Rules.Version && uIFixMarker.HasMoved(go.transform))
@@ -2921,7 +3063,13 @@ namespace LOM_UI_EN
 					{
 						uIFixMarker.HasOnTextChangeRule = true;
 					}
-					if ((fromTextChange && !item.onTextChange) || (!fromTextChange && !item.always && !item.onTextChange && uIFixMarker.AppliedOnce.Contains(item.Index)))
+					// translatedOnly rules belong to the scene text layer's translations (ApplyOnTranslation), every other rule to
+					// the normal passes
+					if (item.translatedOnly != onTranslation)
+					{
+						continue;
+					}
+					if (!onTranslation && ((fromTextChange && !item.onTextChange) || (!fromTextChange && !item.always && !item.onTextChange && uIFixMarker.AppliedOnce.Contains(item.Index))))
 					{
 						continue;
 					}
@@ -4186,6 +4334,14 @@ namespace LOM_UI_EN
 		/// <summary>Apply only while the game runs the language this mod's English replaces (EnglishLanguage.Active).</summary>
 		public bool englishOnly;
 
+		/// <summary>
+		/// Applied only when the scene text layer translates this object's text, before the text is set
+		/// (RuleApplier.ApplyOnTranslation), never in the normal rule passes: when and where the XUnity-format resizer files
+		/// applied up to 1.1.x, which rules/05_text_sizes.json replaces. Texts the game data table fills (numbers among them)
+		/// never pass through a translation, so they keep their own sizes, as they did.
+		/// </summary>
+		public bool translatedOnly;
+
 		public bool? active;
 
 		public bool? disabled;
@@ -4325,6 +4481,9 @@ namespace LOM_UI_EN
 		public static IReadOnlyList<Rule> All => _rules;
 
 		public static int Count => _rules.Count;
+
+		/// <summary>Some rule is translatedOnly (rules/05_text_sizes.json): the scene text layer's translations look them up.</summary>
+		public static bool HasTranslatedOnly { get; private set; }
 
 		public static int Version { get; private set; }
 
@@ -4548,6 +4707,7 @@ namespace LOM_UI_EN
 				Plugin.Log.LogWarning("Rules directory missing: " + dir);
 			}
 			_rules = list;
+			HasTranslatedOnly = list.Any((Rule r) => r.translatedOnly);
 			_matched.Clear();
 			BuildIndex(list);
 			_matchCache.Clear();

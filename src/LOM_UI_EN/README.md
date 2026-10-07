@@ -1,4 +1,4 @@
-# LOM_UI_EN source (recovered) - 1.1.0
+# LOM_UI_EN source (recovered) - 1.2.0
 
 LOM_UI_EN is the plugin of **LOM English Localization + QoL** (the public name since 1.0.0; the plugin keeps its name
 and GUID `lom.ui.english`, so configs carry over).
@@ -10,8 +10,8 @@ Comments from the original source are lost; behaviour is identical except for th
 Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Game <folder>] [-OutDir <folder>]` (Roslyn csc from Visual
 Studio 2022, else the newest installed; .NET Framework 4.7.1+ reference assemblies; game and BepInEx DLLs as references;
 deterministic since 1.0.0). Output: `bin\LOM_UI_EN.dll`; copy it over `BepInEx\plugins\LOM_UI_EN\LOM_UI_EN.dll`.
-Since 1.1.0 also `build.ps1 -BepInEx5` for `bin\LOM_UI_EN.BepInEx5.dll`, the same source for BepInEx 5 (see 1.1.0 below),
-which goes next to it.
+Since 1.2.0 that one DLL is for BepInEx 5.4.23.3, built against the pinned zip in `release/vendor` (see 1.2.0 below);
+1.1.x built a BepInEx 6 `LOM_UI_EN.dll` and, with `-BepInEx5`, `LOM_UI_EN.BepInEx5.dll` next to it.
 Release: also copy `PLAYER_README.txt` over `BepInEx\plugins\LOM_UI_EN\README.txt` (publish.py ships
 `THIRD_PARTY_NOTICES.txt` and the translation only), then package with `tools/release.py`; the whole checklist is in
 `docs/DEVELOPMENT.md`.
@@ -1037,3 +1037,162 @@ Sword, Scholarship, and the Martial Points, Forging and Alchemy counters.
     the run folder, and run `r_teardown` again.
   - The harness `dump NAME PATH` and `invoke` split their arguments on spaces, so a path with a space
     (`StatPanel (1)`, `Scroll View`) only works with `hover`, `active` and `show`.
+
+## 1.2.0 changes: Lash's English Patch 2026.10.05, BepInEx 5.4.23.3 only, the legacy resizer retired
+
+Lash's English Patch (joshfreitas1984/LegendOfMortalOverLlm) released 2026.09.29.21.13, 2026.10.04.09.26 and
+2026.10.05.09.58 (the latest; the 2026.09.28.13.56 release 1.1.0 was built for is gone from its releases page).
+- **Installer.** The release zips no longer hold BepInEx. A separate installer (GitHub pre-release `installer`,
+  `Installer-win-x64.exe`; its code is `FanslationStudio.Installer.Core` in the sibling repo FanslationStudio.LlmKit, its
+  settings `Installer/installer.json`) installs BepInEx 5.4.23.3 x86 from the official zip, pinned by SHA-256
+  `275bc94f...`, writes `dll_search_path_override = "BepInEx\core"` into `doorstop_config.ini` ("Mortal ships its own
+  MonoMod in Managed; without this BepInEx loads it and crashes in the preloader") and a marker
+  `BepInEx/installer-bepinex.sha256`. Then it applies the release zip by its `release-manifest.json`: each listed file
+  checked by hash, then written (`BepInEx/config/BepInEx.cfg` only when missing: `seedOnly`); the files the previous
+  manifest listed and this one does not are removed; the manifest is kept as `BepInEx/release-manifest.json`. It never
+  touches a file no manifest listed, so this mod's folder is safe through its updates.
+- **In-game updater.** The pack's `UiEditor` plugin now hosts `UpdateHost`: with `BepInEx/release-manifest.json` present
+  it asks GitHub for a newer release at start (`[Updates] Enabled`, `PromptDelaySeconds = 15` in the pack's config) and
+  shows a small uGUI window ("Update available", Update now / Later) on its own overlay canvas. "Update now" downloads
+  the zip, starts the installer and quits the game. The window's texts are English and its object is named with the
+  pack's editor prefix: no rule, scene line or guard of this mod touches it.
+- **Plugin pack.** `FanslationStudio.Plugins.dll` (FanslationStudio.Plugins at a59ec4a, "Make global resizer last") gained
+  the updater, an element picker, and a reworked TextResizer: `ApplyResizing(TextMeshProUGUI, bool)` and
+  `ApplyResizingToLegacyText(Text, bool)` each got a private overload `(…, string freshPath)` that the service's own
+  refresh calls directly, and every way in now ends in `ApplyResizingCore` / `ApplyResizingToLegacyTextCore`.
+  `PrefabTextReplacerService._replacements` / `LoadReplacements`, `StringPatcherService.GroupedDynamicStringContracts`
+  and the `EnsurePatched` methods are as before, and so is the game plugin `FanslationStudio.LegendOfMortal.Plugin`
+  (`GetString_Prefix`, `GetTranslation_Postfix`, `CsvUtility.ParseFile`; rebuilt 2026-10-03, same size and members as 2026.09.28's).
+- **Tables.** The same 44 per-file CSVs; the resizers are new yaml files per screen (`UI_TopPanel.yaml` ...,
+  `zzzGlobalResizer.yaml` still `/*` at 80%, now applied last).
+
+What this version does about it:
+- **The resizer guard** (`BaseGuards`). `AccessTools.Method(type, "ApplyResizing")` with the overloads is an ambiguous
+  match: on 2026.10.05 the guard found nothing, and the pack's global 80% would have shrunk every label under this mod's
+  layout. `ResizerTargets` now takes the `*Core` method where there is one (every way in passes through it), else every
+  overload of the name (the 2026.09.28 build), and `HookAll` hooks each, so both builds are held back.
+- **BepInEx 5.4.23.3 only.** The mod runs on the BepInEx Lash's English Patch installs, and only there:
+  - `build.ps1` builds one `LOM_UI_EN.dll` against `BepInEx.dll` and `0Harmony.dll` (HarmonyX 2.9.0) of the pinned
+    `release/vendor/BepInEx_win_x86_5.4.23.3.zip` (extracted once under `%TEMP%`, or `-BepInExCore`), and the shipped
+    Newtonsoft.Json; the game folder's BepInEx no longer matters for building. The `BIE5` conditionals are gone
+    (`Loader.cs` keeps the BepInEx 5 chainloader calls and the log handler stand-ins; `Plugin.Start` runs
+    `Loader.AllLoaded`; the manager-object fix stays).
+  - The full package bundles that zip, with `doorstop_config.ini`'s `dll_search_path_override` set by
+    `release.doorstop_ini` exactly as the installer's `ApplyDoorstopSettings` sets it (same regex, same replacement);
+    `THIRD_PARTY_NOTICES-BepInEx.txt` names the source commit of tag v5.4.23.3 (0d627cd), Doorstop 4.4.0, HarmonyX,
+    MonoMod and Mono.Cecil, and says which line differs.
+  - `publish.py check` accepts `LOM_UI_EN.dll` alone (a 1.1.x `LOM_UI_EN.BepInEx5.dll` left in the folder fails it);
+    `release.py` rebuilds and ships the one DLL.
+  - Over a 1.1.x install, a leftover `LOM_UI_EN.BepInEx5.dll` is the same GUID at a lower version: BepInEx 5 loads the
+    newer one and logs "Skipping ... because a newer version exists". The READMEs ask to delete the folder first.
+- **The legacy resizer is retired.** Up to 1.1.x `SceneText` applied XUnity-format resizer files
+  (`SceneResizeTable`, a port of XUnity's UI resizer): this mod's `translation/scene/resize/{mainmenu,status,story}.resizer.txt`
+  (reviewed copies of Lash's, from the patch's XUnity days) and, under Original, the patch's own in
+  `BepInEx/Translation/en/Text`, plus XUnity's implicit "wide text" effect (`[Translation] WideTextOverflow`). All of it
+  is gone: `SceneResizeTable`, `[Translation] ApplyResizers` / `WideTextOverflow` and their Advanced items,
+  `TranslationProfiles.ResizeDir/BaseResizeDir/ResizeSource`, and the resize files (ledger entries removed).
+  - `rules/05_text_sizes.json` carries their sizes: 197 rules, one per resizer path (`paths: [P, P/**]`, the resizer's
+    ancestor matching), shallow paths first so a deeper one wins per property, as the resizer merged them; AutoResize
+    becomes `bestFit`/`minSize`/`maxSize` and TMP `autoSize`, the overflows, line spacing, `fontScale` for the one
+    percentage, TMP overflow and alignment. The two `TMP_Alignment(Middle)` commands are left out (no such
+    `TextAlignmentOptions`; the resizer skipped them too).
+  - They are `translatedOnly` (new rule field): `SceneText` applies them through `RuleApplier.ApplyOnTranslation` when it
+    translates a text (a hit, or a fill from the base patch's XUnity), before the text is set, exactly where it called
+    `SceneResizeTable.Apply`; the normal rule passes skip them. Measured in game against 1.1.1 first: applied to every
+    text under their paths (`[P, P/**]` as plain rules), they also reached texts the scene layer never translates, the
+    ones the game builds in English from the table, numbers among them: the Attributes combat values went from 25px to
+    best fit 6-16, the save slots' times got best fit, a later hand-written once-rule lost to a re-applied size (Social's
+    chapter toggles, best fit 16-24 to 12-24). As `translatedOnly` rules, the 11 standard screens equal 1.1.1's text
+    settings (fonts, best fit, alignment, overflow, line spacing, TMP auto-size) except the deliberate changes below and
+    XUnity's implicit wide-text effect: the three Settings panel titles and the time-progress Start button keep the
+    prefab's vertical Truncate where 1.1.1 had Overflow (all single lines that fit). The file loads first, so within one
+    pass every hand-written rule wins; between a pass and a translation the later one wins, as with the resizer (a
+    translation after the first pass beats its once-rules: the Status tab labels' CaplineFlush, the Bag category labels'
+    auto-size 12-24; the onTextChange rules that the text set runs after a translation beat it: the HUD's Mood header).
+  - `publish.py check` fails on a resizer file in `workspace/translation/scene/resize`; the build removed the three
+    shipped ones.
+- **Reapply and Reload keep every screen as it was** (found by the pre-publish review and the in-game check).
+  `RuleApplier.ResetAllMarkers` (in `Plugin.Reapply`: Mod Settings' Layout fixes and Translated images, layout's Try
+  again; and in `Plugin.Reload`) puts every marked object back to its originals, which also undid the `translatedOnly`
+  sizes that only a translation applies. `RuleApplier` now remembers each object a translation sized
+  (`_sizedOnTranslation`) and whether the normal passes had reached it first, and `ReapplyOnTranslation` gives the sizes
+  back in that order: before `ApplyToAll`, or after it followed by the object's onTextChange rules, as the text set after
+  a translation runs them. Second, `UIFixMarker.Restore` cleared `FontScaleApplied` only after putting the game's font
+  back, and the live `Text.font` hook maps that font again at once, so the font map's 0.9 size scale was skipped: after
+  Translated images or Try again, every text in the two mapped fonts came back at full size until the next screen (the
+  title buttons 27 to 30; the same code in 1.1.1). The flag is now cleared before the font goes back. Checked in game:
+  the title, Relationships and Bag dumps after `Plugin.Reapply`, `Plugin.Reload` and Layout fixes off and on equal the
+  fresh screen object by object (text settings, sizes, fonts, rule tags aside from their order).
+- **Sect tab income** (`status-home-facility-income`, `10_status_shell.json`): the facility cards read "+50", "+30": the
+  unit wrapped to a second line in a one-line box and was cut (the same in 1.1.1). The resizer line meant for it
+  (AssetList: AutoResize 16-18 + horizontal overflow) never applied in this mod, since the game builds the text in English.
+  Now one line at 20px.
+- **Book descriptions.** A player saw some book descriptions as fragments. The cause: 44 wording overrides in
+  `strings/13_items.csv` (Book/Desc, from the 2026-09-12 term pass, made on the base patch's already shortened texts)
+  held only the sentences they corrected, the rest elided with "..." ("...but this book was compiled by later scholars
+  from the Shanghan Lun and the Jingui Yaolue."), and an override replaces the whole row on screen, over the full,
+  reviewed table row. The table parses the same in IdeaCsv and Python's csv, and the game sets the text straight from
+  `Book/Desc/<id>` (no splitting). Each of the 44 now holds the reviewed table row with the override's own corrections
+  applied where the row still lacked them (a Sonnet pass, checked against the Chinese). `publish.py check` now fails on
+  a description override (`/Desc/`, `/Intro/`, `CharacterIntro*`) with more ellipses than its table row and the game's
+  text (dialogue keeps its pauses). In game, before: the Items tab showed "...but this book ..." for 8102 and the
+  override's older wording for 0000, while `tget` served the table's full rows.
+  The description boxes had a second, layout risk. Both, the Items tab's
+  `Detail/Scroll View/Viewport/DescText` (330 wide) and the martial panel's (350 wide), are the Scroll View's content,
+  sized by a `ContentSizeFitter` (vertical PreferredSize) to exactly the text's preferred height, with the prefab's
+  vertical Truncate; `item-desc-fit` had kept Truncate too. As with the Attributes tooltips in 1.1.1, Unity can then drop
+  the last line, so a description ends mid-sentence. Fix: vertical Overflow on both (`item-desc-fit`, now also
+  `bestFit` off, which the old resizer had turned on at 10-16; new `martial-desc-every-line`) and on the Social tab's
+  biography, which has the same setup (`social-desc-every-line`, a fixed 20px for the old best fit 12-20). The harness
+  `textfit [PATH-PREFIX]` (new) lists, per active Text, its length, the characters Unity drew and the box against the
+  preferred height, marking `CUT` where it stopped short and `n/a` where Unity has not generated it (off screen in a
+  mask, a box of no size).
+- **Text.** `System/CombatStartText`, the duel splash, reads "Fight Their Mother" (the owner's ruling, 2026-10-06: it
+  keeps the joke of 戰你娘親); it was "Duel Start". The splash rule (`duel-splash-horizontal`, 1000x160, auto-size
+  40-100, no wrap) fits it.
+- **Tools.** `release_test.py`: A is a clean install of the full package on a bare game (the whole BepInEx folder, Mods
+  and the loader's root files held aside, the harness cache kept in place); `r_setup ZIP --installer` installs a release
+  as its installer does (BepInEx 5.4.23.3 from `release/vendor` with the doorstop line and the marker, the manifest's
+  files, `BepInEx/release-manifest.json`); a root `release-manifest.json` counts as a loader file; `a_setup [FULL_ZIP]`
+  installs an earlier release's full package for a before/after comparison. L and L5 (BepInEx 6 scenarios) are left to
+  the 1.1.x branch. A dry run of A, R `--clean --installer`, R over and `final` on a fake game folder (`LOM_GAME`,
+  `LOM_RELEASE_TEST_DIR`) left it byte-identical; it caught A reading `backup_stock` after holding BepInEx aside.
+- **Lash's 2026.10.05, other findings.** Its zip no longer carries `BepInEx/config/FanslationStudio.Plugins.UIEditor.cfg`
+  (2026.09.28's did), so a clean install gets the pack's defaults: its PrefabTextReplacer and DynamicStringPatcher are off
+  (`Enabled = false`, `ResourcePath = ./english`), and its prefab and code texts do not apply (the guards report "0 of
+  0"); an install updated from 2026.09.28 keeps the old file. Its updater logs "Installed 2026.10.05.09.58, latest
+  2026.10.05.09.58 -> UpToDate" and shows nothing.
+- **Verified in game 2026-10-06** with the owner's go-ahead (run `_release_test/run_20261006-195141`, saves and registry
+  restored, every move hash-checked), at 1600x900:
+  - A with the 1.1.1 full package (BepInEx 6) as the baseline: the 11 screens, the Bag's 15 books one by one, the
+    Training panel's description box, the duel splash ("Duel Start"). Book 8102 read "...but this book was compiled ..."
+    and 0000 the override's older wording, while `tget` served the table's full rows: the cause above.
+  - A with the 1.2.0 candidate (BepInEx 5.4.23.3, clean): 19 features working, 3 not needed; 0 Chinese on the 11
+    screens; `textfit` on all 15 books, the Social biography and the Training box: every character drawn (8102 ends
+    "...and the Jingui Yaolue."); every visible text on the 11 screens, the duel (45) and Mod Settings (25) drawn whole
+    (the Story scene's 9 flagged texts are hidden templates: the vertical CG captions for Chinese and an unopened meet
+    menu showing its raw keys, as in 1.1.1); the splash "Fight Their Mother" on one line; Advanced without the two
+    resizer items; `SimulateHookErrors = all` turned 11 features off with their fallbacks and Try again brought all 19
+    back.
+  - R, Lash's 2026.10.05 installed as its installer does, with 1.2.0: installed and running (44 tables, Pristine 22 of
+    24, label hook, pack hooked); 20 features working, 2 not needed; the resizer prefix on `ApplyResizingCore` and
+    `ApplyResizingToLegacyTextCore` (884 resizes held at the title); the 11 screens equal A's text settings exactly, 0
+    Chinese, nothing cut; Lash's ("Environment settings | Scripture Hall | Retiring to the mountains") and back;
+    `SimulateHookErrors = basePlugins` turned the feature off (the title buttons at the pack's 24px) and Try again
+    brought it back; marked as checked (1.2.0, 2026-10-06, fingerprint fc01f3b44033).
+  - C on R (`SimulateGameChange = all`): 19 not working with their fallbacks, the title and Mod Settings without
+    Chinese; the hidden time-progress result panel shows its 3 Chinese placeholders (Lash's prefab replacer, which
+    covered two of them, is off in 2026.10.05's defaults).
+  - Then the owner's choice for the game folder: this mod alone on BepInEx 5.4.23.3 (the 1.2.0 full package, the stock
+    `Unity.Addressables.dll`); the BepInEx 6 install with Lash's 2026-02 patch is kept in
+    `LOM_Localization/backups/install_be692_2026-10-06` (with the patched Addressables). A smoke start there: 549 rules,
+    19 working, 0 Chinese.
+- **Verified again 2026-10-06** after the pre-publish review's fixes, with the final DLL (run
+  `_release_test/run_20261006-212106`, saves and registry restored, every move hash-checked):
+  - B on the owner's install: the Reapply and Reload checks above (title, Relationships, Bag: equal to the fresh screen
+    after each).
+  - The update a 1.1.x player makes: the 1.1.1 full package on a bare game (BepInEx 6.0.0-be.692) started once, its
+    plugin folder deleted, the 1.2.0 candidate full package extracted over it. BepInEx 5.4.23.3 starts among be.692's
+    leftover core files (one warning: it cannot read be.692's chainloader cache, and rebuilds it); 19 features
+    working, 3 not needed; 0 Chinese on the 11 screens, which equal the clean install's text settings (534 texts, 0
+    differ).

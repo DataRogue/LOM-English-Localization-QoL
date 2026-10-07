@@ -75,17 +75,25 @@ shows that language in English. It is tested with game version `release_1.0.5000
 3. Extract the zip into that folder, so that `winhttp.dll` and the `BepInEx` folder sit next to `Mortal.exe`.
 4. Start the game. The title screen now has a **Mod Settings** button; F8 opens the same window anywhere.
 
-The full package includes [BepInEx](https://github.com/BepInEx/BepInEx) 6.0.0-be.692, the mod loader. If you already
-have it, for example because Lash's English Patch is installed, use the smaller `-mod-only.zip` instead.
+The full package includes [BepInEx](https://github.com/BepInEx/BepInEx) 5.4.23.3, the mod loader: the same version
+Lash's English Patch installs. If you already have it, for example because Lash's English Patch is installed with its
+installer, use the smaller `-mod-only.zip` instead.
 
-From 1.1.0 the mod also runs on BepInEx 5. Lash's English Patch moves the game to BepInEx 5 from its 2026-09-28
-release on. The mod carries a DLL for each BepInEx, and each BepInEx loads only its own. Version 1.0.0 runs on BepInEx 6
-only, so update this mod when you install such a release. With one installed, use the `-mod-only.zip`: the full
-package would switch the game back to BepInEx 6, where that patch's plugins do not run, though this mod still reads
-its text.
+From 1.2.0 the mod runs on BepInEx 5.4.23.3 only. An older setup on BepInEx 6 (this mod's full package up to 1.1.x, or
+Lash's English Patch up to its 2026-02 releases) does not load it; see Updating. Version 1.1.x still runs on BepInEx 6.
 
-**Updating:** delete the folder `BepInEx/plugins/LOM_UI_EN`, then extract the new `-mod-only.zip` into the game folder.
-Your settings are kept in `BepInEx/config`.
+**Updating:** delete the folder `BepInEx/plugins/LOM_UI_EN` first (your settings are kept in `BepInEx/config`; this also
+removes 1.1.x's `LOM_UI_EN.BepInEx5.dll`, which is no longer used). Then:
+- if the game already runs BepInEx 5.4.23.3 (this mod's 1.2.0 full package, or Lash's English Patch set up by its
+  installer), extract the new `-mod-only.zip`;
+- if you installed this mod's full package of 1.1.x or older (BepInEx 6), extract the new `-full.zip`: it moves the game
+  to BepInEx 5.4.23.3;
+- if you use Lash's English Patch from before its installer (its 2026-02 releases, BepInEx 6), run Lash's installer
+  first, which updates the patch and moves the game to BepInEx 5.4.23.3, then extract the `-mod-only.zip`. Delete
+  `Mods/English/StringTable.csv` afterwards: the new patch reads that old file over part of its new text (Mod Settings
+  reminds you).
+
+Lash's English Patch now offers its own updates when the game starts; they never touch this mod's folder.
 
 **Uninstalling:** delete `BepInEx/plugins/LOM_UI_EN`. If no other mod uses BepInEx, also delete the `BepInEx` folder,
 `winhttp.dll`, `doorstop_config.ini`, `.doorstop_version` and `changelog.txt`. Steam's "Verify integrity of game files"
@@ -113,6 +121,9 @@ A note from the maintainer: I may be slow to update this mod, especially after a
 - **Nothing changed, and there is no Mod Settings button.** The files are probably one folder too deep. `winhttp.dll`
   must be next to `Mortal.exe`, not inside a `LOM-English-Localization-QoL...` folder. After a start, `BepInEx/LogOutput.log`
   should exist.
+- **No Mod Settings button after updating from 1.1.x.** The game still runs BepInEx 6, which does not load 1.2.0: extract
+  the `-full.zip` (or run the installer of Lash's English Patch). The first line of `BepInEx/LogOutput.log` names the
+  BepInEx version; 1.2.0 needs 5.4.23.3.
 - **Some text is still in Chinese.** Check that the game language is Traditional Chinese. After a game update, new or
   changed text stays Chinese until the mod is updated; Mod Settings > Compatibility says what changed.
 - **My antivirus flags `winhttp.dll`.** It is BepInEx's loader, Unity Doorstop, and is unmodified from the official
@@ -146,7 +157,7 @@ something reads wrong, please report it.
 
 ## Building from source
 
-The plugin is C# for BepInEx 6 on Unity 2020.3 Mono; `build.ps1 -BepInEx5` builds the same source for BepInEx 5.
+The plugin is C# for BepInEx 5.4.23.3 on Unity 2020.3 Mono (the 1.0.x and 1.1.x branches build for BepInEx 6 too).
 `src/LOM_UI_EN/build.ps1` builds it with the compiler that comes with Visual Studio 2022 or later. The build is deterministic, so you can check a release DLL against the source. The
 translation lives in `workspace/`, and `tools/` holds the maintainer tools that turn it into the plugin folder and
 package releases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
@@ -154,8 +165,10 @@ package releases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 ## Credits
 
 - **Lash**, for [Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm), the original English
-  patch this mod grew from. Lines that kept its wording, and three layout files, are Lash's work.
-- **[BepInEx](https://github.com/BepInEx/BepInEx)** (LGPL-2.1), the mod loader, bundled unmodified in the full package.
+  patch this mod grew from. Lines that kept its wording, and the text sizes carried over from its resizer files, are
+  Lash's work.
+- **[BepInEx](https://github.com/BepInEx/BepInEx)** (LGPL-2.1), the mod loader, bundled in the full package: unmodified
+  but for one line of `doorstop_config.ini`, set as the installer of Lash's English Patch sets it.
 - **[XUnity.AutoTranslator](https://github.com/bbepis/XUnity.AutoTranslator)** (MIT): its translation-file format and
   lookup are ported in the scene text engine.
 - **[Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)** (MIT), shipped unmodified as Unity's AOT build from

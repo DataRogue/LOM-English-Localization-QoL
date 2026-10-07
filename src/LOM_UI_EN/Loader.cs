@@ -1,19 +1,13 @@
 using System;
 using System.Collections.Generic;
 using BepInEx;
-#if BIE5
 using BepInEx.Bootstrap;
-#else
-using BepInEx.Unity.Mono.Bootstrap;
-#endif
 
 namespace LOM_UI_EN
 {
 	/// <summary>
-	/// The few BepInEx calls that differ between BepInEx 6 (be.692, what the English patch shipped up to 2026.02 and this mod's
-	/// full package bundles) and BepInEx 5 (the loader of the patch's own plugin since its llmkit-upgrade). The same source builds
-	/// for either: build.ps1 -BepInEx5 defines BIE5 and writes LOM_UI_EN.BepInEx5.dll. Each BepInEx loads only the DLL built for it
-	/// (6 wants a reference to BepInEx.Core, 5 one to BepInEx), so both can sit in the plugin folder.
+	/// The chainloader calls this mod makes. Since 1.2.0 it runs on BepInEx 5.4.23.3 only, the BepInEx Lash's English Patch installs
+	/// (1.1.x also built a BepInEx 6 be.692 DLL; the 1.0.x and 1.1.x branches keep that build).
 	/// </summary>
 	internal static class Loader
 	{
@@ -25,33 +19,25 @@ namespace LOM_UI_EN
 		{
 			get
 			{
-#if BIE5
 				return Chainloader.PluginInfos;
-#else
-				return UnityChainloader.Instance?.Plugins;
-#endif
 			}
 		}
 
 		/// <summary>
-		/// Runs the action once every plugin has loaded: on BepInEx 6 at the chainloader's Finished event; BepInEx 5 has none, so
-		/// Plugin.Start runs it (Unity calls Start after the Awake of every plugin the chainloader added in the same pass).
+		/// Runs the action once every plugin has loaded. BepInEx 5 has no event for that, so Plugin.Start runs it (Unity calls Start
+		/// after the Awake of every plugin the chainloader added in the same pass).
 		/// </summary>
 		public static void WhenAllLoaded(Action action)
 		{
-#if BIE5
 			if (_allLoaded)
 			{
 				action();
 				return;
 			}
 			_pending.Add(action);
-#else
-			UnityChainloader.Instance.Finished += action;
-#endif
 		}
 
-		/// <summary>Plugin.Start: the chainloader is done (BepInEx 5; on BepInEx 6 the Finished event already ran the actions).</summary>
+		/// <summary>Plugin.Start: the chainloader is done.</summary>
 		public static void AllLoaded()
 		{
 			if (_allLoaded)
@@ -75,7 +61,6 @@ namespace LOM_UI_EN
 	}
 }
 
-#if BIE5
 namespace BepInEx.Core.Logging.Interpolation
 {
 	using System.Text;
@@ -150,4 +135,3 @@ namespace BepInEx.Core.Logging.Interpolation
 		}
 	}
 }
-#endif
