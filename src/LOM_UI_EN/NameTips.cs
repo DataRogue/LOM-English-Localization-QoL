@@ -155,6 +155,14 @@ namespace LOM_UI_EN
 		private static readonly HashSet<int> _notDialog = new HashSet<int>();
 		private static readonly HashSet<TipCharacter> _portraitWanted = new HashSet<TipCharacter>();
 
+		/// <summary>
+		/// Listed characters whose introduction card has played while their Status > Social entry stayed locked: the game's mode-1
+		/// cards (<c>intropanel.Show(id, 1)</c> shows the card every time and activates nothing), so the met-only gate, which reads
+		/// that entry, would never open for them. Ids as in nametips.tsv; kept in <see cref="MetFile"/> between sessions.
+		/// </summary>
+		private static readonly HashSet<string> _met = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		private const string MetFile = "lom.ui.english.met.txt";
+
 		/// <summary>Set by Update: tips are on, the feature works and the game is in English. The mesh hook reads only this.</summary>
 		private static volatile bool _on;
 		private static int _mode = -1;
@@ -190,7 +198,7 @@ namespace LOM_UI_EN
 		{
 			CfgEnabled = cfg.Bind("Story", "NameTooltips", true, "Dialogue and choice menus: names of characters who have portrait art are coloured, and pointing at one shows the character's portrait and title and, once the game lists them in Status > Social, your affinity with them. The characters, and the extra name forms matched (given names such as 'Xiaomei'), are listed in plugins/LOM_UI_EN/nametips.tsv.");
 			CfgColor = cfg.Bind("Story", "NameTooltipColor", "#E8C47C", "Colour of those names in dialogue, as #RRGGBB (on a light dialog box a darker shade of it is used). Empty = the text's own colour; the names can still be pointed at.");
-			CfgMetOnly = cfg.Bind("Story", "NameTooltipsMetOnly", true, "Characters who have an entry in Status > Social become tooltips only once the game has introduced them (the card that unlocks their entry), so a name mentioned before a reveal shows no face. Off = from the start.");
+			CfgMetOnly = cfg.Bind("Story", "NameTooltipsMetOnly", true, "Characters who have an entry in Status > Social become tooltips only once the game has introduced them (the card that unlocks their entry; a card that unlocks nothing counts once it has played, and is remembered in lom.ui.english.met.txt), so a name mentioned before a reveal shows no face. Off = from the start.");
 			CfgMetOnly.SettingChanged += delegate
 			{
 				DirtyAll();
@@ -235,6 +243,7 @@ namespace LOM_UI_EN
 			Compat.Require(F.NameTips, "Mortal.Core", "Mortal.Core.RelationshipStat", "Type", essential: false, part: "affinity");
 			Compat.Require(F.NameTips, "Mortal.Story", "Mortal.Story.StoryManager", "IsStoryPause", essential: false, part: "menus");
 			Load();
+			LoadMet();
 			if (!_loaded)
 			{
 				F.NameTips.Problems.Add(_loadError);
@@ -246,7 +255,18 @@ namespace LOM_UI_EN
 			}
 			// The dice menu's option labels are TextMeshPro: they are coloured when TMP reports a rebuilt text.
 			Compat.Part(F.NameTips, "TextMeshPro text event", SubscribeTmp, part: "tmp", isHook: false);
+			// An introduction card that unlocks no Social entry is remembered (see _met), so the met-only gate can open for it.
+			Compat.Part(F.NameTips, "introduction card hook", () => PatchCards(h), part: "cards");
 			SceneManager.sceneLoaded += OnSceneLoaded;
+		}
+
+		/// <summary>CharacterIntroPanel.Show(string key, int mode), found by assembly and type name so a renamed one costs only this part.</summary>
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		private static void PatchCards(Harmony h)
+		{
+			Type panel = TranslationProfiles.FindType("Mortal.Core", "Mortal.Core.CharacterIntroPanel");
+			System.Reflection.MethodBase target = (panel != null) ? AccessTools.Method(panel, "Show", new Type[2] { typeof(string), typeof(int) }) : null;
+			Compat.Hook(F.NameTips, h, target, "CharacterIntroPanel.Show(string, int)", null, new HarmonyMethod(typeof(NameTips), nameof(CardShown_Postfix)));
 		}
 
 		// ---- data --------------------------------------------------------------------------------------------------------
@@ -822,7 +842,9 @@ namespace LOM_UI_EN
 					continue;
 				}
 				byte cat;
-				if (ch == ' ' || ch == (char)10 || ch == (char)9 || ch == (char)13)
+				// A space, line feed or tab draws no quad; a carriage return does, like the other whitespace (a Story line broken
+				// with CR+LF has one quad more per break), so it is not in this list.
+				if (ch == ' ' || ch == (char)10 || ch == (char)9)
 				{
 					cat = CatSpace;
 					spaces++;
@@ -1276,7 +1298,7 @@ namespace LOM_UI_EN
 
 		private static string Clip(string s)
 		{
-			s = s.Replace((char)10, ' ');
+			s = s.Replace((char)13, ' ').Replace((char)10, ' ');
 			return s.Length > 80 ? s.Substring(0, 80) + "..." : s;
 		}
 
@@ -1624,7 +1646,8 @@ namespace LOM_UI_EN
 		/// <summary>
 		/// [Story] NameTooltipsMetOnly: a character who has an affinity record becomes a link only once the game has introduced
 		/// them (its introduction card unlocks their Status > Social entry), so a name mentioned before a reveal (the youth in dark
-		/// robes, the white-clad youth) shows no face. Characters without a record are always linked.
+		/// robes, the white-clad youth) shows no face. Characters without a record are always linked. A card shown in the game's
+		/// mode 1 unlocks no entry; the characters it introduced are remembered (<see cref="_met"/>) and count as introduced too.
 		/// </summary>
 		private static bool Linkable(TipCharacter c)
 		{
@@ -1659,7 +1682,110 @@ namespace LOM_UI_EN
 				return false;
 			}
 			Mortal.Core.RelationshipStat r = c.Relationship as Mortal.Core.RelationshipStat;
-			return r == null || r.Active;
+			return r == null || r.Active || _met.Contains(c.Id);
+		}
+
+		// ---- introduction cards that unlock no Social entry --------------------------------------------------------------
+
+		/// <summary>
+		/// Postfix of CharacterIntroPanel.Show(key, mode), which the story scripts call as <c>intropanel.Show("id")</c> (mode 0: the first
+		/// time, the game unlocks the character's Status > Social entry and shows the card) or <c>intropanel.Show("id", 1)</c> (mode 1:
+		/// the card every time, nothing unlocked). Only mode 1 needs remembering; mode 0 leaves the entry active for the gate to read.
+		/// </summary>
+		private static void CardShown_Postfix(string key, int mode)
+		{
+			if (mode != 1 || string.IsNullOrEmpty(key) || !F.NameTips.PartOk("cards"))
+			{
+				return;
+			}
+			try
+			{
+				F.NameTips.Probe();
+				NoteCard(key);
+			}
+			catch (Exception ex)
+			{
+				if (Compat.IsStructural(ex))
+				{
+					F.NameTips.BreakPart("cards", ex.GetType().Name + ": " + ex.Message);
+				}
+				else
+				{
+					F.NameTips.Fail(ex, "introduction card");
+				}
+			}
+		}
+
+		/// <summary>
+		/// A mode-1 card played for this id. Remembered when it is a listed character whose entry is still locked, i.e. the card is
+		/// what introduces them; a character whose entry is already active (a recap card) needs no memory, so the gate keeps reading
+		/// the game's own state for everyone else and a new game does not start with these names unlocked by an old card.
+		/// </summary>
+		private static void NoteCard(string key)
+		{
+			if (!_byId.TryGetValue(key, out TipCharacter c) || c.IsFaction || _met.Contains(c.Id) || !EntryLocked(c))
+			{
+				return;
+			}
+			_met.Add(c.Id);
+			SaveMet(c.Id);
+			Plugin.Log.LogInfo("name tips: the introduction card of " + c.Id + " played without unlocking Status > Social; the name links from now on (kept in " + MetFile + ")");
+			if (_on)
+			{
+				DirtyAll();
+			}
+		}
+
+		/// <summary>The character has an affinity record and it is not active.</summary>
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		private static bool EntryLocked(TipCharacter c)
+		{
+			if (!ResolveRelationship(c))
+			{
+				return false;
+			}
+			Mortal.Core.RelationshipStat r = c.Relationship as Mortal.Core.RelationshipStat;
+			return r != null && !r.Active;
+		}
+
+		private static string MetPath => Path.Combine(BepInEx.Paths.ConfigPath, MetFile);
+
+		private static void LoadMet()
+		{
+			_met.Clear();
+			try
+			{
+				if (!File.Exists(MetPath))
+				{
+					return;
+				}
+				foreach (string raw in File.ReadAllLines(MetPath, Encoding.UTF8))
+				{
+					string line = raw.Trim();
+					if (line.Length > 0 && !line.StartsWith("#"))
+					{
+						_met.Add(line);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("name tips: could not read " + MetFile + ": " + ex.Message);
+			}
+		}
+
+		private static void SaveMet(string id)
+		{
+			try
+			{
+				string path = MetPath;
+				string head = File.Exists(path) ? "" : "# LOM_UI_EN name tips: characters whose introduction card played without unlocking their Status > Social entry, one id per line.\r\n# Their names link in dialogue from then on (see [Story] NameTooltipsMetOnly). Delete a line, or this file, to forget them.\r\n";
+				File.AppendAllText(path, head + id + "\r\n", new UTF8Encoding(false));
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("name tips: could not save " + MetFile + ": " + ex.Message + " (remembered until the game closes)");
+			}
 		}
 
 		/// <summary>
@@ -1777,6 +1903,7 @@ namespace LOM_UI_EN
 			{
 				sb.Append(" (last: " + _lastMismatch + ")");
 			}
+			sb.Append("; cards remembered (" + MetFile + "): " + (_met.Count == 0 ? "none" : string.Join(", ", _met.ToArray())));
 			sb.Append('\n');
 			foreach (Tracked t in _tracked.Values)
 			{

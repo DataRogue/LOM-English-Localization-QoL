@@ -1168,7 +1168,7 @@ namespace LOM_UI_EN
 			}
 			sd.SetActive(state: true);
 			SayDialog.ActiveSayDialog = sd;
-			sd.Say(text.Replace("\\n", "\n"), clearPrevious: true, waitForInput: true, fadeWhenDone: false, stopVoiceover: true, waitForVO: false, voiceOverClip: null, onComplete: null);
+			sd.Say(text.Replace("\\r", "\r").Replace("\\n", "\n"), clearPrevious: true, waitForInput: true, fadeWhenDone: false, stopVoiceover: true, waitForVO: false, voiceOverClip: null, onComplete: null);
 			Log("say " + which + " (" + PathUtil.GetPath(sd.transform) + "): " + text);
 		}
 

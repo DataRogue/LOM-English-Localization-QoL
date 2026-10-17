@@ -452,8 +452,10 @@ character and the player's affinity with them, where the game has one.
   `menus` can fail on their own). Settings `[Story] NameTooltips` (on), `NameTooltipsMetOnly` (on) and
   `NameTooltipColor` (`#E8C47C`; empty = no colour), all on Mod Settings > Story & Reading.
 - Spoiler gate (`NameTooltipsMetOnly`): a character who has an affinity record is linked only while that record is
-  Active. The game activates it only in its character introduction card (the Show coroutine of the intro panel), i.e. at
-  the reveal, so a name mentioned earlier shows no face. This matters because several disguises reuse the real art:
+  Active. The game activates it only in a first-time introduction card, `intropanel.Show("<id>")` (the Show coroutine of
+  the intro panel, mode 0), i.e. at the reveal, so a name mentioned earlier shows no face. That holds for mode 0 only:
+  `Show("<id>", 1)` shows the card every time and activates nothing (the section "After 1.3.0" below covers those
+  cards). This matters because several disguises reuse the real art:
   special1_1 "Youth in dark robes" = Liu E's normal.png, special999_1 "White-Clad Youth" = Rui Sheng's, the "???" and
   "Young woman" variants too. Characters without a record are always linked; the list leaves out the ones whose
   disguise shares their art (Guildmaster Jiang / "Merchant", Xin Ru, Crane Hand), Nangong Xiu (an assumed name with Duan
@@ -485,9 +487,10 @@ character and the player's affinity with them, where the game has one.
   When the stage art cannot load, the affinity record's own avatar is used.
 - Crop: 640 px of a 1700 px portrait from 40 px above the figure's top, centred on the head (`crop` column: the opaque
   columns of the 260 px band below the figure's top, measured offline).
-- Harness: `say [character|narrative|center|think] TEXT` writes a line through a story dialog's Writer, `nametips` prints
-  the state (names on screen with screen positions, mesh mode, cover), `namehover NAME|ID` points at a name through the
-  Input System, `mousemove X Y|PATH` moves the pointer.
+- Harness: `say [character|narrative|center|think] TEXT` writes a line through a story dialog's Writer (`\n` and `\r` in
+  TEXT are a line feed and a carriage return), `nametips` prints the state (names on screen with screen positions, mesh
+  mode, cover, the remembered introduction cards), `namehover NAME|ID` points at a name through the Input System,
+  `mousemove X Y|PATH` moves the pointer.
 - build.ps1 references OBB.Framework, Unity.Addressables, Unity.ResourceManager and UnityEngine.AudioModule.
 - Portrait addresses are the game's own `AddressKey`s: an address can differ from the asset's path in its bundle (the
   Special_833 folder was renamed 南宮秀 -> 段智秀, the address kept the old name), so tools look them up in the catalog's
@@ -1276,3 +1279,63 @@ tables Story_18 to Story_21 (Story_17 grew), new tables (DiceHeader, BattleTalki
     texts are the hidden TimeProgress/ResultPanel placeholders, as in earlier releases.
 - **Not in this version:** the text the update added or changed (new chapters and tables) is not translated yet; it
   shows in Chinese, or as Lash's line where `Fall back to Lash's English Patch` finds one.
+
+## After 1.3.0 (not released yet): name tips on lines with a carriage return, and introduction cards that unlock nothing
+
+The in-game test of the 19 name-tip characters the update added (2026-10-17) found two gaps in the name tips. Both are
+older than the update. The plugin version and the CHANGELOG are untouched until the release.
+
+- **Carriage returns** (`NameTips.Build`). UGUI `Text` in this Unity draws one quad for each carriage return (U+000D),
+  unlike a space, a line feed or a tab, which draw none; `Build` counted a CR with the spaces. A Story line broken with
+  CR+LF therefore fitted no quad-count mode (`PickMode` found none: "name tips: cannot map the text to its mesh", counted
+  as `mismatches` by the harness `nametips`), and no name in it was linked. 9,534 of the 80,643 English Story rows (11.8%)
+  have a CR+LF break. The quad counts of three real lines are glyphs plus the number of CRs: D_S2321_03_02_001 115 = 114 + 1,
+  D_S2321_02_05_04_01_020 108 = 107 + 1, D_S2321_02_05_04_01_018 187 = 185 + 2; a line with LF alone maps. A CR is now
+  `CatOtherSpace`: it draws a quad in the modes where the other whitespace does, which includes the mode this game uses
+  ("glyphs and other whitespace"). The TextMeshPro labels (the dice menu) need nothing: `BuildTmp` reads TMP's own
+  `characterInfo` and counts no quads. The choice menus' UGUI labels go through the same `Build`. `Clip`, the log's
+  excerpt of a text, drops CR too, so a warning stays on one line. Harness: `say` takes `\r` as well as `\n` (a batch file
+  is read line by line, so a real CR cannot be sent in it).
+- **Introduction cards that unlock no Social entry** (`NameTips.CardShown_Postfix`, Compat part `cards`).
+  - The game: `intropanel.Show("<id>")` (mode 0) unlocks the character's Status > Social entry the first time and shows
+    the card once; `Show("<id>", 1)` shows the card every time and unlocks nothing (IL of `CharacterIntroPanel.<Show>d__31`;
+    `RelationshipStat.SetActive` has no other caller in the game's assemblies). The scripts of build 25987745 call mode 1
+    for special825 (S0702_01_01, twice), special103, special999, player and girl5_11 (S2320_01), special831
+    (S2321_02_05_04), special215_1 (S2321_02_05_04_01) and special805_0 (ch2_5_3_1). special825, special831 and special215_1
+    have no mode-0 call anywhere, so with the met-only gate on the tips of Xia Lingxi, Meng Xianyao and Meng Gong (46 Story
+    rows name them) never appeared in a new game.
+  - Owner's choice 2026-10-17: the plugin remembers the cards. The other answers were to leave it, or a per-row opt-out in
+    nametips.tsv, which would have lost the protection for Meng Gong (his hidden twin special215_0 "???" has the same art).
+  - A postfix on `CharacterIntroPanel.Show(string key, int mode)`, found by assembly and type name and installed as its own
+    Compat part, so a game rename shows the feature as partly working and the gate reads the Social entry alone, as before.
+    For `mode == 1` and a listed character whose record exists and is still locked (`EntryLocked`), the id joins a set and is
+    appended to `BepInEx/config/lom.ui.english.met.txt` (one id per line, `#` comments, read at startup). A recap card for a
+    character whose entry is already active remembers nothing, so everyone else keeps reading the game's own state and a
+    new game does not start with names unlocked by an old card.
+  - `LinkableBody` links a gated character when the record is Active or the id is in the set. The tip then has no affinity
+    row (the record is locked, the game lists no entry). A newly remembered card redraws the dialogs.
+  - Per PC, not per save: the game has no place for plugin data in a save, and a side file per slot would go stale when a
+    slot is overwritten. A second playthrough on the same PC therefore links those names from the start. A card played
+    before this version was installed is not remembered (it counts when its scene plays again). Delete a line, or the
+    file, to forget it. The harness `nametips` prints the remembered ids; the cfg description of `NameTooltipsMetOnly`
+    says so; Mod Settings is unchanged.
+- **Verified in game 2026-10-17** (run_20261017-155436, the owner's go-ahead, DLL sha D6D0B5F3D087; two launches of build
+  25987745, saves and registry restored by hash afterwards, the test's `lom.ui.english.met.txt` moved out):
+  - Compatibility: `nameTips Working (2 game hooks, 11 checks)`. Without the file, "Meng Gong and Meng Xianyao came." linked
+    neither name.
+  - Carriage returns: harness `say` lines with CR+LF (a name before and after the break), CR+LF twice with a blank line and a
+    lone CR linked every name (3 and 6), 0 mismatches, and the tip of a name after the break sat on it with the right
+    portrait. Real lines: S2321_02_05_04_01 from its start (line 020, a CR line, on the screen) to about 40 lines past Meng
+    Gong's card, and S2321_02_05_04 to Meng Xianyao's card: `mismatches 0` over 6,360 rebuilds (the old DLL had counted 127
+    at Meng Gong's card in S2321_02_05_04_01). General Zhao Fang links, with his tip, in D_S2321_02_05_04_032, a real CR+LF
+    line.
+  - Cards: after Meng Gong's card (S2321_02_05_04_01 after line 021) the log said so, the file held the header and
+    `special215_1`, "Meng Gong" linked in a centre-dialog line (tip with portrait, no affinity row) while "Meng Xianyao" and
+    "Xia Lingxi" stayed plain; after Meng Xianyao's card (S2321_02_05_04) the file held both and she linked. After a
+    restart, with no card played in that process, both linked at once and Xia Lingxi stayed plain.
+    `SimulateHookErrors=nameTips` turned the feature off cleanly (names plain), and Try again brought it back with the
+    remembered ids.
+  - Not exercised: a recap card for an active entry (the harness `lua` is not a coroutine, so no card can be played on
+    demand; the rule is `EntryLocked`), and the part failing at runtime or at install.
+- **For the release:** a CHANGELOG entry (names link in lines with a line break; Meng Gong, Meng Xianyao and Xia Lingxi
+  link after their cards, remembered in `lom.ui.english.met.txt`), and a line for it in PLAYER_README.txt if wanted.

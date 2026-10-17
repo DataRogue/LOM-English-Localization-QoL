@@ -378,6 +378,16 @@ Working files go to `LOM_Localization/update_pass/` (untracked: they hold the ga
     workspace table with the `strings/*.csv` overrides laid over it (Character/trainee224 is "Yu Lin" only in an override).
   - `import-factions PROPOSAL.tsv [--live]`: workspace/factiontips.tsv (`lom_paths.WS_FACTIONTIPS`, shipped byte for byte)
     from a reviewed proposal with id, title, forms, description.
+- **The spoiler gate and the introduction cards** (nametips.tsv has no column for it). The plugin links a character who has
+  an affinity record once the record is Active, and the game activates a record only in `intropanel.Show("<id>")` (mode 0,
+  the first time). `Show("<id>", 1)` shows the card every time and activates nothing; since 2026-10-17 the plugin remembers
+  such a card for a listed character whose record is still locked, in `BepInEx/config/lom.ui.english.met.txt` (see the src
+  README, "After 1.3.0"). `dump`, `candidates` and `check` do not tell the two kinds apart. After a game update list the
+  mode-1 calls with `grep -rn "intropanel.Show(.*, 1)" gamedata/lua` (`gamedata/lua` holds the game's scripts, dumped
+  again after an update): build 25987745 has special805_0, special825, special103, special999, player, girl5_11,
+  special831 and special215_1; special825 (Xia Lingxi), special831 (Meng Xianyao) and special215_1 (Meng Gong) have no
+  mode-0 call, so their tips appear only after the plugin has seen their card. A listed character with a record and no
+  `Show` call at all would never link while the gate is on.
 - **scan_overllm.py FILE...** -- prints every line publish.py's scan for OverLlm text would flag (4-word runs only OverLlm
   has, whole long OverLlm values), to reword a description before `publish.py build` refuses the file.
   - Rules the 2026-09-26 list follows (see the src README 0.7.0): specific individuals only; never a disguise or
