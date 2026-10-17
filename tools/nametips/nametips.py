@@ -8,10 +8,11 @@ plugins/LOM_UI_EN/nametips.tsv.
                                              Addressables bundles; without --all only rows that have no crop yet. --live
                                              writes the workspace file (backup in backups/), otherwise the result goes to
                                              LOM_Localization/staged/nametips/nametips.tsv
-  python nametips.py candidates              every story character's served English name (workspace table), how often it and
-                                             its last word occur in the English story text, and whether nametips.tsv lists it,
-                                             to LOM_Localization/nametips/candidates.tsv: the review list after a game update
-  python nametips.py check                   nametips.tsv and factiontips.tsv against the game dump and the workspace table:
+  python nametips.py candidates              every story character's served English name (workspace table with the strings/*.csv
+                                             overrides), how often it and its last word occur in the English story text, and
+                                             whether nametips.tsv lists it, to LOM_Localization/nametips/candidates.tsv: the
+                                             review list after a game update
+  python nametips.py check                   nametips.tsv and factiontips.tsv against the game dump and the served table:
                                              unknown ids, names that are not English, name forms two entries share, missing
                                              crops, long descriptions, and how often each entry's forms occur in the story
                                              text. Exit code 1 on errors.
@@ -49,7 +50,11 @@ REL_TYPES = {0: "sister1", 1: "brother1", 2: "brother2", 3: "brother3", 4: "brot
              102: "special102", 103: "special103", 205: "special205", 206: "special206", 605: "girl5", 606: "girl6", 607: "girl7",
              608: "girl8", 609: "girl9", 401: "special401", 403: "special403", 404: "special404", 405: "special405",
              409: "special409", 800: "special800", 808: "special808", 809: "special809", 825: "special825", 999: "special999",
-             990: "girl2_3_1", 991: "girl2_4"}
+             990: "girl2_3_1", 991: "girl2_4",
+             # build 25987745 (1.0.6000.3) added these; 805 is the hidden Crane Hand, 501 the player, 502 Xiaomei's expedition record
+             215: "special215_1", 501: "player", 502: "girl5_11", 805: "special805_0", 831: "special831"}
+# A game update can add members: `dump` prints the records of a type missing here. Read the new members' StringValues from
+# Mortal.Core.dll (System.Reflection ReflectionOnlyLoadFrom, the attribute's constructor argument of each enum field).
 
 HEADER = """# LOM_UI_EN dialog name tips: the characters whose names in story dialogue show a portrait tip on hover.
 # TAB-separated columns: id, aliases, portrait, crop. Lines starting with '#' are comments.
@@ -259,7 +264,8 @@ def cmd_dump():
         json.dump({"characters": chars, "affinity_records": rels}, f, ensure_ascii=False, indent=1, sort_keys=True)
     print("%d story characters, %d affinity records -> %s" % (len(chars), len(rels), p))
     if unknown:
-        print("affinity records of an unknown type (add them to REL_TYPES from Mortal.Core RelationshipStatType):", unknown)
+        # ascii(): the record names are Chinese, and a cp1252 console would raise here (the dump is already written)
+        print("affinity records of an unknown type (add them to REL_TYPES from Mortal.Core RelationshipStatType):", ascii(unknown))
 
 
 def load_dump():
@@ -383,12 +389,21 @@ def cmd_crops(all_rows, live):
 # ---- review ---------------------------------------------------------------------------------------------------------------
 
 def read_table():
+    """The text the plugin serves for each key: the workspace table with the wording overrides (workspace/strings/*.csv, columns
+    key, text, note) laid over it as the plugin's StringOverrides does (files by name, a later file wins, '@table' keeps the
+    table's text). Names are matched as served: Character/trainee224 is "Yu Lin" from an override while its table row is older."""
     csv.field_size_limit(10 ** 9)
     t = {}
     with io.open(P.TABLE, encoding="utf-8-sig", newline="") as f:
         for row in csv.reader(f):
             if len(row) >= 2:
                 t[row[0]] = row[1]
+    for path in sorted(glob.glob(os.path.join(P.STRINGS_DIR, "*.csv")), key=lambda p: os.path.basename(p).lower()):
+        with io.open(path, encoding="utf-8-sig", newline="") as f:
+            for row in csv.reader(f):
+                key = row[0].strip() if row else ""
+                if len(row) >= 2 and key and not key.startswith("#") and key != "key" and row[1] != "@table":
+                    t[key] = row[1]
     return t
 
 

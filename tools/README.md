@@ -362,14 +362,20 @@ Working files go to `LOM_Localization/update_pass/` (untracked: they hold the ga
 - **nametips.py** -- maintains `lom_paths.WS_NAMETIPS` (workspace/nametips.tsv: which characters' names in dialogue
   show a portrait tip, extra name forms, portrait crops; no translated text). publish.py ships it byte for byte.
   - `dump`: the game's story characters and affinity records (UnityPy + TypeTreeGeneratorAPI) to
-    LOM_Localization/nametips/game_characters.json, which the other commands read.
+    LOM_Localization/nametips/game_characters.json, which the other commands read. A record's id comes from `REL_TYPES`
+    (Mortal.Core `RelationshipStatType` value -> its StringValue); a game update can add members (build 25987745 added 215,
+    501, 502, 805, 831), and `dump` lists the records of a type it does not know: add them from the enum's StringValues
+    in Mortal.Core.dll, or those characters count as having no affinity record (no spoiler gate in `candidates`).
   - `crops [--all] [--live]`: head position in each listed character's portrait, from the Addressables bundles;
     addresses resolved through aa/catalog.json (an address can differ from the asset's bundle path). Staged output
-    unless --live (backup in backups/).
+    unless --live (backup in backups/). The crop starts at the highest part of the figure, so a tall weapon drags it
+    (special215_1's halberd): look at the result and set such a row by hand (a comment line above it says so; `--all`
+    would measure it again).
   - `candidates`: every story character's served name with its counts in the story text and whether it is listed
     (LOM_Localization/nametips/candidates.tsv), for review after a game update.
   - `check`: unknown ids, non-English names, forms two entries share (characters and factions), missing crops, long
-    faction descriptions, counts in the text.
+    faction descriptions, counts in the text. `candidates` and `check` read the names as the plugin serves them: the
+    workspace table with the `strings/*.csv` overrides laid over it (Character/trainee224 is "Yu Lin" only in an override).
   - `import-factions PROPOSAL.tsv [--live]`: workspace/factiontips.tsv (`lom_paths.WS_FACTIONTIPS`, shipped byte for byte)
     from a reviewed proposal with id, title, forms, description.
 - **scan_overllm.py FILE...** -- prints every line publish.py's scan for OverLlm text would flag (4-word runs only OverLlm
@@ -377,6 +383,11 @@ Working files go to `LOM_Localization/update_pass/` (untracked: they hold the ga
   - Rules the 2026-09-26 list follows (see the src README 0.7.0): specific individuals only; never a disguise or
     placeholder variant, nor a character whose disguise reuses their art without an affinity record to gate it;
     aliases only for given names of two or more syllables that the text uses alone for that one person.
+  - The 2026-10-17 update pass added 19 characters under the same rules. The list is inclusive (it holds names with 0-1
+    mentions), so do not filter by count. Left out: a persona that shows another character's art (special216 Yao
+    Buzhiming, the impostor of the Sect Leader Contest, shares the art of special217 Thousand-Faced Demon, a title; the real
+    leader is the listed special806), and the placeholder a named character is first shown as (Guard, Fellow, Woman,
+    Young woman, Youth): the plugin matches by name, so variants with a listed character's name need no row.
 
 ## story/ -- Lua flow inspection (ad hoc, from the area-story session)
 
