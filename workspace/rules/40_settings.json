@@ -105,6 +105,32 @@
     "path": "**/SystemSettingPanel/Panel/Graphics/GamepadIcon/Dropdown",
     "rect": { "dx": 79, "width": 300 }
   },
+  {
+    "id": "settings-dialogsize-header",
+    "comment": "'Dialog Size' (about 169px) would wrap in the 150px header box of the Graphics > DialogSize row that game build 25987745 added. Widen to 190 and keep one line; the toggles below are moved right so the text stays clear of the first checkbox.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/DialogSize/Header",
+    "onTextChange": true,
+    "rect": { "width": 190 },
+    "text": { "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-dialogsize-toggle-normal",
+    "comment": "The three Dialog Size toggles sit 150px apart (x 200/350/500), spacing made for one-hanzi labels. 'Dialog Size' (169px) ends on the first checkbox, 'Standard' (140px) runs under the Medium checkbox, 'Medium' (127px) under the Large one. Shift the checkboxes right (35 / 98 / 149) so each has a gap of about 20px after the word before it. The row then ends near x 1150 of 1600, clear of everything to its right.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/DialogSize/ToggleSetting - Normal",
+    "rect": { "dx": 35 }
+  },
+  {
+    "id": "settings-dialogsize-toggle-medium",
+    "comment": "See settings-dialogsize-toggle-normal.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/DialogSize/ToggleSetting - Medium",
+    "rect": { "dx": 98 }
+  },
+  {
+    "id": "settings-dialogsize-toggle-large",
+    "comment": "See settings-dialogsize-toggle-normal.",
+    "path": "**/SystemSettingPanel/Panel/Graphics/DialogSize/ToggleSetting - Large",
+    "rect": { "dx": 149 }
+  },
 
   {
     "id": "settings-volume-headers",

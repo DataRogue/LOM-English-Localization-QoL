@@ -252,6 +252,43 @@ plugin folder is written only by `publish.py`. The OverLlm patch's installed fil
 Every script does `sys.path.insert(0, "..")` and `import lom_paths` so it can be run directly from its
 own folder, e.g. `python proof/extract_scenes.py <lua dir> <out dir> 1,2`.
 
+## update/ -- translating what a game update adds or changes (2026-10-17, game build 25987745)
+
+New keys are translated from the Chinese, compared with Lash's draft, and added to the workspace as this mod's own rows (base_ref
+lacks them, so `publish.py build` ships them without a ledger entry; they are listed in the ledger as pass `update-2026-10` anyway).
+Working files go to `LOM_Localization/update_pass/` (untracked: they hold the game's text). Order of a run, from LOM_Localization:
+
+1. `publish.py source <srcdump.tsv>` first (records the new text, flags the changed rows), then `update/extract_lua.py` (the new
+   build's key-based story scripts into `gamedata/lua`; the old set is kept as `gamedata/lua_<old version>`).
+2. Copy the old and new dumps to `update_pass/old_game_source.tsv` / `new_game_source.tsv` and Lash's per-file tables to
+   `update_pass/lash_1016/` (comparison only; `lashtables.py` reads them into `update_pass/lash_en.json`).
+3. `update/make_chunks.py plan|data|story|legend|changed` cuts the lines into chunks (`update_pass/chunks/<set>/`): `p_NNNN.txt` is the
+   translator's view (settled terms of the chunk, voice samples, scene cast, preceding lines with their English, the next lines in
+   Chinese), `p_NNNN.json` maps the line numbers to keys, `l_NNNN.txt` is Lash's draft (reviewer and referee only). Symbol-only rows and
+   long exact re-keyed lines never reach a model (`upd_common.classify_added`: `symbol`, `move`).
+4. `update/term_stats.py` (which glossary terms the published text really uses) and `update/term_candidates.py` +
+   `terms_workflow.js` + `ingest_terms.py` (vocabulary that first occurs in the new text, settled once for all chunks) feed
+   `update_pass/terms.tsv`, the pass's term sheet that the chunk views use.
+5. `update/update_workflow.js` (Workflow tool): per chunk a Sonnet translator that never sees Lash's draft, then a Sonnet reviewer who
+   checks the translation against the Chinese and compares it with Lash's draft (`lash` same / minor / differs, and whose reading the
+   Chinese supports); `mode: 'referee'` rules on the contested lines in batches, `mode: 'repair'` fixes lines that failed the checks.
+   The house card every agent reads is `update/translator_card.md`. The `changed` set uses a revise-or-keep prompt.
+6. `update/apply_update.py`: `collect <journal.jsonl>` (agents' results into `raw/`), `batches` / `repairs` (write the referee and repair
+   batch files and print the workflow args), `decide` (final line per key from the manual `overrides.tsv`, the unlock-condition template,
+   the referee's ruling, the translator, the repair; each checked for line breaks, tags, placeholders, Chinese, full-width marks, length
+   and the owner's retired forms), `apply [--live]` (new rows appended to the workspace table; DiceHeader rows to
+   `strings/17_library_position.csv`; ledger entries; never publishes), `apply-changed [--live]` (rows whose Chinese changed are
+   replaced, or kept; the kept ones are listed in `update_pass/restamp.txt`), `fix [--live]` (corrections from `fixes.tsv`), `auto`.
+7. Finish with `publish.py source base_ref/game_source.tsv --restamp @update_pass/restamp.txt` (builds; the kept rows stop falling
+   back) and `publish.py check`. `update/check_terms.py` lists lines that miss a settled term, or use a singular they/them.
+8. In-game check (only with the owner's go-ahead; `ingame/release_test.py prep`, `b_setup`, ..., `b_teardown`, `final`). Load the Story
+   autosave from the title, then, from that Story scene only, harness `lua` (single quotes) jumps into new content:
+   `luamanager.SetNextScript('S2321_03_02'); luamanager.ChangeScene('Story', '', '')` for a scene, `luamanager.ChangeScene('Combat',
+   '1508_01', 'Story')` for a duel with new CombatTalking shouts (Verbal Attack card, then the play diamond), `luamanager.ChangeScene('Battle',
+   '1802_01', 'Story')` for an army battle with new BattleDialog shouts (start it with `click /[UI]/MainUI/Level_3/ReadyPanel/Container/
+   StartPanel/MenuButton_StartGame`). A layout rule can be tried without a restart: write the rule file as the build ships it
+   (`publish.ship_rules`), then harness `reload` (F11 in game) and `dump`.
+
 ## proof/ -- scene-by-scene proofreading pass
 
 - **extract_scenes.py** -- reads: Lua story scripts (arg `lua dir`), `lom_paths.TABLE` (current English),

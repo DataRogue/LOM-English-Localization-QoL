@@ -57,7 +57,7 @@
 "Character/trainee221","Soul-Stealing Disciple","was: Soul‑stealer Disciple | Verified the old text contains the forbidden U+2011 hyphen (hex-confirmed) and a lowercase 'stealer'. NOMENCLATURE.md reserves 'Soul-Stealing' for 奪魄 (matching Soul-Stealing Orchid, Soul-Stealing Phantom Claw), which is exactly this row's Chinese (奪魄弟子)."
 "Character/trainee222","Soul-Stealing Disciple","was: Soul‑stealer Disciple | Old text confirmed as 'Soul‑stealer Disciple' (U+2011 hyphen, verified byte-level). Nomenclature fixes 奪魄 as the adjective 'Soul-Stealing' (奪魄幽蘭 = Soul-Stealing Orchid, 奪魄幽靈爪 = Soul-Stealing Phantom Claw); ASCII hyphen required by GLOSSARY."
 "Character/trainee223","Soul-Stealing Disciple","was: Soul‑stealer Disciple | Same fix as trainee222; old text and reasoning confirmed."
-"Character/trainee224","Soul-Stealing Disciple","was: Soul‑stealer Disciple | Same fix as trainee222; old text and reasoning confirmed."
+"Character/trainee224","Yu Lin","was: Soul-Stealing Disciple | Chinese changed in game 1.0.6000.3 | was: Soul‑stealer Disciple | Same fix as trainee222; old text and reasoning confirmed."
 "Character/trainee301","Diancang Disciple","was: Dian Cang Disciple | Confirmed old text 'Dian Cang Disciple'. NOMENCLATURE explicitly: 點蒼 = Diancang, never split into Dian Cang (11 wrong uses cited)."
 "Character/trainee302","Diancang Disciple","was: Dian Cang Disciple | Same fix as trainee301."
 "Character/trainee303","Diancang Disciple","was: Dian Cang Disciple | Same fix as trainee301."
