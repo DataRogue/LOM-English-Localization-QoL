@@ -6,11 +6,13 @@
 #
 # -Game defaults to $env:LOM_GAME, then the default Steam folder; only its Mortal_Data\Managed is referenced.
 # BepInEx: since 1.2.0 the mod runs on BepInEx 5.4.23.3 only, the version Lash's English Patch installs (its installer pins the
-# same official zip). The core files are taken from release/vendor/BepInEx_win_x86_5.4.23.3.zip, checked against its SHA-256,
+# same official zip). The core files are taken from release/vendor/BepInEx_win_x64_5.4.23.3.zip, checked against its SHA-256,
 # into a cache folder under %TEMP%; -BepInExCore (or $env:LOM_BEPINEX_CORE) names another folder holding BepInEx.dll and
-# 0Harmony.dll 5.4.23.3 instead. Whatever BepInEx the game folder has installed does not matter. Newtonsoft.Json is the copy
-# the plugin ships (release/vendor/unity-newtonsoft/Runtime-AOT, else the installed plugin folder's). The 1.0.x and 1.1.x
-# branches keep the BepInEx 6 (be.692) build.
+# 0Harmony.dll 5.4.23.3 instead. Whatever BepInEx the game folder has installed does not matter. The game is 64-bit since its
+# October 2026 update (build 25987745), so the pin is the x64 zip, as in that installer; the x86 zip's core files are the same
+# bytes (only winhttp.dll differs), so either gives the same DLL. Newtonsoft.Json is the copy the plugin ships
+# (release/vendor/unity-newtonsoft/Runtime-AOT, else the installed plugin folder's). The 1.0.x and 1.1.x branches keep the
+# BepInEx 6 (be.692) build.
 # The build is deterministic (-deterministic, source paths mapped): the same source, compiler and references give the same
 # bytes, so anyone can rebuild a release DLL and compare it with the shipped one (tools/release.py does).
 param([string]$Game = "", [string]$OutDir = "", [string]$Csc = "", [string]$BepInExCore = "")
@@ -22,9 +24,9 @@ if (-not $Game) { $Game = "C:\Program Files (x86)\Steam\steamapps\common\LegendO
 if ($OutDir -eq "") { $OutDir = "$src\bin" }
 
 $BieVersion = "5.4.23.3"
-$BieZip = "$loc\release\vendor\BepInEx_win_x86_$BieVersion.zip"
-$BieSha = "275bc94fa582ba0ddeb5dca1241fd657d5f101563c3a8dd3a4a6c27ca28e2376"
-$BieUrl = "https://github.com/BepInEx/BepInEx/releases/download/v$BieVersion/BepInEx_win_x86_$BieVersion.zip"
+$BieZip = "$loc\release\vendor\BepInEx_win_x64_$BieVersion.zip"
+$BieSha = "41a089e5b1b1f0713b331346baf6677b1184c69eabebf51101097954e854c749"
+$BieUrl = "https://github.com/BepInEx/BepInEx/releases/download/v$BieVersion/BepInEx_win_x64_$BieVersion.zip"
 
 function Find-Csc {
     if ($env:LOM_CSC) { return $env:LOM_CSC }

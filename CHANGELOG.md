@@ -3,6 +3,24 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
+## Unreleased (1.3.0)
+
+Works with the game's October 2026 update (game version `release_1.0.6000.3`), which made the game 64-bit, and with
+Lash's English Patch of 2026-10-16 (`EnglishPatch-2026.10.16.07.52`).
+
+- **The game is 64-bit now.** It only loads the 64-bit build of BepInEx's loader (`winhttp.dll`), and the full package
+  up to 1.2.0 brought the 32-bit one: since the update the game starts without any mod, Lash's included. The full
+  package now brings BepInEx 5.4.23.3 for 64-bit, as Lash's installer does since 2026-10-16. If you installed this
+  mod's full package before, extract the new full package; with Lash's English Patch, run its newest installer once
+  (its in-game updater cannot do it, as no mod loads until then), then extract the mod-only package.
+- **Name tooltips.** A character whose stage portrait cannot be loaded shows their full-length art from Status >
+  Social again: the update moved that art out of memory, and the tooltip now loads it like the stage portraits.
+- **Story dialogs and the language list keep their layout.** The update moved the speaker's name plate inside the
+  dialog box (for its new dialog-size setting) and rebuilt the language dropdown's list; this mod's sizing of names and
+  titles, and the "English" entry in the language list, follow them.
+- **The new story and text are not translated yet.** The update adds new story chapters and game text; until this mod
+  covers them they show in Chinese, or in Lash's English where that patch is installed and has the line.
+
 ## 1.2.0 (2026-10-06)
 
 Works with Lash's English Patch of 2026-10-05 (`EnglishPatch-2026.10.05.09.58`) and its new installer, and moves to

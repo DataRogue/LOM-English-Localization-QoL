@@ -9,7 +9,8 @@ branches keep the BepInEx 6 scenarios L and L5 and the older A).
   prep        refuses while the game runs; backs up the save folder and the game's registry key, parks the harness output
               (a finished run's state.json moves into that run's folder first)
   a_setup     scenario A, a clean install: the game's BepInEx folder, Mods and the loader's root files held aside (this mod's
-              harness cache stays where run_batch.ps1 looks), the stock Unity.Addressables.dll in, the newest
+              harness cache stays where run_batch.ps1 looks), the stock Unity.Addressables.dll in (the installed one when
+              it is stock, else BepInEx/backup_stock's Unity.Addressables.dll.stock-<Steam build id>), the newest
               release/dist/*-candidate/*-full.zip (or FULL_ZIP, e.g. an earlier release's for a before/after comparison;
               its -mod-only.zip must lie next to it) extracted as a player would (BepInEx 5.4.23.3 with it), a fresh
               lom.ui.english.cfg with only the harness on, steam_appid.txt
@@ -62,7 +63,8 @@ SAVES = _saves_folder()
 PLUGIN = os.path.join(G, "BepInEx", "plugins", "LOM_UI_EN")
 CFG = os.path.join(G, "BepInEx", "config")
 ADDR = os.path.join(G, "Mortal_Data", "Managed", "Unity.Addressables.dll")
-ADDR_STOCK = os.path.join(G, "BepInEx", "backup_stock", "Unity.Addressables.dll.stock-20337760")
+# a stock copy kept for one game build (Steam build id): only that build may get it back
+ADDR_STOCK_FMT = os.path.join(G, "BepInEx", "backup_stock", "Unity.Addressables.dll.stock-%s")
 HARNESS_OUT = os.path.join(G, "BepInEx", "cache", "LOM_UI_EN", "harness", "out")
 VENDOR = os.environ.get("LOM_VENDOR_DIR") or os.path.join(LOC, "release", "vendor")
 BEPINEX = os.path.join(G, "BepInEx")
@@ -85,6 +87,32 @@ def _candidate(kind):
 
 
 APPID = os.path.join(G, "steam_appid.txt")
+
+
+def game_build():
+    """The installed game's Steam build id (steamapps/appmanifest_1859910.acf, two folders above the game folder), or None."""
+    acf = os.path.join(os.path.dirname(os.path.dirname(G)), "appmanifest_1859910.acf")
+    try:
+        m = re.search(r'"buildid"\s+"(\d+)"', open(acf, encoding="utf-8", errors="replace").read())
+    except OSError:
+        return None
+    return m.group(1) if m else None
+
+
+def stock_addressables():
+    """(path of a stock Unity.Addressables.dll for the installed game build, how it was found), or (None, why not).
+    Lash's English Patch up to its 2026-02 releases (Binarizer) patches that DLL, adding the static field ModPaths; a DLL
+    without the name is the game's own. The installed one is taken when it is stock, else the copy backup_stock keeps for
+    this build: a stock DLL of another build would not match the game's other assemblies."""
+    with open(ADDR, "rb") as f:
+        patched = b"ModPaths" in f.read()
+    if not patched:
+        return ADDR, "the installed one (stock)"
+    build = game_build()
+    kept = ADDR_STOCK_FMT % build if build else None
+    if kept and os.path.isfile(kept):
+        return kept, "backup_stock's copy for build " + build
+    return None, "the installed Unity.Addressables.dll is a patched one and BepInEx/backup_stock has no stock copy for game build %s (%s)" % (build, kept)
 
 
 def sha(p):
@@ -257,14 +285,15 @@ def a_setup(full_zip=None):
     for z in (full_zip, mod_zip):
         if not os.path.isfile(z) or not zipfile.is_zipfile(z):
             sys.exit("REFUSED: %s is missing or not a zip (the -mod-only.zip must lie next to the -full.zip)" % z)
-    if not os.path.isfile(ADDR_STOCK):
-        sys.exit("REFUSED: no stock Unity.Addressables.dll at %s" % ADDR_STOCK)
+    addr_stock, addr_how = stock_addressables()
+    if addr_stock is None:
+        sys.exit("REFUSED: " + addr_how)
     pre = _attempt(run, "A")
-    a = {"pre": pre, "game_before": _game_tree(), "before": os.path.join(run, pre + "held")}
+    a = {"pre": pre, "game_before": _game_tree(), "before": os.path.join(run, pre + "held"), "addr_stock_from": addr_how}
     # 1. the stock Unity.Addressables.dll, read before its folder (BepInEx/backup_stock) goes aside
     stock = os.path.join(run, pre + "Unity.Addressables.dll.stock")
-    shutil.copy2(ADDR_STOCK, stock)
-    if sha(stock) != sha(ADDR_STOCK):
+    shutil.copy2(addr_stock, stock)
+    if sha(stock) != sha(addr_stock):
         sys.exit("copy of the stock Addressables failed")
     # 2. the whole install aside: BepInEx, Mods, the loader's root files (Lash's English Patch, any BepInEx, this mod)
     cache_hold = os.path.join(run, pre + "harness_cache")
@@ -288,8 +317,8 @@ def a_setup(full_zip=None):
         f.write("1859910")
     st["a"] = a
     save(st)
-    print("scenario A set up: the install held in %s, Addressables stock %s, %s extracted (%d files)" % (
-        a["before"], a["addr_stock_sha"][:12], os.path.basename(a["full_zip"]), a["files"]))
+    print("scenario A set up: the install held in %s, Addressables stock %s (%s), %s extracted (%d files)" % (
+        a["before"], a["addr_stock_sha"][:12], addr_how, os.path.basename(a["full_zip"]), a["files"]))
 
 
 def a_teardown():

@@ -86,6 +86,9 @@
    "id": "say-name-plate",
    "comment": "Speaker name (350x97 TMP, TopRight, overflow), right edge at x554 above the story text; the dialog art starts at x192. Auto-size keeps long localized names inside the plate instead of overflowing left over the art. onTextChange because the name is assigned after enable (SetCharacterName) and the resizer's ChangeFontSizeByPercentage(0.7) re-applies on that assignment. No font swap (the box's DFT_S5_SDF_StoryTitle_001 is a dynamic atlas; a 'Palatino Linotype' TMP asset cannot be built by TMP 3.0 and the failed build was retried on every line). Floor 20 rather than 24: of the 341 named speakers in character/think dialogs, 'Fire Dragon Immortal Monarch' (special204, 91 lines) is the only one wider than 350px at 24 with Source Han Serif metrics (389px, reaching x164); at 20 it settles at ~21.6px inside the plate. With the 0.5em-per-letter advances TMP reports for this atlas in the live dumps it already fits at 25px, and every other name stays >= 24.4px, so the lower floor changes nothing else.",
    "paths": [
+    // since game build 25987745 the name plate sits inside Panel/Background (the dialog-size scaler); Panel/Name before
+    "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/Name/Text (TMP)",
+    "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Background/Name/Text (TMP)",
     "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name/Text (TMP)",
     "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Name/Text (TMP)"
    ],
@@ -145,6 +148,9 @@
    "id": "say-title-size",
    "comment": "Speaker title above the name plate (CharacterTitle/<id>, or PlayerInfo/Title/<n> for the player via '{title}'): Text 500x60 UpperRight, Wrap + Truncate, so one line. CharacterSayDialog gets XUnity's ChangeFontSizeByPercentage(0.7) and renders the title at 25px (28 after a rule reload); ThinkSayDialog has no resizer line and renders it at the FontMap size 36 (40 after a reload). At 36 the player title 'Eldest Disciple of Snow Mountain' (PlayerInfo/Title/7, 542px) wraps and loses 'Mountain' on every one of the player's 2343 thought lines while he holds it; at 40 four NPC titles are cut too ('Former Wulin Alliance [Leader]', 'Soul-Stealer Secluded [Orchid]', 'Flying Heaven Gate [Disciple]', 'Young Swordsman in [White]'). Pin both dialogs to 25 so a title looks the same in speech and in thought; the widest title is 377px at 25.",
    "paths": [
+    // Panel/Background/Name since game build 25987745, Panel/Name before (see say-name-plate)
+    "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/Name/Title",
+    "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Background/Name/Title",
     "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name/Title",
     "/StoryCore/SayDialogs/ThinkSayDialog/Panel/Name/Title"
    ],

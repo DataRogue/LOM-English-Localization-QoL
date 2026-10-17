@@ -20,7 +20,7 @@ Gates (any failure refuses to package):
 
 Writes into DIR (default LOM_Localization/release/dist/<version>[-candidate]/):
   LOM-English-Localization-QoL-<version>-mod-only.zip   BepInEx/plugins/LOM_UI_EN/... only
-  LOM-English-Localization-QoL-<version>-full.zip       the same plus BepInEx 5.4.23.3 (Unity Mono, x86), the version Lash's
+  LOM-English-Localization-QoL-<version>-full.zip       the same plus BepInEx 5.4.23.3 (Unity Mono, x64), the version Lash's
                                                         English Patch installs: the official zip (release/vendor, pinned by
                                                         SHA-256, the same pin as that patch's installer) with one line of
                                                         doorstop_config.ini set as that installer sets it
@@ -42,9 +42,12 @@ SLUG = "LOM-English-Localization-QoL"
 SRC = os.path.join(P.REAL_LOCALIZATION, "src", "LOM_UI_EN")
 RELEASE = os.path.join(P.REAL_LOCALIZATION, "release")
 VENDOR = os.path.join(RELEASE, "vendor")
-BEPINEX_ZIP = "BepInEx_win_x86_5.4.23.3.zip"
-BEPINEX_SHA256 = "275bc94fa582ba0ddeb5dca1241fd657d5f101563c3a8dd3a4a6c27ca28e2376"
-BEPINEX_SOURCE = "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.3/BepInEx_win_x86_5.4.23.3.zip"
+# The game is 64-bit since its October 2026 update (build 25987745): the x86 loader (winhttp.dll) is never loaded by it, and the
+# installer of Lash's English Patch moved to the x64 zip with its 2026.10.16 release. Only winhttp.dll differs between the two
+# zips.
+BEPINEX_ZIP = "BepInEx_win_x64_5.4.23.3.zip"
+BEPINEX_SHA256 = "41a089e5b1b1f0713b331346baf6677b1184c69eabebf51101097954e854c749"
+BEPINEX_SOURCE = "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.3/BepInEx_win_x64_5.4.23.3.zip"
 # Lash's English Patch's installer (FanslationStudio.Installer.Core BepInExInstaller.ApplyDoorstopSettings, pin
 # "dllSearchPathOverride": "BepInEx\\core" in its installer.json) rewrites this line after extracting the same zip: the game
 # ships its own MonoMod in Managed, and BepInEx must load its own copies from BepInEx\core first.
@@ -63,7 +66,7 @@ NOT_SHIPPED_PREFIX = ("harness/",)
 
 BEPINEX_NOTICE_HEAD = """LOM English Localization + QoL - the bundled mod loader
 
-The full package bundles BepInEx 5.4.23.3 (Unity Mono, x86), the version Lash's English Patch installs: winhttp.dll,
+The full package bundles BepInEx 5.4.23.3 (Unity Mono, x64), the version Lash's English Patch installs: winhttp.dll,
 .doorstop_version, changelog.txt and everything in BepInEx/core are byte for byte the files of
 %(zip)s
 (SHA-256 %(sha)s), downloaded from

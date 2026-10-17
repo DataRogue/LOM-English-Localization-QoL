@@ -33,7 +33,9 @@ sys.path.insert(0, os.path.join(HERE, ".."))
 import lom_paths as P
 
 DATA = os.path.join(P.GAME, "Mortal_Data")
-AA = os.path.join(DATA, "StreamingAssets", "aa", "StandaloneWindows")
+# the bundle folder is StandaloneWindows64 since the game went 64-bit (build 25987745), StandaloneWindows before
+AA = next((p for p in (os.path.join(DATA, "StreamingAssets", "aa", n) for n in ("StandaloneWindows64", "StandaloneWindows"))
+           if os.path.isdir(p)), os.path.join(DATA, "StreamingAssets", "aa", "StandaloneWindows64"))
 DUMP_NAME = "game_characters.json"
 TAB = chr(9)
 LF = chr(10)

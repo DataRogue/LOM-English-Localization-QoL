@@ -43,14 +43,22 @@ still holds the 2026-02-06 release. A dry run onto `EnglishPatch-2026.09.28.13.5
 
 From its 2026.09.29 release on, Lash's English Patch is installed by its own installer (`Installer-win-x64.exe`, a
 GitHub pre-release named `installer`; source in the sibling repo `FanslationStudio.LlmKit`, `FanslationStudio.Installer.*`).
-The installer puts BepInEx 5.4.23.3 in place (the official `BepInEx_win_x86_5.4.23.3.zip`, pinned by SHA-256, with
-`dll_search_path_override = "BepInEx\core"` written into `doorstop_config.ini` and a marker
+The installer puts BepInEx 5.4.23.3 in place (the official `BepInEx_win_x64_5.4.23.3.zip` since its 2026.10.16 release,
+`BepInEx_win_x86_5.4.23.3.zip` before; pinned by SHA-256, with `dll_search_path_override = "BepInEx\core"` written
+into `doorstop_config.ini` and a marker
 `BepInEx/installer-bepinex.sha256`), then the release zip's files as its `release-manifest.json` lists them, and keeps
 that manifest in `BepInEx/release-manifest.json`. The zip itself no longer holds BepInEx. An update removes only the
 files the previous manifest listed, so it never touches this mod's folder. The pack's `UiEditor` plugin checks GitHub
 at every start and offers a newer release in a small window ("Update available"), then hands over to the installer and
 quits the game. Since 1.2.0 this mod runs on the same BepInEx 5.4.23.3, and its full package bundles that zip with the
 same `doorstop_config.ini` line (`tools/release.py`).
+
+**The game is 64-bit since its October 2026 update** (Steam build 25987745, built 2026-10-16; before it, build 20337760
+was 32-bit). A 64-bit game never loads the x86 loader (`winhttp.dll`), so an install that still has it runs no mod at
+all, this one and Lash's alike, and Lash's in-game updater cannot fix it either. Since 1.3.0 the full package bundles
+the x64 zip, as the installer of Lash's English Patch does since 2026.10.16. The two zips differ only in `winhttp.dll`;
+every file in `BepInEx/core` is the same, so the plugin DLL is the same build for either. The update also moved the
+Addressables bundles to `Mortal_Data/StreamingAssets/aa/StandaloneWindows64` (`StandaloneWindows` before).
 
 ## Updating in a fork
 
@@ -82,7 +90,7 @@ run, but you don't need it to keep the mod working:
 
 - The game. Its installed BepInEx does not matter for building; to run the build, BepInEx 5.4.23.3 (the full release
   package or the installer of Lash's English Patch installs it).
-- `release/vendor/BepInEx_win_x86_5.4.23.3.zip` (see the table below): the build references its core files.
+- `release/vendor/BepInEx_win_x64_5.4.23.3.zip` (see the table below): the build references its core files.
 - Unity's AOT `Newtonsoft.Json.dll` in `release/vendor/unity-newtonsoft/Runtime-AOT/` (see the table below), which the
   build references too; without it, the build falls back to the copy in the game's `BepInEx/plugins/LOM_UI_EN/`.
 - Visual Studio 2022 or later, or its Build Tools, with the .NET Framework 4.7.1+ targeting pack.
@@ -96,7 +104,7 @@ powershell -ExecutionPolicy Bypass -File src/LOM_UI_EN/build.ps1 [-Game <game fo
 
 The output is `src/LOM_UI_EN/bin/LOM_UI_EN.dll`, for BepInEx 5.4.23.3, the version Lash's English Patch installs. Since
 1.2.0 there is one DLL; the 1.0.x and 1.1.x branches also build the BepInEx 6 (be.692) one. The build references
-BepInEx's `BepInEx.dll` and `0Harmony.dll` from `release/vendor/BepInEx_win_x86_5.4.23.3.zip` (checked against its
+BepInEx's `BepInEx.dll` and `0Harmony.dll` from `release/vendor/BepInEx_win_x64_5.4.23.3.zip` (checked against its
 SHA-256 and extracted once under `%TEMP%`), or from `-BepInExCore` / `LOM_BEPINEX_CORE`; whatever the game folder has
 installed does not matter. Copy the DLL into `BepInEx/plugins/LOM_UI_EN/` while the game is closed, and keep the
 previous one in `BepInEx/backup_stock/`. The build is deterministic: the same source, compiler and references give the
@@ -127,7 +135,7 @@ Lash's English Patch has.
 
 | File | From | SHA-256 |
 |---|---|---|
-| `BepInEx_win_x86_5.4.23.3.zip` | https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.3/BepInEx_win_x86_5.4.23.3.zip | `275bc94fa582ba0ddeb5dca1241fd657d5f101563c3a8dd3a4a6c27ca28e2376` (the pin of Lash's installer too) |
+| `BepInEx_win_x64_5.4.23.3.zip` | https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.3/BepInEx_win_x64_5.4.23.3.zip | `41a089e5b1b1f0713b331346baf6677b1184c69eabebf51101097954e854c749` (the pin of Lash's installer too, since 2026.10.16) |
 | `unity-newtonsoft/com.unity.nuget.newtonsoft-json-3.2.2.tgz` | https://download.packages.unity.com/com.unity.nuget.newtonsoft-json/-/com.unity.nuget.newtonsoft-json-3.2.2.tgz | `5db19a6ec4478ab974922d155aa32b952bc34abadaa78afc7973cf049b62db41` |
 
 The plugin folder ships `package/Runtime/AOT/Newtonsoft.Json.dll` from Unity's package (SHA-256
@@ -156,7 +164,9 @@ plugin marks those data parts as not working in Compatibility (`Plugin.CheckLayo
    `screens05.ps1`. The mod runs on BepInEx 5.4.23.3 only, so every scenario installs it.
    1. `release_test.py prep`
    2. **A, clean install:** `release_test.py a_setup`. This holds the whole install aside (BepInEx, `Mods`, the loader's
-      root files) and the patched `Unity.Addressables.dll`, then extracts the `-full` candidate onto the bare game.
+      root files), puts the game's stock `Unity.Addressables.dll` in (the installed one when it is stock, else
+      `BepInEx/backup_stock/Unity.Addressables.dll.stock-<Steam build id>`; it refuses a copy from another build), then
+      extracts the `-full` candidate onto the bare game.
       Launch `Mortal.exe` and check:
       - `detect`, `compat`, the log's "loaded: N rules, N sprite replacements";
       - the 11 screens, Mod Settings, a Story scene with name tips, a duel.

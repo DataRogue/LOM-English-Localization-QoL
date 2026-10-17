@@ -1662,12 +1662,17 @@ namespace LOM_UI_EN
 			return r == null || r.Active;
 		}
 
-		/// <summary>The character's own full-length art from its affinity record (already in memory), used when its stage art cannot be loaded.</summary>
+		/// <summary>
+		/// The address of the character's own full-length art from its affinity record, tried when its stage art cannot be loaded.
+		/// Up to game build 20337760 the record held the sprite itself (in memory); since 25987745 it holds an Addressables
+		/// reference that the game loads on demand, so the tip loads it through its own handle like the stage art.
+		/// </summary>
 		[MethodImpl(MethodImplOptions.NoInlining)]
-		private static Sprite AffinityAvatar(TipCharacter c)
+		private static string AffinityAvatarKey(TipCharacter c)
 		{
 			ReadAffinityBody(c, out int _);
-			return (c.Relationship as Mortal.Core.RelationshipStat)?.Avatar;
+			UnityEngine.AddressableAssets.AssetReference r = (c.Relationship as Mortal.Core.RelationshipStat)?.AvatarReference?.Reference;
+			return (r != null && r.RuntimeKeyIsValid()) ? r.RuntimeKey.ToString() : null;
 		}
 
 		// ---- portraits ---------------------------------------------------------------------------------------------------
@@ -1723,15 +1728,18 @@ namespace LOM_UI_EN
 		/// <summary>Called by the loader when a portrait arrived or every address failed.</summary>
 		internal static void PortraitDone(TipCharacter c)
 		{
-			if (c.State == PortraitState.Failed)
+			if (c.State == PortraitState.Failed && c.PortraitKeys != null)
 			{
 				try
 				{
-					Sprite avatar = F.NameTips.PartOk("affinity") ? AffinityAvatar(c) : null;
-					if (avatar != null)
+					// Every stage address failed: the affinity art goes last in the list (once; the list outlives a scene change), and
+					// the loader comes back here when it fails too.
+					string avatar = F.NameTips.PartOk("affinity") ? AffinityAvatarKey(c) : null;
+					if (avatar != null && !c.PortraitKeys.Contains(avatar))
 					{
-						c.Portrait = avatar;
-						c.State = PortraitState.Ready;
+						c.PortraitKeys.Add(avatar);
+						PortraitLoader.LoadNext(c);
+						return;
 					}
 				}
 				catch (Exception)

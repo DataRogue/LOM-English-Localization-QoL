@@ -1196,3 +1196,83 @@ What this version does about it:
     leftover core files (one warning: it cannot read be.692's chainloader cache, and rebuilds it); 19 features
     working, 3 not needed; 0 Chinese on the 11 screens, which equal the clean install's text settings (534 texts, 0
     differ).
+
+## 1.3.0 changes: the 64-bit game (build 25987745) and Lash's English Patch 2026.10.16
+
+The game updated on 2026-10-15/17: Steam build 25987745, `Application.version` `release_1.0.6000.3` (built 2026-10-16;
+1.2.0 was made for build 20337760, `release_1.0.5000.13`). Still Unity 2020.3.49f1 Mono, but **64-bit**: `Mortal.exe`,
+`UnityPlayer.dll` and `MonoBleedingEdge` are x64, `Mortal_Data/Plugins/x86_64`, and the Addressables bundles moved to
+`StreamingAssets/aa/StandaloneWindows64`. Every managed game DLL, scene and bundle was rebuilt; the update adds story
+tables Story_18 to Story_21 (Story_17 grew), new tables (DiceHeader, BattleTalking, CombatInfo, ...) and reworked duel code
+(support actions, a per-hit damage cap, new effects).
+
+- **The loader.** A 64-bit process does not load the x86 Doorstop `winhttp.dll`, so 1.2.0's full package (and Lash's
+  installer before its 2026.10.16 release) leaves the game without any mod and without a fresh `LogOutput.log`; Lash's
+  in-game updater cannot help, its plugin does not load either. The official `BepInEx_win_x64_5.4.23.3.zip` (SHA-256
+  `41a089e5...`, the pin of Lash's installer since 2026.10.16: `Installer/installer.json` `"architecture": "x64"`) differs
+  from the x86 zip in `winhttp.dll` only; `BepInEx/core`, `doorstop_config.ini`, `.doorstop_version` and `changelog.txt`
+  are the same bytes. build.ps1, release.py (and through it release_test.py) pin the x64 zip; the DLL built against
+  either zip's core is byte for byte the same (checked: F63B1A40... both ways for the 1.2.0 source).
+- **Game members.** Of the 597 member references of the 1.2.0 DLL into the game's assemblies, one no longer resolves:
+  `RelationshipStat.get_Avatar()` (a `Sprite`). The record now holds `AvatarReference`, an
+  `AssetReferenceCache<Sprite>` over an Addressables `AssetReference` that the game loads on demand. The name tips'
+  affinity-art fallback (`NameTips.AffinityAvatarKey`) takes its `RuntimeKey` and appends it, once, to the character's
+  portrait addresses when every stage address failed, so `PortraitLoader` loads and releases it like the stage art (the
+  key list outlives a scene change, so the check keeps it from being added twice). Every by-name lookup (the
+  `Compat.Require` lists, QuickSave's scene gates, the `AccessTools`/`Traverse` names) still resolves against the new
+  DLLs (scratchpad checknames.py over a Cecil dump of 21 game assemblies; `StoryCharacterConfig.List` lives on the generic
+  base `CollectionData<T>` as before). The duel gauges' tiers read from `ModifyPoisonValue` / `ModifyParalyzedValue`'s
+  coroutine IL are unchanged: 50/100, D101-D103 and D201-D203.
+- **Lash's English Patch 2026.10.16.07.52** (zip `ac45bc70...`): the same two plugin DLLs. The pack's services in its
+  Costura-embedded `FanslationStudio.Plugins.Shared` keep every member the guards hook (`TextResizerService`
+  `ApplyResizingCore` / `ApplyResizingToLegacyTextCore`, `PrefabTextReplacerService._replacements` as
+  `Dictionary<string,string>` and `LoadReplacements(string)`, `StringPatcherService.GroupedDynamicStringContracts(List)`,
+  the `EnsurePatched` methods; `StringTableInjectionPatches.GetTranslation_Postfix(string, LeanTranslation)` and
+  `_translations` in the game plugin). New: `Mods/English` has 49 CSVs (Story_18-21, DiceHeader, BattleTalking, ...),
+  all read by BaseTables' `*.csv` walk, and a second prefab text file `dumpedPrefabText.txt.yaml` that the replacer's
+  `*prefabText*` pattern loads too (the guard filters each `LoadReplacements` call). The pack's UIEditor can now also
+  apply layout rules from `BepInEx/layouts/*.yaml` and image rules from `BepInEx/sprites2/*.yaml`; the release ships
+  neither folder, so nothing of it reaches this mod's screens yet (a future release that ships them would need a guard
+  like the resizer's).
+- **Layout rules against the new assets** (offline: every GameObject path of the 11 scenes, the shared assets and the 190
+  bundles via UnityPy, 22,125 objects, against the 1,668 runtime paths of 677 harness dumps from the old build): no panel
+  was renamed, moved or removed; 1,480 old paths exist as they were, the other 188 are objects made at run time. 535 of
+  the 549 rules find their targets. Two moves needed rule paths (the old ones are kept, so the rules still fit build
+  20337760):
+  - The say dialogs' name plate went into `Panel/Background` (`Panel/Background/Name/Text (TMP)`, `.../Name/Title`):
+    `Background` carries the new `DialogUISizeScale`, the scaler of the new dialog-size setting
+    (`System_DialogUISize`, Settings > Graphics > DialogSize). Same sizes as before (350x97.2 TopRight, 500x60); the
+    rules set no rect. Rules `say-name-plate`, `say-title-size`, `size-storycore-saydialogs-charactersaydialog-panel-name`.
+  - The language dropdown's list template is a plain `Content` (vertical layout, 230 wide, Unity's `Dropdown`) instead of
+    the default `Template/Viewport/Content`; Unity clones it as `Dropdown List` with the rows `Item N: <label>` directly
+    under it. Rules `settings-language-dropdown-items`, `settings-language-item-english`.
+  The new rows Settings > Game > BraveMode (`System_BraveMode`) and Graphics > DialogSize get `settings-toggle-labels` like
+  the other toggles. Six rules found nothing before the update either (path typos `Dropdow` and `Slote`, and four
+  `DevelopPanel/List` rules whose working twins in 21_upgrade.json use `DevelopPanel/Scroll View/Viewport/List`); left
+  as they were. The 24 sprite replacements and the three mapped fonts all exist under the same names and sizes.
+- **Tools.** release_test.py's scenario A took `backup_stock/Unity.Addressables.dll.stock-20337760` as "the stock
+  Addressables": on build 25987745 that would have put a DLL of the old build into the game. It now takes the installed
+  DLL when it is stock (no `ModPaths`, the field Binarizer's patched build adds), else
+  `backup_stock/Unity.Addressables.dll.stock-<Steam build id>` from `appmanifest_1859910.acf`, and refuses otherwise.
+  tools/nametips reads the bundles from `StandaloneWindows64` (else `StandaloneWindows`).
+- **Language list width** (`settings-language-dropdown-list`, found in game): the new 230-wide list sat under the
+  330-wide dropdown and "Simplified Chinese" (205px at 22) ran into its edge; the template `Content` and its clone
+  `Dropdown List` are now 330 wide, as the old stretched template was.
+- **Verified in game 2026-10-17** (run_20261017-113138, the owner's go-ahead), on build 25987745 x64:
+  - B (this install, 1.3.0 alone): BepInEx 5.4.23.3 reports `System platform: Bits64`; 20 features working (2 not
+    needed); 0 Chinese on 10 of the 11 screens, the settings screen's 5 being the new rows (BraveMode, DialogSize);
+    `textfit` 0 cut on Settings (22 texts) and the duel (50); the say dialog's name plate and title take their rules
+    at the Normal and Large dialog sizes (`SystemSettings.SetDialogUISize 2`: `Background` scaled 1.2, 0 cut); the
+    language list reads "English" for item 0; name tips with portraits; duel tier marks; Marked as checked
+    (release_1.0.6000.3, fingerprint 413033fedb72). `srcdump`: 91,915 keys.
+  - A (the candidate full zip on the bare game): boots with the zip's x64 `winhttp.dll`, 550 rules, verified; the 11
+    screens equal B's (paths, rects, font sizes, texts); the extracted plugin folder equals the mod-only zip.
+  - R (Lash's 2026.10.16.07.52 as its installer does, clean): 20 working; his labels held (134 at start), resizer held,
+    prefab texts 128 of 149 and code strings 8 of 130 this mod's; his updater "UpToDate"; 0 Chinese on all 11
+    screens (his lines fill the new settings rows), which equal A's but for those rows and a taller Legend list
+    (his rows for new codex keys); Which translation to Lash's and back; the fallback served 3 changed rows;
+    SimulateHookErrors=all (12 off, title still without Chinese) and =basePlugins, each back with Try again.
+  - C (SimulateGameChange=all on R): 19 off with their reasons, Mod Settings opens, Lash's text shows; the 3 Chinese
+    texts are the hidden TimeProgress/ResultPanel placeholders, as in earlier releases.
+- **Not in this version:** the text the update added or changed (new chapters and tables) is not translated yet; it
+  shows in Chinese, or as Lash's line where `Fall back to Lash's English Patch` finds one.

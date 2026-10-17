@@ -66,7 +66,8 @@ installed.
 ## Install
 
 You need Legend of Mortal on Steam for Windows, with the game language on **Traditional Chinese** (the default); the mod
-shows that language in English. It is tested with game version `release_1.0.5000.13` (Steam build 20337760).
+shows that language in English. It is tested with game version `release_1.0.6000.3` (Steam build 25987745, the 64-bit
+update of October 2026).
 
 1. Download `LOM-English-Localization-QoL-<version>-full.zip` from
    [Releases](https://github.com/DataRogue/LOM-English-Localization-QoL/releases/latest).
@@ -82,12 +83,19 @@ installer, use the smaller `-mod-only.zip` instead.
 From 1.2.0 the mod runs on BepInEx 5.4.23.3 only. An older setup on BepInEx 6 (this mod's full package up to 1.1.x, or
 Lash's English Patch up to its 2026-02 releases) does not load it; see Updating. Version 1.1.x still runs on BepInEx 6.
 
+**The game is 64-bit since its October 2026 update.** BepInEx's loader (`winhttp.dll`) comes in a 32-bit and a 64-bit
+build, and the updated game only loads the 64-bit one. From 1.3.0 the full package brings the 64-bit build; up to 1.2.0
+it brought the 32-bit one. If no mod loads since that update, see Updating.
+
 **Updating:** delete the folder `BepInEx/plugins/LOM_UI_EN` first (your settings are kept in `BepInEx/config`; this also
 removes 1.1.x's `LOM_UI_EN.BepInEx5.dll`, which is no longer used). Then:
-- if the game already runs BepInEx 5.4.23.3 (this mod's 1.2.0 full package, or Lash's English Patch set up by its
-  installer), extract the new `-mod-only.zip`;
-- if you installed this mod's full package of 1.1.x or older (BepInEx 6), extract the new `-full.zip`: it moves the game
-  to BepInEx 5.4.23.3;
+- if you installed this mod's full package (any version up to 1.2.0), extract the new `-full.zip`: it brings the
+  64-bit loader the updated game needs (and moves a 1.1.x or older install from BepInEx 6 to BepInEx 5.4.23.3);
+- if you use Lash's English Patch set up by its installer, run its newest installer once (from 2026-10-16 on it
+  installs the 64-bit BepInEx; the patch's in-game updater cannot do this, as no mod loads until then), then extract
+  the new `-mod-only.zip`;
+- if the game already runs the 64-bit BepInEx 5.4.23.3 (this mod's 1.3.0 full package, or Lash's installer from
+  2026-10-16 on), extract the new `-mod-only.zip`;
 - if you use Lash's English Patch from before its installer (its 2026-02 releases, BepInEx 6), run Lash's installer
   first, which updates the patch and moves the game to BepInEx 5.4.23.3, then extract the `-mod-only.zip`. Delete
   `Mods/English/StringTable.csv` afterwards: the new patch reads that old file over part of its new text (Mod Settings
@@ -121,6 +129,10 @@ A note from the maintainer: I may be slow to update this mod, especially after a
 - **Nothing changed, and there is no Mod Settings button.** The files are probably one folder too deep. `winhttp.dll`
   must be next to `Mortal.exe`, not inside a `LOM-English-Localization-QoL...` folder. After a start, `BepInEx/LogOutput.log`
   should exist.
+- **No Mod Settings button since the game's October 2026 update.** The game is 64-bit now and does not load the
+  32-bit loader of this mod's full package up to 1.2.0 (or of Lash's installer before 2026-10-16). The game starts
+  without any mod, and `BepInEx/LogOutput.log` is not written again (it keeps its old date). Extract the 1.3.0
+  `-full.zip`, or run the newest installer of Lash's English Patch, as in Updating.
 - **No Mod Settings button after updating from 1.1.x.** The game still runs BepInEx 6, which does not load 1.2.0: extract
   the `-full.zip` (or run the installer of Lash's English Patch). The first line of `BepInEx/LogOutput.log` names the
   BepInEx version; 1.2.0 needs 5.4.23.3.

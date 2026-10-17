@@ -408,8 +408,10 @@
  },
  {
   "id": "size-storycore-saydialogs-charactersaydialog-panel-name",
-  "comment": "From story.resizer.txt:2.",
+  "comment": "From story.resizer.txt:2. The name plate moved into Panel/Background with game build 25987745.",
   "paths": [
+   "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/Name",
+   "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Background/Name/**",
    "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name",
    "/StoryCore/SayDialogs/CharacterSayDialog/Panel/Name/**"
   ],

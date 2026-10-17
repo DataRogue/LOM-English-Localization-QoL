@@ -17,12 +17,18 @@ Keep the game's language on Traditional Chinese (the default): this mod shows th
 Since version 1.2.0 this mod runs on BepInEx 5.4.23.3 only. An older setup on BepInEx 6 (this mod's full package up to
 1.1.x, or Lash's English Patch up to its 2026-02 releases) does not load it. Version 1.1.x of this mod still runs on
 BepInEx 6.
+The game is 64-bit since its October 2026 update (game version release_1.0.6000.3) and loads only the 64-bit BepInEx
+loader (winhttp.dll). From 1.3.0 the full package brings that one; up to 1.2.0 it brought the 32-bit one, which the
+updated game ignores: it then starts without any mod. See the update steps below.
 To update, delete the folder BepInEx/plugins/LOM_UI_EN first; your settings are kept (they are saved in
 BepInEx/config), and 1.1.x's LOM_UI_EN.BepInEx5.dll, no longer used, goes with the folder. Then:
- - the game already runs BepInEx 5.4.23.3 (this mod's 1.2.0 full package, or Lash's English Patch set up by its
-   installer): extract the new mod-only package;
- - you installed this mod's full package of 1.1.x or older (BepInEx 6): extract the new full package, which moves the
-   game to BepInEx 5.4.23.3;
+ - you installed this mod's full package (any version up to 1.2.0): extract the new full package. It brings the 64-bit
+   loader the updated game needs (and moves a 1.1.x or older install from BepInEx 6 to BepInEx 5.4.23.3);
+ - you use Lash's English Patch set up by its installer: run its newest installer once (from 2026-10-16 on it installs
+   the 64-bit BepInEx; the patch's in-game updater cannot, as no mod loads until then), then extract the new mod-only
+   package;
+ - the game already runs the 64-bit BepInEx 5.4.23.3 (this mod's 1.3.0 full package, or Lash's installer from
+   2026-10-16 on): extract the new mod-only package;
  - you use Lash's English Patch from before its installer (its 2026-02 releases): run Lash's installer first (it
    updates the patch and moves the game to BepInEx 5.4.23.3), then extract the mod-only package, and delete
    Mods/English/StringTable.csv (the new patch reads that old file over part of its new text).

@@ -41,10 +41,23 @@
   },
   {
     "id": "settings-language-dropdown-items",
-    "comment": "Dropdown list items (Template follows the widened dropdown): single line, no clipping.",
-    "path": "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Template/Viewport/Content/Item/Item Label",
+    "comment": "Dropdown list items: single line, no clipping. Up to game build 20337760 the list template was Unity's default Template/Viewport/Content (a scroll view that followed the widened dropdown); since 25987745 it is a plain Content (vertical layout, 230 wide) that Unity clones as 'Dropdown List' with the rows 'Item N: <label>' directly under it.",
+    "paths": [
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Content/Item/Item Label",
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Dropdown List/Item */Item Label",
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Template/Viewport/Content/Item/Item Label"
+    ],
     "onTextChange": true,
     "text": { "fontSize": 22, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "MiddleLeft" }
+  },
+  {
+    "id": "settings-language-dropdown-list",
+    "comment": "The language list as wide as the widened dropdown (330). Since game build 25987745 its template is a plain Content, 230 wide, that Unity clones as 'Dropdown List' when it opens; 'Simplified Chinese' (205px at 22) then ran into its right edge. Up to build 20337760 Unity's default template stretched with the dropdown. The rows follow (the list's layout group controls their width).",
+    "paths": [
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Content",
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Dropdown List"
+    ],
+    "rect": { "width": 330 }
   },
   {
     "id": "settings-language-disabled-note",
@@ -117,8 +130,11 @@
   },
   {
     "id": "settings-language-item-english",
-    "comment": "The list entry of language index 0 (the Traditional Chinese slot that this mod's English replaces) reads 'English', so a player who switched to Simplified Chinese or Korean can find the way back. Unity names the runtime item 'Item 0: <label>'.",
-    "paths": ["**/SystemSettingPanel/Panel/Game/Language/Dropdown/Dropdown List/Viewport/Content/Item 0*/Item Label"],
+    "comment": "The list entry of language index 0 (the Traditional Chinese slot that this mod's English replaces) reads 'English', so a player who switched to Simplified Chinese or Korean can find the way back. Unity names the runtime item 'Item 0: <label>' (directly under 'Dropdown List' since game build 25987745, under its Viewport/Content before).",
+    "paths": [
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Dropdown List/Item 0*/Item Label",
+      "**/SystemSettingPanel/Panel/Game/Language/Dropdown/Dropdown List/Viewport/Content/Item 0*/Item Label"
+    ],
     "onTextChange": true,
     "text": { "text": "English" }
   }
