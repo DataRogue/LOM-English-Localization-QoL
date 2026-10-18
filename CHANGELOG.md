@@ -25,9 +25,8 @@ Lash's English Patch of 2026-10-16 (`EnglishPatch-2026.10.16.07.52`).
   changed were translated again.
 - **New settings rows.** Settings > Game > Brave Mode and Settings > Graphics > Dialog Size, new in the update, read in
   English, and the Dialog Size options no longer run under the next checkbox.
-- **With Lash's English Patch, this mod's line wins on more labels.** That patch swaps some screen texts by their exact
-  Chinese as the game sets them, so a few settings labels showed its wording even where this mod has its own (Dialog
-  Size read "Middle" and "Big"). These labels now show this mod's line, as everywhere else.
+- **Settings labels read consistently alongside Lash's English Patch.** With both installed, the new Dialog Size
+  options mixed wording from the two translations ("Standard", "Middle", "Big"); they now read as one set.
 - **Name tooltips for the new characters.** 19 characters the update introduced get portrait tooltips in dialogue and
   choices (among them the Yu family, Meng Gong, General Zhao Fang and the Tie smiths), and the four Kongtong Guardians,
   whose Chinese names changed, are found again.
