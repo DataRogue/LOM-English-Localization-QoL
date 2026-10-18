@@ -1445,5 +1445,33 @@ mistake. A screenshot now tells whose text it is.
     from the start. AskAgain + "Ask me later" closed it unanswered; Answer 0 brought this mod's text back (128 prefab
     texts taken over again, the title with no Chinese).
   - B, without the patch: no question; "Translation: LOM English Localization 1.4.0".
-  - Not confirmed: the harness could not show whether `ShowTranslationNote = false` hid the note (both listings were taken
-    after it was back on); the clicks on Lash's own window (the harness's mouse events do not reach legacy input).
+  - Not confirmed in that run: whether `ShowTranslationNote = false` hid the note (confirmed in the next run, below); the
+    clicks on Lash's own window (the harness's mouse events do not reach legacy input).
+- **Second round (2026-10-17, after the owner's "Address all the open things"):**
+  - The answer buttons' two small lines are a `Text` of their own under the title (in one rich-text label every line took
+    the title font's height, which spread them apart).
+  - `TranslationNote.Setup` (Compat.Setup): when `translationNote` turns itself off, `Hide` takes the note off the screen
+    and closes an open question (before, the note stayed with its last text); Try again redraws it.
+  - The 1.3.0 review's known limitations are fixed (the source changes anyway for 1.4.0, which is tested afresh):
+    a mode-1 card that plays before the affinity records can be read waits in `_pendingCards` and `Update` decides it
+    (`EntryState` returns null then; was: not remembered); `SaveMet` starts a new line when a hand-edited file ends
+    without one, and its header says the memory is per PC and a deletion counts from the next start; the `NoteCard`
+    comment says what the per-PC memory does; `RelationshipStat.AvatarReference` has its own `Compat.Require` (part
+    "affinity art"), and `PortraitDone` turns that part off on a structural error instead of swallowing it; BaseGuards
+    keeps the pack's prefab map even while `basePlugins` is off and resyncs it when the feature comes back on
+    (`F.BasePlugins.OnTurnedOn = SyncPrefab`).
+  - The six resize rules that never matched anything are gone from `05_text_sizes.json` (191 `translatedOnly` rules
+    left, 548 in all): they copied typos of the patch's old resizer files (`Dropdow`, `Slote`) and four
+    `DevelopPanel/List` paths whose working twins are in `21_upgrade.json`. No screen changes (checked below).
+  - Lash's 2026.10.18.09.29: its two DLLs and configs are byte-identical to 2026.10.16.07.52 and every guard target is
+    there (checked offline in its own session), and in game below.
+  - **Checked in game** (run_20261017-185657, DLL 815C4F8B...): R with Lash's 2026.10.18.09.29 installed as its
+    installer does (its updater "UpToDate", so no window of its own): the question opened alone on the title;
+    Lash's handed both layers over (title and story in its wording; 11 Chinese texts in the story scene are
+    placeholders of hidden panels its prefab file lacks); `ShowTranslationNote = false` took the note off (inactive)
+    and `true` brought it back; back to this mod's translation; guards held (prefab texts 128 of 149);
+    SimulateHookErrors=all turned 13 features off (translationNote among them) and Try again brought all 21 back.
+    B without the patch: no question; "Translation: LOM English Localization 1.4.0"; the note hid when
+    `SimulateHookErrors=translationNote` tripped the feature and came back with Try again; the 11 screens have no
+    Chinese and equal 1.3.0's final B run except the note's own objects and a save time. Marked as checked: 1.4.0,
+    release_1.0.6000.3, fingerprint 413033fedb72. Saves and registry restored.

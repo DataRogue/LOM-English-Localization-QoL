@@ -13,6 +13,8 @@ Player-facing changes. The detailed engineering notes for every version are in
   Patch both installed, a short question asks which translation to use. "Ask me later" (or Esc) asks again at the next
   start, and a choice made in Mod Settings counts as the answer. When Lash's patch offers an update at start, the
   question waits for its window.
+- **Name tooltips.** An introduction card that plays while the game is still loading its character records is no
+  longer missed.
 - **Choosing Lash's English Patch shows its text on the screens too.** With its releases from 2026-09-28 on, the
   "Lash's" choice only switched the game data text, kept this mod's screen text, and wrongly said the patch wasn't
   installed. It now leaves the screen text to that patch as well.

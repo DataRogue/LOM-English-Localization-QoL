@@ -78,6 +78,8 @@ namespace LOM_UI_EN
 		public static void Install(Harmony h)
 		{
 			_h = h;
+			// Try again after the guards had turned off: the prefab entries follow who serves the scene text again.
+			F.BasePlugins.OnTurnedOn = SyncPrefab;
 			TryInstall(late: false);
 			Loader.WhenAllLoaded(delegate
 			{
@@ -336,6 +338,17 @@ namespace LOM_UI_EN
 		/// <summary>After each prefab text file loads: the texts this mod's scene lines cover are left to this mod.</summary>
 		private static void PrefabLoaded_Postfix(object __instance)
 		{
+			// The map is kept even while the guards are off, so Try again (SyncPrefab) and the label takeover find it.
+			try
+			{
+				if (_replacements?.GetValue(__instance) is Dictionary<string, string> held)
+				{
+					_prefabMap = held;
+				}
+			}
+			catch (Exception)
+			{
+			}
 			if (!F.BasePlugins.Live)
 			{
 				return;
@@ -343,11 +356,7 @@ namespace LOM_UI_EN
 			try
 			{
 				F.BasePlugins.Probe();
-				Dictionary<string, string> map = _replacements?.GetValue(__instance) as Dictionary<string, string>;
-				if (map != null)
-				{
-					_prefabMap = map;
-				}
+				Dictionary<string, string> map = _prefabMap;
 				SceneDictionary d = ServedScene();
 				if (map == null || d == null)
 				{

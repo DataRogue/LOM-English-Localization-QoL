@@ -58,6 +58,34 @@ namespace LOM_UI_EN
 			};
 		}
 
+		/// <summary>Plugin.Awake (Compat.Setup): when the feature turns itself off, the note and the question go away with it.</summary>
+		public static void Setup()
+		{
+			F.TranslationNote.OnTurnedOff = Hide;
+			F.TranslationNote.OnTurnedOn = Invalidate;
+		}
+
+		/// <summary>The feature turned off: no stale note left on screen, no question open.</summary>
+		private static void Hide()
+		{
+			try
+			{
+				if (_root != null)
+				{
+					_root.SetActive(false);
+				}
+				_shown = null;
+				if (ModMenu.IsPromptOpen)
+				{
+					ModMenu.Close();
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogWarning("translation note: could not hide: " + ex.Message);
+			}
+		}
+
 		/// <summary>Redraw the note at the next frame (a translation switch, a detection change, a setting).</summary>
 		public static void Invalidate()
 		{

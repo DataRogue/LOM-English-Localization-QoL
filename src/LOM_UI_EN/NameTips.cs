@@ -162,6 +162,8 @@ namespace LOM_UI_EN
 		/// </summary>
 		private static readonly HashSet<string> _met = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		private const string MetFile = "lom.ui.english.met.txt";
+		/// <summary>Mode-1 cards that played before the game's affinity records could be read: decided again from Update.</summary>
+		private static readonly HashSet<string> _pendingCards = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>Set by Update: tips are on, the feature works and the game is in English. The mesh hook reads only this.</summary>
 		private static volatile bool _on;
@@ -241,6 +243,9 @@ namespace LOM_UI_EN
 			Compat.Require(F.NameTips, "Mortal.Core", "Mortal.Core.RelationshipStat", "Value", essential: false, part: "affinity");
 			Compat.Require(F.NameTips, "Mortal.Core", "Mortal.Core.RelationshipStat", "Active", essential: false, part: "affinity");
 			Compat.Require(F.NameTips, "Mortal.Core", "Mortal.Core.RelationshipStat", "Type", essential: false, part: "affinity");
+			// The full-length art the tip falls back to (an Addressables reference since game build 25987745): its own part, so a
+			// rename shows on the Compatibility page and costs only that fallback.
+			Compat.Require(F.NameTips, "Mortal.Core", "Mortal.Core.RelationshipStat", "AvatarReference", essential: false, part: "affinity art");
 			Compat.Require(F.NameTips, "Mortal.Story", "Mortal.Story.StoryManager", "IsStoryPause", essential: false, part: "menus");
 			Load();
 			LoadMet();
@@ -1326,6 +1331,10 @@ namespace LOM_UI_EN
 			{
 				return;
 			}
+			if (_pendingCards.Count > 0)
+			{
+				RetryCards();
+			}
 			if (_portraitWanted.Count > 0)
 			{
 				TipCharacter[] wanted = _portraitWanted.ToArray();
@@ -1718,12 +1727,26 @@ namespace LOM_UI_EN
 
 		/// <summary>
 		/// A mode-1 card played for this id. Remembered when it is a listed character whose entry is still locked, i.e. the card is
-		/// what introduces them; a character whose entry is already active (a recap card) needs no memory, so the gate keeps reading
-		/// the game's own state for everyone else and a new game does not start with these names unlocked by an old card.
+		/// what introduces them. A character whose entry is already active (a recap card) is not remembered: the gate reads the
+		/// game's own state for them. The memory is per PC, not per save: in another save or a new game a remembered character
+		/// links before their card plays there. When the game's affinity records cannot be read yet, the card waits in
+		/// _pendingCards and Update decides it once they can.
 		/// </summary>
 		private static void NoteCard(string key)
 		{
-			if (!_byId.TryGetValue(key, out TipCharacter c) || c.IsFaction || _met.Contains(c.Id) || !EntryLocked(c))
+			if (!_byId.TryGetValue(key, out TipCharacter c) || c.IsFaction || _met.Contains(c.Id))
+			{
+				_pendingCards.Remove(key);
+				return;
+			}
+			bool? locked = EntryState(c);
+			if (!locked.HasValue)
+			{
+				_pendingCards.Add(c.Id);
+				return;
+			}
+			_pendingCards.Remove(c.Id);
+			if (!locked.Value)
 			{
 				return;
 			}
@@ -1736,16 +1759,46 @@ namespace LOM_UI_EN
 			}
 		}
 
-		/// <summary>The character has an affinity record and it is not active.</summary>
+		/// <summary>The character has an affinity record and it is not active; null while the records cannot be read yet.</summary>
 		[MethodImpl(MethodImplOptions.NoInlining)]
-		private static bool EntryLocked(TipCharacter c)
+		private static bool? EntryState(TipCharacter c)
 		{
 			if (!ResolveRelationship(c))
 			{
-				return false;
+				return null;
 			}
 			Mortal.Core.RelationshipStat r = c.Relationship as Mortal.Core.RelationshipStat;
 			return r != null && !r.Active;
+		}
+
+		/// <summary>Update: decides the cards that played before the affinity records could be read (ResolveRelationship asks at most
+		/// every 2 s, so this costs nothing in between).</summary>
+		private static void RetryCards()
+		{
+			if (!F.NameTips.PartOk("cards"))
+			{
+				_pendingCards.Clear();
+				return;
+			}
+			try
+			{
+				foreach (string id in _pendingCards.ToArray())
+				{
+					NoteCard(id);
+				}
+			}
+			catch (Exception ex)
+			{
+				_pendingCards.Clear();
+				if (Compat.IsStructural(ex))
+				{
+					F.NameTips.BreakPart("cards", ex.GetType().Name + ": " + ex.Message);
+				}
+				else
+				{
+					F.NameTips.Fail(ex, "introduction card");
+				}
+			}
 		}
 
 		private static string MetPath => Path.Combine(BepInEx.Paths.ConfigPath, MetFile);
@@ -1779,7 +1832,17 @@ namespace LOM_UI_EN
 			try
 			{
 				string path = MetPath;
-				string head = File.Exists(path) ? "" : "# LOM_UI_EN name tips: characters whose introduction card played without unlocking their Status > Social entry, one id per line.\r\n# Their names link in dialogue from then on (see [Story] NameTooltipsMetOnly). Delete a line, or this file, to forget them.\r\n";
+				string head;
+				if (!File.Exists(path))
+				{
+					head = "# LOM_UI_EN name tips: characters whose introduction card played without unlocking their Status > Social entry, one id per line.\r\n# Their names link in dialogue from then on, in every save on this PC (see [Story] NameTooltipsMetOnly). Delete a line, or this file, to forget them (from the next start).\r\n";
+				}
+				else
+				{
+					// A hand-edited file may end without a line break: the id must not join its last line.
+					string text = File.ReadAllText(path);
+					head = (text.Length > 0 && !text.EndsWith("\n", StringComparison.Ordinal)) ? "\r\n" : "";
+				}
 				File.AppendAllText(path, head + id + "\r\n", new UTF8Encoding(false));
 			}
 			catch (Exception ex)
@@ -1860,7 +1923,7 @@ namespace LOM_UI_EN
 				{
 					// Every stage address failed: the affinity art goes last in the list (once; the list outlives a scene change), and
 					// the loader comes back here when it fails too.
-					string avatar = F.NameTips.PartOk("affinity") ? AffinityAvatarKey(c) : null;
+					string avatar = (F.NameTips.PartOk("affinity") && F.NameTips.PartOk("affinity art")) ? AffinityAvatarKey(c) : null;
 					if (avatar != null && !c.PortraitKeys.Contains(avatar))
 					{
 						c.PortraitKeys.Add(avatar);
@@ -1868,8 +1931,14 @@ namespace LOM_UI_EN
 						return;
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					// A renamed member turns this fallback off (and says so on the Compatibility page); anything else leaves the tip
+					// without that art this time.
+					if (Compat.IsStructural(ex))
+					{
+						F.NameTips.BreakPart("affinity art", ex.GetType().Name + ": " + ex.Message);
+					}
 				}
 			}
 			if (_view != null)

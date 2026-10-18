@@ -865,9 +865,8 @@ namespace LOM_UI_EN
 			intro.offsetMax = new Vector2(-70f, intro.offsetMax.y);
 			MMUi.AddText(intro, "This mod and " + Plugin.BaseModName + " are both installed. Which English should the game show?", 26, MMUi.TextMain, TextAnchor.UpperCenter);
 
-			string muted = "#" + ColorUtility.ToHtmlStringRGB(MMUi.Muted);
-			AnswerButton(p, -240f, "This mod's translation", "The reviewed translation of\n" + Plugin.DisplayName, muted, 0);
-			AnswerButton(p, 240f, Plugin.BaseModName, "The fan translation this mod grew from,\nwith this mod's screen fixes", muted, 1);
+			AnswerButton(p, -240f, "This mod's translation", "The reviewed translation of\n" + Plugin.DisplayName, 0);
+			AnswerButton(p, 240f, Plugin.BaseModName, "The fan translation this mod grew from,\nwith this mod's screen fixes", 1);
 
 			RectTransform foot = MMUi.NewRect("MM_PromptFoot", p);
 			foot.anchorMin = new Vector2(0f, 0f);
@@ -886,17 +885,29 @@ namespace LOM_UI_EN
 			p.gameObject.SetActive(false);
 		}
 
-		private void AnswerButton(RectTransform parent, float x, string label, string detail, string mutedHex, int preset)
+		private void AnswerButton(RectTransform parent, float x, string label, string detail, int preset)
 		{
 			RectTransform rt = MMUi.NewRect("MM_PromptAnswer" + preset, parent);
 			MMUi.Place(rt, new Vector2(0.5f, 0.5f), new Vector2(x, -10f), new Vector2(440f, 170f));
-			MMButton b = MMUi.MakeButton(rt, "", 30, delegate
+			MMButton b = MMUi.MakeButton(rt, label, 30, delegate
 			{
 				ChooseTranslation(preset);
 			}).Framed(MMUi.Frame);
-			b.Label.horizontalOverflow = HorizontalWrapMode.Wrap;
-			b.Label.lineSpacing = 1.15f;
-			b.Label.text = label + "\n<size=20><color=" + mutedHex + ">" + detail + "</color></size>";
+			// The title in the upper part, the two smaller lines in a Text of their own below it: in one rich-text label every line
+			// takes the height of the title's font, which spread the small lines apart.
+			RectTransform lr = b.Label.rectTransform;
+			lr.anchorMin = new Vector2(0f, 0.56f);
+			lr.anchorMax = new Vector2(1f, 1f);
+			lr.offsetMin = new Vector2(8f, 0f);
+			lr.offsetMax = new Vector2(-8f, -10f);
+			b.Label.alignment = TextAnchor.LowerCenter;
+			RectTransform dr = MMUi.NewRect("MM_PromptAnswerDetail", rt);
+			dr.anchorMin = new Vector2(0f, 0f);
+			dr.anchorMax = new Vector2(1f, 0.56f);
+			dr.offsetMin = new Vector2(14f, 12f);
+			dr.offsetMax = new Vector2(-14f, -8f);
+			Text d = MMUi.AddText(dr, detail, 20, MMUi.Muted, TextAnchor.UpperCenter);
+			d.lineSpacing = 1f;
 			b.SetColors(MMUi.ControlBg, MMUi.ControlHover, MMUi.ControlPress, MMUi.TextMain, MMUi.Gold);
 		}
 

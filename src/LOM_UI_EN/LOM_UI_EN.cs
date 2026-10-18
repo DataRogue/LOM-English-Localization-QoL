@@ -2207,6 +2207,7 @@ namespace LOM_UI_EN
 				Compat.Setup(F.QuickSave, QuickSave.Probe);
 				Compat.Setup(F.NameTips, () => NameTips.Patch(h));
 				Compat.Setup(F.MenuButtons, () => ModMenu.Patch(h));
+				Compat.Setup(F.TranslationNote, TranslationNote.Setup);
 				ManualLogSource log = Log;
 				bool isEnabled;
 				BepInExInfoLogInterpolatedStringHandler bepInExInfoLogInterpolatedStringHandler = new BepInExInfoLogInterpolatedStringHandler(48, 5, out isEnabled);

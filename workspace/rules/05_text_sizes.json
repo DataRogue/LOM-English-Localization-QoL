@@ -2470,25 +2470,6 @@
   }
  },
  {
-  "id": "size-ui-layer-3-systemsettingpanel-panel-game-language-dropdow",
-  "comment": "From mainmenu.resizer.txt:18.",
-  "paths": [
-   "/UI/Layer_3/SystemSettingPanel/Panel/Game/Language/Dropdow",
-   "/UI/Layer_3/SystemSettingPanel/Panel/Game/Language/Dropdow/**"
-  ],
-  "translatedOnly": true,
-  "text": {
-   "bestFit": true,
-   "minSize": 12,
-   "maxSize": 24
-  },
-  "tmp": {
-   "autoSize": true,
-   "minSize": 12,
-   "maxSize": 24
-  }
- },
- {
   "id": "size-ui-layer-2-loadgamepanel-container-autosave-gameautosaveslot-story-slot",
   "comment": "From mainmenu.resizer.txt:26.",
   "paths": [
@@ -2636,72 +2617,6 @@
    "minSize": 8,
    "maxSize": 14,
    "hOverflow": "Overflow"
-  },
-  "tmp": {
-   "autoSize": true,
-   "minSize": 8,
-   "maxSize": 14
-  }
- },
- {
-  "id": "size-ui-toppanel-poisonupgradepanel-developpanel-list-developitempanel-clone-requirelevel-level",
-  "comment": "From story.resizer.txt:226.",
-  "paths": [
-   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level",
-   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level/**"
-  ],
-  "translatedOnly": true,
-  "text": {
-   "hOverflow": "Overflow"
-  }
- },
- {
-  "id": "size-ui-toppanel-poisonupgradepanel-developpanel-list-developitempanel-clone-public-name",
-  "comment": "From story.resizer.txt:227, story.resizer.txt:228, story.resizer.txt:229.",
-  "paths": [
-   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name",
-   "/[UI]/TopPanel/PoisonUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name/**"
-  ],
-  "translatedOnly": true,
-  "text": {
-   "bestFit": true,
-   "minSize": 8,
-   "maxSize": 14,
-   "hOverflow": "Overflow",
-   "lineSpacing": 1.2
-  },
-  "tmp": {
-   "autoSize": true,
-   "minSize": 8,
-   "maxSize": 14
-  }
- },
- {
-  "id": "size-ui-toppanel-weaponupgradepanel-developpanel-list-developitempanel-clone-requirelevel-level",
-  "comment": "From story.resizer.txt:266.",
-  "paths": [
-   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level",
-   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/RequireLevel/Level/**"
-  ],
-  "translatedOnly": true,
-  "text": {
-   "hOverflow": "Overflow"
-  }
- },
- {
-  "id": "size-ui-toppanel-weaponupgradepanel-developpanel-list-developitempanel-clone-public-name",
-  "comment": "From story.resizer.txt:267, story.resizer.txt:268, story.resizer.txt:269.",
-  "paths": [
-   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name",
-   "/[UI]/TopPanel/WeaponUpgradePanel/DevelopPanel/List/DevelopItemPanel(Clone)/Public/Name/**"
-  ],
-  "translatedOnly": true,
-  "text": {
-   "bestFit": true,
-   "minSize": 8,
-   "maxSize": 14,
-   "hOverflow": "Overflow",
-   "lineSpacing": 1.2
   },
   "tmp": {
    "autoSize": true,
@@ -3132,25 +3047,6 @@
    "autoSize": true,
    "minSize": 14,
    "maxSize": 26
-  }
- },
- {
-  "id": "size-ui-layer-2-loadgamepanel-container-scroll-view-viewport-slots-loadgameslot-clone-slote",
-  "comment": "From mainmenu.resizer.txt:29.",
-  "paths": [
-   "/UI/Layer_2/LoadGamePanel/Container/Scroll View/Viewport/Slots/LoadGameSlot(Clone)/Slote",
-   "/UI/Layer_2/LoadGamePanel/Container/Scroll View/Viewport/Slots/LoadGameSlot(Clone)/Slote/**"
-  ],
-  "translatedOnly": true,
-  "text": {
-   "bestFit": true,
-   "minSize": 12,
-   "maxSize": 18
-  },
-  "tmp": {
-   "autoSize": true,
-   "minSize": 12,
-   "maxSize": 18
   }
  },
  {
