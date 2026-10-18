@@ -5471,12 +5471,17 @@ namespace LOM_UI_EN
 		/// <summary>
 		/// A Lean scene label reads the game's own (Chinese) Lean data, which the scene-text layer translates by its text. When it has
 		/// no line for it, the label is still Chinese; the string table then usually has the label's key (Position/Name/Forge and
-		/// others), so its value is shown instead, tidied like any other table value.
+		/// others), so its value is shown instead, tidied like any other table value. With the newer base patch the label may show
+		/// that patch's prefab-text English for its Chinese instead (see BaseGuards.PrefabReplacement); it is taken over the same way.
 		/// </summary>
 		private static bool TableFallback(string key, Component component, string current, out string text)
 		{
 			text = null;
-			if (string.IsNullOrEmpty(current) || !SceneDictionary.IsTranslatableChinese(current) || SceneText.IsSkipped(component))
+			if (string.IsNullOrEmpty(current) || SceneText.IsSkipped(component))
+			{
+				return false;
+			}
+			if (!SceneDictionary.IsTranslatableChinese(current) && !ShowsBasePrefabText(key, current))
 			{
 				return false;
 			}
@@ -5497,6 +5502,17 @@ namespace LOM_UI_EN
 			}
 			text = (StringsPlugin.CfgEnabled.Value && StringsPlugin.CfgNormalize.Value && (StringsPlugin.CfgNormalizeStory.Value || !key.StartsWith("Story/", StringComparison.Ordinal))) ? NormalizeCached(value) : value;
 			return true;
+		}
+
+		/// <summary>The label shows exactly what the newer base patch's prefab replacer made of its key's game text.</summary>
+		private static bool ShowsBasePrefabText(string key, string current)
+		{
+			if (!BaseGuards.PrefabMapReady)
+			{
+				return false;
+			}
+			string game = TextTable.GameSource(key);
+			return game != null && game != current && BaseGuards.PrefabReplacement(game) == current;
 		}
 
 		private static string Short(string s)

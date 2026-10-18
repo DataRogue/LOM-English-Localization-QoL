@@ -58,7 +58,9 @@ CHARACTER AND FACTION TOOLTIPS
 In dialogue and in choice menus, the names of characters who have portrait art are coloured. Point at one to see the
 character's portrait and title, and, once the character is listed in Status > Social, your affinity with them (level,
 progress to the next level and the exact value out of 100). A character with an entry in Status > Social gets a tooltip
-only once the game has introduced them, so a name mentioned before a reveal shows no face.
+only once the game has introduced them, so a name mentioned before a reveal shows no face. A few introduction cards
+show a character without adding them to Status > Social (Xia Lingxi, Meng Xianyao, Meng Gong): the mod remembers such a
+card once it has played, for every save on this PC, in BepInEx/config/lom.ui.english.met.txt; delete the file to forget.
 The names of sects, clans and other factions are coloured too (in a different colour); point at one for a short,
 spoiler-free description of who they are.
 Mod Settings > Extras turns either kind off or changes its colour. nametips.tsv and factiontips.tsv list the

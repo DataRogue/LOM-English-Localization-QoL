@@ -1277,13 +1277,45 @@ tables Story_18 to Story_21 (Story_17 grew), new tables (DiceHeader, BattleTalki
     SimulateHookErrors=all (12 off, title still without Chinese) and =basePlugins, each back with Try again.
   - C (SimulateGameChange=all on R): 19 off with their reasons, Mod Settings opens, Lash's text shows; the 3 Chinese
     texts are the hidden TimeProgress/ResultPanel placeholders, as in earlier releases.
-- **Not in this version:** the text the update added or changed (new chapters and tables) is not translated yet; it
-  shows in Chinese, or as Lash's line where `Fall back to Lash's English Patch` finds one.
+- **The update's text** (commit a89714f, tools/update, steps in tools/README.md): 19,429 new table rows (19,012
+  translated by model chunks: 16,571 Story, 1,517 chronicle entries, 924 data and UI rows; 379 symbol-only rows and 38
+  exact re-keyed lines without a model), 686 rows replaced because their Chinese changed (165 more kept their English and
+  were restamped), 77 new DiceHeader wording overrides (the dice-check headers are served as overrides, as the other 398
+  were), and the Dialog Size row's layout (`40_settings.json`: a 190 px header, the three toggles moved right by 35, 98
+  and 149 px). Each chunk had a translator that never saw Lash's draft and a reviewer that checked the line against the
+  Chinese and compared it with the draft; an audit of 300 random lines found 6 wrong (2%), fixed, and their three
+  patterns swept over every new row. Coverage on build 25987745: every one of the 91,915 keys of the harness `srcdump`
+  is served (91,440 table rows, 475 DiceHeader overrides), and no shipped row contains Chinese.
+- **New characters in the name tips** (commit f1de181): nametips.tsv lists 109 characters (19 new, among them the four
+  Kongtong Guardians, whose Chinese names changed); tools/nametips knows the five RelationshipStatType members the build
+  added.
 
-## After 1.3.0 (not released yet): name tips on lines with a carriage return, and introduction cards that unlock nothing
+### 1.3.0, continued: labels the base patch's prefab replacer swaps (found in the release ladder)
+
+With Lash's 2026.10.16 installed, Settings > Graphics > Dialog Size read "Middle" and "Big" (its prefabText.txt.yaml:
+`中` -> Middle, `大` -> Big) although this mod's table serves `SystemSetting/Game/DialogUISize_Medium` / `_Large` ("Medium",
+"Large"; `tget` showed both served and the fallback took nothing). The pack's `PrefabTextReplacerService` swaps whole
+texts by their exact Chinese in a `Text.text` setter prefix, so the label had the pack's English the moment Lean set it,
+and `StringOverrides.TableFallback` (the table's value for a Lean label the scene layer left Chinese) only took labels that
+still showed Chinese. BaseGuards' prefab filter drops only the pack's entries that this mod's scene lines cover, and these
+are keyed table rows. (`_Normal` 標準 stayed ours because the pack's file has the Simplified 标准.)
+- `BaseGuards.PrefabReplacement(chinese)` reads the pack's replacement map as the filter left it (kept from
+  `PrefabLoaded_Postfix`); `PrefabMapReady` is the cheap test.
+- `TableFallback` also takes a label whose text is exactly the pack's replacement of its key's game text
+  (`TextTable.GameSource`); its key must be one the table (or, when handed back, the patch's own table) serves. The map is
+  not filtered by table keys, so a static prefab text with the same Chinese and no key keeps the pack's English. Without
+  the pack nothing changes (one null test per label update).
+- **Release ladder 2026-10-17 on the final DLL** (run_20261017-170328; DLL 89C054C5...): B (11 screens, 0 Chinese, equal
+  to the previous B run; a CR line links both names, 0 mismatches; duel 0 cut; Marked as checked), A (the candidate full
+  zip; screens equal B's; plugin folder equals the mod-only zip), R (Lash 2026.10.16.07.52 with `--clean --installer`:
+  the 11 screens now equal A's, Dialog Size included; guards held, prefab texts 128 of 149 this mod's; Which translation
+  to Lash's and back; SimulateHookErrors=all and =basePlugins back with Try again; duel 0 cut), C (19 off, Mod Settings
+  opens, Lash's text; the 3 Chinese texts are the hidden TimeProgress placeholders). Saves and registry restored.
+
+### 1.3.0, continued: name tips on lines with a carriage return, and introduction cards that unlock nothing
 
 The in-game test of the 19 name-tip characters the update added (2026-10-17) found two gaps in the name tips. Both are
-older than the update. The plugin version and the CHANGELOG are untouched until the release.
+older than the update (commit f0732e9).
 
 - **Carriage returns** (`NameTips.Build`). UGUI `Text` in this Unity draws one quad for each carriage return (U+000D),
   unlike a space, a line feed or a tab, which draw none; `Build` counted a CR with the spaces. A Story line broken with
@@ -1337,5 +1369,4 @@ older than the update. The plugin version and the CHANGELOG are untouched until 
     remembered ids.
   - Not exercised: a recap card for an active entry (the harness `lua` is not a coroutine, so no card can be played on
     demand; the rule is `EntryLocked`), and the part failing at runtime or at install.
-- **For the release:** a CHANGELOG entry (names link in lines with a line break; Meng Gong, Meng Xianyao and Xia Lingxi
-  link after their cards, remembered in `lom.ui.english.met.txt`), and a line for it in PLAYER_README.txt if wanted.
+- CHANGELOG 1.3.0 and PLAYER_README.txt (Character and faction tooltips) describe both for players.

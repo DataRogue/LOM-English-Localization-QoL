@@ -18,8 +18,25 @@ Lash's English Patch of 2026-10-16 (`EnglishPatch-2026.10.16.07.52`).
 - **Story dialogs and the language list keep their layout.** The update moved the speaker's name plate inside the
   dialog box (for its new dialog-size setting) and rebuilt the language dropdown's list; this mod's sizing of names and
   titles, and the "English" entry in the language list, follow them.
-- **The new story and text are not translated yet.** The update adds new story chapters and game text; until this mod
-  covers them they show in Chinese, or in Lash's English where that patch is installed and has the line.
+- **The update's new story and text are translated.** About 19,400 new lines: the new story chapters (about 16,600
+  lines), about 1,500 chronicle entries in Status > Legend, and the new items, effects, duel and battle lines, settings
+  and other game text, plus 77 new dice-check headers. Each line was translated from the Chinese and reviewed against
+  it, with the same glossary and conventions as the rest of the mod. 686 existing lines whose Chinese the update
+  changed were translated again.
+- **New settings rows.** Settings > Game > Brave Mode and Settings > Graphics > Dialog Size, new in the update, read in
+  English, and the Dialog Size options no longer run under the next checkbox.
+- **With Lash's English Patch, this mod's line wins on more labels.** That patch swaps some screen texts by their exact
+  Chinese as the game sets them, so a few settings labels showed its wording even where this mod has its own (Dialog
+  Size read "Middle" and "Big"). These labels now show this mod's line, as everywhere else.
+- **Name tooltips for the new characters.** 19 characters the update introduced get portrait tooltips in dialogue and
+  choices (among them the Yu family, Meng Gong, General Zhao Fang and the Tie smiths), and the four Kongtong Guardians,
+  whose Chinese names changed, are found again.
+- **More names link in dialogue.** About one Story line in eight is written with a Windows line break; no name in such
+  a line got a tooltip before. They do now.
+- **Characters introduced by a card that unlocks nothing.** Some introduction cards (Xia Lingxi, Meng Xianyao, Meng
+  Gong) show the character without adding them to Status > Social, so their names never became tooltips. The mod now
+  remembers such a card once it has played (in `BepInEx/config/lom.ui.english.met.txt`, for every save on this PC);
+  delete the file to forget them.
 
 ## 1.2.0 (2026-10-06)
 

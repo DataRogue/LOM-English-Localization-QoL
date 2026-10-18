@@ -61,6 +61,8 @@ namespace LOM_UI_EN
 
 		private static Harmony _h;
 		private static FieldInfo _replacements;
+		/// <summary>The pack's prefab replacement map (exact Chinese -> its English) as this mod's filter left it, for PrefabReplacement.</summary>
+		private static Dictionary<string, string> _prefabMap;
 		private static PropertyInfo _raw;
 		private static readonly HashSet<string> _installed = new HashSet<string>(StringComparer.Ordinal);
 
@@ -339,6 +341,10 @@ namespace LOM_UI_EN
 			{
 				F.BasePlugins.Probe();
 				Dictionary<string, string> map = _replacements?.GetValue(__instance) as Dictionary<string, string>;
+				if (map != null)
+				{
+					_prefabMap = map;
+				}
 				SceneDictionary d = ServedScene();
 				if (map == null || d == null)
 				{
@@ -380,6 +386,26 @@ namespace LOM_UI_EN
 				F.BasePlugins.Fail(ex, "code strings");
 			}
 		}
+
+		/// <summary>
+		/// What the pack's prefab replacer puts in place of this exact Chinese text, or null. Its raws are whole texts, keys play no
+		/// part, and it swaps them as they are set: a Lean label whose game text is one of them (Settings > Dialog Size's 中 and
+		/// 大 since game build 25987745) shows the pack's English as soon as Lean sets the label, never the Chinese that this mod's
+		/// table fallback for labels looks for (StringOverrides.TableFallback reads this to take the label over all the same).
+		/// The map is not filtered by table keys: a static prefab text with the same Chinese and no key keeps the pack's English.
+		/// </summary>
+		public static string PrefabReplacement(string chinese)
+		{
+			Dictionary<string, string> map = _prefabMap;
+			if (map == null || string.IsNullOrEmpty(chinese) || !PrefabGuarded || !F.BasePlugins.Live)
+			{
+				return null;
+			}
+			return map.TryGetValue(chinese, out string english) ? english : null;
+		}
+
+		/// <summary>The pack's prefab replacer has loaded and is guarded: PrefabReplacement can answer (a cheap test for callers).</summary>
+		public static bool PrefabMapReady => _prefabMap != null && PrefabGuarded && F.BasePlugins.Live;
 
 		/// <summary>This mod's scene dictionary while it serves the scene text (not in Off or when handed back).</summary>
 		private static SceneDictionary ServedScene()
