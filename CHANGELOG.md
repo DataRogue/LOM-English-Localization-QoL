@@ -3,7 +3,10 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
-## Unreleased (1.4.0)
+## 1.4.0 (2026-10-17)
+
+Shows which translation is in use, for players and for bug reports, and works with Lash's English Patch of
+2026-10-18 (`EnglishPatch-2026.10.18.09.29`).
 
 - **Which translation, at a glance.** A small note in the bottom-left corner of every screen names the translation in
   use: this mod's, Lash's English Patch (with its release), or a mix of the two. A screenshot then shows whose text it
