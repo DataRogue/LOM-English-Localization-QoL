@@ -380,6 +380,9 @@ namespace LOM_UI_EN
 			{
 				Plugin.Log.LogInfo($"translation: game data text {Describe(table)}, scene text {Describe(scene)}");
 			}
+			// The newer patch's prefab texts that this mod's scene lines took over go back to it while this mod serves no scene
+			// text (and out again when it does), before the redraw below sets the texts again.
+			BaseGuards.SyncPrefab();
 			if (!retranslate)
 			{
 				return;
@@ -437,7 +440,7 @@ namespace LOM_UI_EN
 			if (CfgScene.Value == TextSource.Off)
 			{
 				SceneText.Use(null, "off");
-				return (report.XUnityRunning && report.XUnityHooked) ? LayerMode.BaseOnly : LayerMode.Off;
+				return ((report.XUnityRunning && report.XUnityHooked) || report.PackSceneRuns) ? LayerMode.BaseOnly : LayerMode.Off;
 			}
 			if (CfgScene.Value == TextSource.Original)
 			{

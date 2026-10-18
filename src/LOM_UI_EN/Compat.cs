@@ -275,6 +275,8 @@ namespace LOM_UI_EN
 		public static readonly Feature BasePlugins;
 		public static readonly Feature NameTips;
 		public static readonly Feature Buildup;
+		/// <summary>TranslationNote: the corner note naming the translation in use, and the title-screen question.</summary>
+		public static readonly Feature TranslationNote;
 
 		static F()
 		{
@@ -287,6 +289,7 @@ namespace LOM_UI_EN
 			QuietBinarizer = Compat.Register("quietBinarizer", "Quiet " + Plugin.BaseModName + " lookups", "Translation", Plugin.BaseModName + " logs every text lookup, which is slower.");
 			BasePlugins = Compat.Register("basePlugins", "Newer plugins of " + Plugin.BaseModName, "Translation", "Some labels and text sizes may be those of " + Plugin.BaseModName + ".");
 			Detector = Compat.Register("detector", "Detecting " + Plugin.BaseModName, "Translation", "This mod may not notice whether " + Plugin.BaseModName + " is installed.");
+			TranslationNote = Compat.Register("translationNote", "Translation name on screen", "Translation", "The corner note and the title-screen question don't show; Mod Settings > Translation still switches.");
 			Language = Compat.Register("language", "Game language check", "Translation", "This mod assumes the game's language is English.");
 			Layout = Compat.Register("layout", "Layout fixes", "Localization", "Screens keep the game's own layout; long English may overflow.");
 			Layout.BurstLimit = 100;

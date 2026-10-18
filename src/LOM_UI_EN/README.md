@@ -1386,3 +1386,64 @@ older than the update (commit f0732e9).
   - Not exercised: a recap card for an active entry (the harness `lua` is not a coroutine, so no card can be played on
     demand; the rule is `EntryLocked`), and the part failing at runtime or at install.
 - CHANGELOG 1.3.0 and PLAYER_README.txt (Character and faction tooltips) describe both for players.
+
+## 1.4.0 changes: the translation in use, named on screen and asked once
+
+Lash's request (2026-10-18): with both translations installed, neither of us should debug the other's script by
+mistake. A screenshot now tells whose text it is.
+
+- **The corner note** (`TranslationNote.cs`, feature `translationNote` "Translation name on screen", group Translation).
+  - Its own DontDestroyOnLoad overlay canvas, `LOM_TranslationNote` (sortingOrder 28000: over the game, under Mod Settings
+    29000, quick save 30000 and the name tips 30500), CanvasScaler 1920x1080 / 0.5 like the other windows, no
+    GraphicRaycaster, so it never takes a click. One `Text` (the window font, 15 px, 88% alpha, a 1 px shadow) on a faint
+    dark plate as wide as the text (42% alpha; light text alone at 62% was hard to read on the title's parchment),
+    bottom-left at (12, 4) in 1920x1080 units; on the title screen at (12, 44), above the game's `AppVersion` label
+    (20, 12, 30 high); in the duel (`Combat`) at (392, 4), right of the fighters' gauges. Checked on the title, the
+    daily-life map (under the player's name banner), a story scene and a duel.
+  - The text is worked out every half second from what serves each layer, not from the settings alone:
+    `TranslationProfiles.TableMode` / `SceneMode` and `F.GameText.Live` / `F.SceneText.Live`. Revised and working = this
+    mod; handed back, read from the patch's files or base only = Lash's; this mod adding nothing (Off, or its layer turned
+    itself off) = Lash's when one of its plugins runs (`TablePluginHooked`, `XUnityRunning`, `LlmKitLoaded`,
+    `PackLoaded`), else the game's own text. One line: "Translation: LOM English Localization 1.4.0 · Lash's English
+    Patch 2026.10.16.07.52 installed", "Translation: Lash's English Patch 2026.10.16.07.52 · layout by LOM 1.4.0", or both
+    layers named when they differ. Lash's release is the `version` of `BepInEx/release-manifest.json` (written by its
+    installer; read when its `gitHubRepo` names LegendOfMortalOverLlm).
+  - Hidden while the game's language is not English (`EnglishLanguage.Active`), or with `[Translation]
+    ShowTranslationNote = false` (Mod Settings > Translation > "Name the translation on screen").
+- **The question** (`ModMenu.OpenTranslationPrompt`, `TranslationNote.MaybeAsk`).
+  - Asked once per session, on the title screen 4 s after it starts (its intro fade ignores clicks), while `[Translation]
+    TranslationAsked` is false, the game is in English, Lash's patch is installed and its text can be shown (one of
+    `TranslationProfiles.OriginalProblem(table)` / `(scene)` is null, the same test the Which translation preset uses)
+    and Mod Settings is closed. A preset already chosen in Mod Settings (`PresetIndex() != 0`) counts as the answer.
+  - A panel of its own (`MM_Prompt`) in the Mod Settings canvas, shown instead of `MM_Window`, so it shares the window's
+    input blocking, pause, cursor and focus handling. Two answers: this mod's translation (preset 0) and Lash's English
+    Patch (preset 1), through `ModMenuPages.ApplyPreset`, which now sets `TranslationAsked` for any choice made in Mod
+    Settings too and refreshes the note. Keys 1 / 2 (pad X / Y) answer; "Ask me later", Esc, the open key and pad B close
+    it unanswered, and it comes back at the next start. A refused switch ("Can't switch: ...") shows in the panel and
+    keeps it open.
+- **Lash's update window.** Its UiEditor offers a newer release at start in a window of its own (`/FSEditorUpdatePrompt`,
+  about 15 s in; its buttons read the mouse through the legacy Input manager, which the Mod Settings window leaves
+  alone). The question waits while that window is up, and when it opens over the question, the question closes and comes
+  back once it is gone.
+- **"Lash's" now covers the screen text with the patch's newer releases.** Up to 1.3.0 the Lash's preset set the scene
+  layer to Original, which needs the patch's XUnity; its releases from 2026.09.28 on have none, so the scene text stayed
+  this mod's and Mod Settings said "Some text stays Revised: Lash's English Patch isn't installed". The question made
+  that visible. `OriginalMod.Report.SceneHandBack` now also holds when the patch's plugin pack translates the screens
+  (`PackSceneRuns`: the pack loaded with the per-file tables), so Original scene text is left to it, and Off counts as
+  BaseOnly then. BaseGuards keeps the pack's prefab entries that this mod's scene lines took out at the pack's start and
+  puts them back while this mod serves no scene text (`SyncPrefab`, from `TranslationProfiles.Apply` before its redraw),
+  taking them out again when it serves once more; the code strings the pack patched at its start follow at the next start.
+- **Harness:** `invoke static LOM_UI_EN.TranslationNote.Describe` (the note's text), `.Answer 0|1`, `.AskAgain`.
+- Only this mod's own types and the scene name are named, so a game update can stop it only through runtime errors
+  (the feature trips; the note and the question stay away; Mod Settings still switches).
+- **Checked in game 2026-10-17** (run_20261017-182934, the owner's go-ahead; build 25987745):
+  - R, Lash's 2026.10.16.07.52 installed as its installer does (its updater offered 2026.10.18.09.29): the question opened
+    on the title; Lash's update window then opened over it and the question stepped aside, coming back when the window
+    went; answering Lash's handed both layers to the patch ("Lash's English Patch translation on.", 128 prefab texts
+    handed back), the title read its wording with no Chinese, and the note said "Translation: Lash's English Patch
+    2026.10.16.07.52 · layout by LOM 1.4.0" on the title, map, story and duel. After a restart no question; Lash's text
+    from the start. AskAgain + "Ask me later" closed it unanswered; Answer 0 brought this mod's text back (128 prefab
+    texts taken over again, the title with no Chinese).
+  - B, without the patch: no question; "Translation: LOM English Localization 1.4.0".
+  - Not confirmed: the harness could not show whether `ShowTranslationNote = false` hid the note (both listings were taken
+    after it was back on); the clicks on Lash's own window (the harness's mouse events do not reach legacy input).

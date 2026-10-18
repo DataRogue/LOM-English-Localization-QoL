@@ -178,6 +178,9 @@ plugin marks those data parts as not working in Compatibility (`Plugin.CheckLayo
       2026.09.28 carry BepInEx 5 themselves); without `--clean` it goes over the current install. Check:
       - `detect`, `compat`, `invoke static LOM_UI_EN.BaseGuards.Describe` (the resizer held back, its hooks found);
       - the 11 screens, compared with A's;
+      - the translation question on the first title screen (both installed): check it, then answer it (click, or
+        `invoke static LOM_UI_EN.TranslationNote.Answer 0`); `invoke static LOM_UI_EN.TranslationNote.Describe` prints the
+        corner note, and `invoke static LOM_UI_EN.TranslationNote.AskAgain` opens the question again;
       - Mod Settings > Translation and About, and Which translation set to Lash's and back;
       - a duel;
       - Mark as checked (step 5);

@@ -63,6 +63,9 @@ namespace LOM_UI_EN
 		private static FieldInfo _replacements;
 		/// <summary>The pack's prefab replacement map (exact Chinese -> its English) as this mod's filter left it, for PrefabReplacement.</summary>
 		private static Dictionary<string, string> _prefabMap;
+		/// <summary>The pack's prefab entries this mod's scene lines took out, kept so that they go back while this mod serves no scene
+		/// text (Which translation set to Lash's or UI only during the session), and out again when it serves once more.</summary>
+		private static readonly Dictionary<string, string> _prefabTakenEntries = new Dictionary<string, string>(StringComparer.Ordinal);
 		private static PropertyInfo _raw;
 		private static readonly HashSet<string> _installed = new HashSet<string>(StringComparer.Ordinal);
 
@@ -350,7 +353,7 @@ namespace LOM_UI_EN
 				{
 					return;
 				}
-				int taken = FilterReplacements(map, d);
+				int taken = FilterReplacements(map, d, _prefabTakenEntries);
 				PrefabTaken += taken;
 				PrefabLoaded = map.Count + PrefabTaken;
 			}
@@ -407,6 +410,58 @@ namespace LOM_UI_EN
 		/// <summary>The pack's prefab replacer has loaded and is guarded: PrefabReplacement can answer (a cheap test for callers).</summary>
 		public static bool PrefabMapReady => _prefabMap != null && PrefabGuarded && F.BasePlugins.Live;
 
+		/// <summary>
+		/// TranslationProfiles.Apply, after a switch and before its redraw: the pack's prefab entries follow who serves the scene text.
+		/// While this mod serves none (handed back to the patch, or Off), the entries its lines had taken go back into the pack's
+		/// map, so the patch's prefab English shows there without a restart; when this mod serves again, they are taken out again.
+		/// The code strings the pack patched at its start are not redone: they follow at the next start.
+		/// </summary>
+		public static void SyncPrefab()
+		{
+			Dictionary<string, string> map = _prefabMap;
+			if (map == null || !PrefabGuarded || !F.BasePlugins.Live)
+			{
+				return;
+			}
+			try
+			{
+				F.BasePlugins.Probe();
+				SceneDictionary d = ServedScene();
+				if (d == null)
+				{
+					if (_prefabTakenEntries.Count == 0)
+					{
+						return;
+					}
+					int back = 0;
+					foreach (KeyValuePair<string, string> kv in _prefabTakenEntries)
+					{
+						if (!map.ContainsKey(kv.Key))
+						{
+							map[kv.Key] = kv.Value;
+							back++;
+						}
+					}
+					_prefabTakenEntries.Clear();
+					PrefabTaken = 0;
+					Plugin.Log.LogInfo("newer plugins of the base patch: " + back + " prefab texts handed back to it (this mod serves no scene text now)");
+				}
+				else
+				{
+					int taken = FilterReplacements(map, d, _prefabTakenEntries);
+					if (taken > 0)
+					{
+						PrefabTaken += taken;
+						Plugin.Log.LogInfo("newer plugins of the base patch: " + taken + " prefab texts this mod's scene lines cover taken over again");
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				F.BasePlugins.Fail(ex, "prefab text");
+			}
+		}
+
 		/// <summary>This mod's scene dictionary while it serves the scene text (not in Off or when handed back).</summary>
 		private static SceneDictionary ServedScene()
 		{
@@ -418,6 +473,12 @@ namespace LOM_UI_EN
 		/// <summary>Takes the texts the dictionary translates out of a prefab replacement map (keys are the exact Chinese); returns how many.</summary>
 		public static int FilterReplacements(Dictionary<string, string> map, SceneDictionary d)
 		{
+			return FilterReplacements(map, d, null);
+		}
+
+		/// <summary>FilterReplacements, keeping each entry taken out in 'kept' (when given) so it can be put back.</summary>
+		internal static int FilterReplacements(Dictionary<string, string> map, SceneDictionary d, Dictionary<string, string> kept)
+		{
 			List<string> drop = new List<string>();
 			foreach (KeyValuePair<string, string> kv in map)
 			{
@@ -428,6 +489,10 @@ namespace LOM_UI_EN
 			}
 			foreach (string k in drop)
 			{
+				if (kept != null)
+				{
+					kept[k] = map[k];
+				}
 				map.Remove(k);
 			}
 			return drop.Count;

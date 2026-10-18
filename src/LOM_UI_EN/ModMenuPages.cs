@@ -590,7 +590,7 @@ namespace LOM_UI_EN
 
 		private static bool OverridesOn => StringsPlugin.CfgEnabled != null && StringsPlugin.CfgEnabled.Value;
 
-		private static int PresetIndex()
+		internal static int PresetIndex()
 		{
 			TextSource t = TranslationProfiles.CfgTable.Value;
 			TextSource s = TranslationProfiles.CfgScene.Value;
@@ -660,7 +660,19 @@ namespace LOM_UI_EN
 			}
 		}
 
-		private static string ApplyPreset(int i)
+		internal static string ApplyPreset(int i)
+		{
+			string result = ApplyPresetCore(i);
+			// Any choice here answers the title-screen question too (TranslationNote), and the corner note follows it at once.
+			if (!result.StartsWith("Can't", StringComparison.Ordinal) && TranslationNote.CfgAsked != null)
+			{
+				TranslationNote.CfgAsked.Value = true;
+			}
+			TranslationNote.Invalidate();
+			return result;
+		}
+
+		private static string ApplyPresetCore(int i)
 		{
 			if (i == 0)
 			{
@@ -886,7 +898,7 @@ namespace LOM_UI_EN
 			}
 			if (!F.SceneText.Live)
 			{
-				return Warn("Not working with this game version; " + (OriginalMod.Current.XUnityRunning ? (BaseName + " translates on its own.") : "the game's own text shows."));
+				return Warn("Not working with this game version; " + ((OriginalMod.Current.XUnityRunning || OriginalMod.Current.PackSceneRuns) ? (BaseName + " translates on its own.") : "the game's own text shows."));
 			}
 			if (TranslationProfiles.CfgScene.Value == TextSource.Off)
 			{
@@ -1114,6 +1126,8 @@ namespace LOM_UI_EN
 					return true;
 				}
 			});
+			tr.Items.Add(OnOff(TranslationNote.CfgShow, "Name the translation on screen", "A small note in the bottom-left corner shows which translation is in use, so a screenshot shows it too.", TranslationNote.Invalidate));
+			tr.Items[tr.Items.Count - 1].Feature = F.TranslationNote;
 			tr.Items.Add(new InfoItem
 			{
 				Label = BaseName,

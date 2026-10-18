@@ -2071,7 +2071,7 @@ namespace LOM_UI_EN
 
 		public const string NAME = "LOM_UI_EN";
 
-		public const string VERSION = "1.3.0";
+		public const string VERSION = "1.4.0";
 
 		/// <summary>The mod's public name (the plugin keeps NAME and GUID, so configs and logs stay the same).</summary>
 		public const string DisplayName = "LOM English Localization + QoL";
@@ -2170,6 +2170,7 @@ namespace LOM_UI_EN
 			NameTips.Bind(base.Config);
 			BuildupGauges.Bind(base.Config);
 			TranslationProfiles.Bind(base.Config);
+			TranslationNote.Bind(base.Config);
 			SceneText.Bind(base.Config);
 			BaseGuards.Bind(base.Config);
 			EnglishLanguage.Bind(base.Config);
@@ -2464,6 +2465,7 @@ namespace LOM_UI_EN
 			Compat.Tick(F.QuickSave, QuickSave.Update);
 			Compat.Tick(F.NameTips, NameTips.Update);
 			Compat.Tick(F.Buildup, BuildupGauges.Update);
+			Compat.Tick(F.TranslationNote, TranslationNote.Tick);
 		}
 
 		public static void Reload()

@@ -69,8 +69,16 @@ namespace LOM_UI_EN
 		private bool _typingLastFrame;
 		private float _fade;
 		private float _statusUntil;
+		private RectTransform _window;
+		/// <summary>The title-screen question (TranslationNote): a panel of its own in this window's canvas, shown instead of the
+		/// settings window, so it shares the window's input blocking, pause and focus handling.</summary>
+		private GameObject _prompt;
+		private Text _promptFoot;
+		private bool _promptMode;
 
 		public static bool IsOpen => _instance != null && _instance._open;
+		/// <summary>The window is open on the translation question (TranslationNote), not on the settings.</summary>
+		public static bool IsPromptOpen => _instance != null && _instance._open && _instance._promptMode;
 		public static bool IsCapturingKey => _instance != null && _instance._capture != null;
 
 		public static void Bind(ConfigFile cfg)
@@ -106,6 +114,15 @@ namespace LOM_UI_EN
 			if (_instance != null)
 			{
 				_instance.DoClose();
+			}
+		}
+
+		/// <summary>Opens the question which translation to use (TranslationNote asks it once, on the title screen).</summary>
+		public static void OpenTranslationPrompt()
+		{
+			if (_instance != null)
+			{
+				_instance.DoOpenPrompt();
 			}
 		}
 
@@ -177,6 +194,9 @@ namespace LOM_UI_EN
 				_canvasRoot = null;
 				_nav.Clear();
 				_pages = null;
+				_window = null;
+				_prompt = null;
+				_promptMode = false;
 			}
 		}
 
@@ -195,6 +215,18 @@ namespace LOM_UI_EN
 			if (_canvasRoot != null)
 			{
 				_canvasRoot.SetActive(false);
+			}
+			if (_promptMode)
+			{
+				_promptMode = false;
+				if (_prompt != null)
+				{
+					_prompt.SetActive(false);
+				}
+				if (_window != null)
+				{
+					_window.gameObject.SetActive(true);
+				}
 			}
 			RestoreGameInput();
 			if (_pausedByUs && Time.timeScale == 0f)
@@ -487,6 +519,20 @@ namespace LOM_UI_EN
 					UpdateCapture();
 					return;
 				}
+				if (_promptMode)
+				{
+					// Keys for the two answers (pad X / Y as well); Esc, the open key and pad B close it as for the window: ask later.
+					if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1) || Input.GetKeyDown(KeyCode.JoystickButton2))
+					{
+						ChooseTranslation(0);
+						return;
+					}
+					if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2) || Input.GetKeyDown(KeyCode.JoystickButton3))
+					{
+						ChooseTranslation(1);
+						return;
+					}
+				}
 				// Esc in a text field only ends the edit. The field may already have dropped focus this frame (the EventSystem can
 				// update before us), so last frame's focus counts too.
 				bool typing = InputFieldFocused();
@@ -751,6 +797,109 @@ namespace LOM_UI_EN
 
 		// ---- construction -----------------------------------------------------------------------------------------
 
+		// ---- the translation question ---------------------------------------------------------------------------------
+
+		private void DoOpenPrompt()
+		{
+			if (_open)
+			{
+				if (_promptMode)
+				{
+					return;
+				}
+				DoClose();
+			}
+			try
+			{
+				if (_canvasRoot == null)
+				{
+					Build();
+				}
+				if (_prompt == null)
+				{
+					BuildPrompt((RectTransform)_canvasRoot.transform);
+				}
+			}
+			catch (Exception ex)
+			{
+				Plugin.Log.LogError("translation question failed to build: " + ex);
+				return;
+			}
+			_promptMode = true;
+			_window.gameObject.SetActive(false);
+			_prompt.SetActive(true);
+			_promptFoot.text = PromptFootText;
+			DoOpen(null);
+		}
+
+		private void ChooseTranslation(int preset)
+		{
+			PlayClick();
+			string msg = TranslationNote.Answer(preset);
+			if (msg.StartsWith("Can't", StringComparison.Ordinal))
+			{
+				_promptFoot.text = "<color=" + MMUi.WarnHex + ">" + msg + "</color>";
+				return;
+			}
+			DoClose();
+		}
+
+		private const string PromptFootText = "Either way, this mod's screen fixes and extras stay. You can switch at any time in Mod Settings > Translation, and the bottom-left corner of the screen names the translation in use.";
+
+		private void BuildPrompt(RectTransform root)
+		{
+			RectTransform p = MMUi.NewRect("MM_Prompt", root);
+			p.anchorMin = p.anchorMax = p.pivot = new Vector2(0.5f, 0.5f);
+			p.sizeDelta = new Vector2(1060f, 600f);
+			MMUi.AddImage(p, MMUi.WindowBg, raycast: true);
+			MMUi.AddFrame(p, MMUi.Frame, 2f, 0f);
+			MMUi.AddFrame(p, MMUi.FrameFaint, 1f, 9f);
+			_prompt = p.gameObject;
+
+			RectTransform title = MMUi.NewRect("MM_PromptTitle", p);
+			MMUi.AnchorTop(title, 60f, 44f);
+			MMUi.AddText(title, "Which translation?", 46, MMUi.Gold, TextAnchor.UpperCenter, wrap: false);
+			RectTransform intro = MMUi.NewRect("MM_PromptIntro", p);
+			MMUi.AnchorTop(intro, 80f, 122f);
+			intro.offsetMin = new Vector2(70f, intro.offsetMin.y);
+			intro.offsetMax = new Vector2(-70f, intro.offsetMax.y);
+			MMUi.AddText(intro, "This mod and " + Plugin.BaseModName + " are both installed. Which English should the game show?", 26, MMUi.TextMain, TextAnchor.UpperCenter);
+
+			string muted = "#" + ColorUtility.ToHtmlStringRGB(MMUi.Muted);
+			AnswerButton(p, -240f, "This mod's translation", "The reviewed translation of\n" + Plugin.DisplayName, muted, 0);
+			AnswerButton(p, 240f, Plugin.BaseModName, "The fan translation this mod grew from,\nwith this mod's screen fixes", muted, 1);
+
+			RectTransform foot = MMUi.NewRect("MM_PromptFoot", p);
+			foot.anchorMin = new Vector2(0f, 0f);
+			foot.anchorMax = new Vector2(1f, 0f);
+			foot.pivot = new Vector2(0.5f, 0f);
+			foot.sizeDelta = new Vector2(-140f, 84f);
+			foot.anchoredPosition = new Vector2(0f, 92f);
+			_promptFoot = MMUi.AddText(foot, PromptFootText, 20, MMUi.Muted, TextAnchor.UpperCenter);
+
+			RectTransform keys = MMUi.NewRect("MM_PromptKeys", p);
+			MMUi.Place(keys, new Vector2(0f, 0f), new Vector2(44f, 28f), new Vector2(560f, 40f));
+			MMUi.AddText(keys, "Keys 1 or 2 choose  \u00b7  Esc asks again next time", 18, MMUi.Muted, TextAnchor.MiddleLeft, wrap: false);
+			RectTransform later = MMUi.NewRect("MM_PromptLater", p);
+			MMUi.Place(later, new Vector2(1f, 0f), new Vector2(-32f, 22f), new Vector2(230f, 52f));
+			MMUi.MakeButton(later, "Ask me later", 22, DoClose).Framed(MMUi.FrameSoft);
+			p.gameObject.SetActive(false);
+		}
+
+		private void AnswerButton(RectTransform parent, float x, string label, string detail, string mutedHex, int preset)
+		{
+			RectTransform rt = MMUi.NewRect("MM_PromptAnswer" + preset, parent);
+			MMUi.Place(rt, new Vector2(0.5f, 0.5f), new Vector2(x, -10f), new Vector2(440f, 170f));
+			MMButton b = MMUi.MakeButton(rt, "", 30, delegate
+			{
+				ChooseTranslation(preset);
+			}).Framed(MMUi.Frame);
+			b.Label.horizontalOverflow = HorizontalWrapMode.Wrap;
+			b.Label.lineSpacing = 1.15f;
+			b.Label.text = label + "\n<size=20><color=" + mutedHex + ">" + detail + "</color></size>";
+			b.SetColors(MMUi.ControlBg, MMUi.ControlHover, MMUi.ControlPress, MMUi.TextMain, MMUi.Gold);
+		}
+
 		private void Build()
 		{
 			_pages = ModMenuPages.Create();
@@ -776,6 +925,7 @@ namespace LOM_UI_EN
 			window.anchorMin = window.anchorMax = new Vector2(0.5f, 0.5f);
 			window.pivot = new Vector2(0.5f, 0.5f);
 			window.sizeDelta = new Vector2(1440f, 900f);
+			_window = window;
 			MMUi.AddImage(window, MMUi.WindowBg, raycast: true);
 			MMUi.AddFrame(window, MMUi.Frame, 2f, 0f);
 			MMUi.AddFrame(window, MMUi.FrameFaint, 1f, 9f);

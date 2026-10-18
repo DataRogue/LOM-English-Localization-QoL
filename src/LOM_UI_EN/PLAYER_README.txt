@@ -37,7 +37,10 @@ wuxia voice of the original, with a ruled glossary, corrected names and choice l
 grew from Lash's English Patch (https://github.com/joshfreitas1984/LegendOfMortalOverLlm), which is optional.
 Installed alongside, that patch adds a second source: "Lash's" in Mod Settings > Translation shows its own text,
 and "Fall back to Lash's English Patch" shows its line wherever one of this mod's no longer fits the game after an
-update.
+update. The first time the title screen comes up with both installed, the game asks which translation to use ("Ask
+me later" asks again at the next start).
+A small note in the bottom-left corner of the screen always names the translation in use, so a screenshot shows whose
+text it is. Mod Settings > Translation > "Name the translation on screen" hides it.
 This mod reads that patch's files where the patch installed them and never changes them: its older versions' single
 table (Mods/English/StringTable.csv) or its newer versions' table per game file (Mods/English/Story_1.csv and so on).
 Mod Settings > Translation says what it found. After installing a newer version of that patch over an older one,
@@ -84,6 +87,8 @@ REPORTING A PROBLEM
 Open an issue at https://github.com/DataRogue/LOM-English-Localization-QoL/issues and attach compat_report.txt (Mod
 Settings > Compatibility > Write a report) and BepInEx/LogOutput.log from the game folder, with a screenshot if it is
 about text or layout.
+If the note in the bottom-left corner names Lash's English Patch, the text comes from that patch: please report text
+problems to it (https://github.com/joshfreitas1984/LegendOfMortalOverLlm/issues).
 
 USING LASH'S ENGLISH PATCH ON ITS OWN (needs that patch installed)
  - Mod Settings > Translation > Which translation > "Lash's" shows the text of Lash's English Patch: handed back to

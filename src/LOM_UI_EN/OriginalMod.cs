@@ -403,8 +403,15 @@ namespace LOM_UI_EN
 			/// <summary>Lines in the table of the plugin the Original table is left to.</summary>
 			public int HandBackEntries => (HandBackTable == TablePlugin.LlmKit) ? LlmKitEntries : BinarizerEntries;
 
-			/// <summary>XUnity runs with its own (non-revised) lines, so Original scene text can be left to it.</summary>
-			public bool SceneHandBack => !Detached && XUnityRunning && XUnityHooked && (XUnityData == BaseData.Pristine || XUnityData == BaseData.Other);
+			/// <summary>
+			/// Original scene text can be left to the base patch: XUnity runs with its own (non-revised) lines (releases up to
+			/// 2026.02), or its plugin pack translates the screens (prefab texts and code strings, PackSceneRuns).
+			/// </summary>
+			public bool SceneHandBack => !Detached && ((XUnityRunning && XUnityHooked && (XUnityData == BaseData.Pristine || XUnityData == BaseData.Other)) || PackSceneRuns);
+
+			/// <summary>From its 2026.09.28 release on (the per-file tables), the patch's screen text is its plugin pack's prefab text
+			/// and code string replacers, which run beside its table plugin; its XUnity file is gone.</summary>
+			public bool PackSceneRuns => PackLoaded && TableLayout == BaseTableLayout.PerFile;
 
 			public List<string> Diagnoses()
 			{

@@ -59,7 +59,9 @@ installed.
 - **Built to survive game updates.** Each feature checks the game when it starts. If an update breaks one, that feature
   switches itself off and says so, and the rest of the mod keeps working.
 - **Works with or without Lash's English Patch.** Installed together, you can switch to its text in Mod Settings, and
-  after a game update it can fill in lines this mod has not caught up with.
+  after a game update it can fill in lines this mod has not caught up with. The first time both are installed, the
+  title screen asks which translation to use, and a small note in the bottom-left corner of every screen names the one
+  in use, so a screenshot shows whose text it is.
 
 ![The Mod Settings window](docs/screenshots/mod-settings.jpg)
 
@@ -151,7 +153,9 @@ Open an [issue](https://github.com/DataRogue/LOM-English-Localization-QoL/issues
 - `BepInEx/LogOutput.log`;
 - a screenshot, for anything about text or layout.
 
-For a translation error, the Chinese line and where it appears help most.
+For a translation error, the Chinese line and where it appears help most. If the note in the bottom-left corner of
+your screenshot names Lash's English Patch, the text comes from that patch: please report text problems to
+[Lash's English Patch](https://github.com/joshfreitas1984/LegendOfMortalOverLlm/issues) instead.
 
 ## How the translation was made
 

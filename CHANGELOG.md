@@ -3,6 +3,20 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
+## Unreleased (1.4.0)
+
+- **Which translation, at a glance.** A small note in the bottom-left corner of every screen names the translation in
+  use: this mod's, Lash's English Patch (with its release), or a mix of the two. A screenshot then shows whose text it
+  is, so a report about a line reaches the right translation. Mod Settings > Translation > "Name the translation on
+  screen" hides the note.
+- **Asked once when both are installed.** The first time the title screen comes up with this mod and Lash's English
+  Patch both installed, a short question asks which translation to use. "Ask me later" (or Esc) asks again at the next
+  start, and a choice made in Mod Settings counts as the answer. When Lash's patch offers an update at start, the
+  question waits for its window.
+- **Choosing Lash's English Patch shows its text on the screens too.** With its releases from 2026-09-28 on, the
+  "Lash's" choice only switched the game data text, kept this mod's screen text, and wrongly said the patch wasn't
+  installed. It now leaves the screen text to that patch as well.
+
 ## 1.3.0 (2026-10-17)
 
 Works with the game's October 2026 update (game version `release_1.0.6000.3`), which made the game 64-bit, and with
