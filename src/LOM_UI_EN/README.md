@@ -1312,6 +1312,22 @@ are keyed table rows. (`_Normal` 標準 stayed ours because the pack's file has 
   to Lash's and back; SimulateHookErrors=all and =basePlugins back with Try again; duel 0 cut), C (19 off, Mod Settings
   opens, Lash's text; the 3 Chinese texts are the hidden TimeProgress placeholders). Saves and registry restored.
 
+### 1.3.0, known limitations (independent code review of 7efe2f2..e8874ff, 2026-10-17)
+
+The review found no blockers and nothing that had to change before the release; these are left for a later version,
+because any source change (a comment included: the build embeds source hashes) would make the shipped DLL differ from
+the one the release ladder tested.
+- A mode-1 introduction card is not remembered when `ResolveRelationship` declines at that moment (its 2-second retry
+  throttle, or the stats not loaded yet), and nothing retries it; unlikely inside a story scene.
+- `SaveMet` appends without checking that the file ends in a line break, so an id written after a hand edit that left
+  none joins the last line; a deleted line only counts after a restart (the file header does not say so).
+- The remembered cards are per PC (a design choice, see below). The comment on `NoteCard` about a new game holds only for
+  recap cards.
+- No `Compat.Require` covers `RelationshipStat.AvatarReference`: if a game update renames it, `PortraitDone` swallows the
+  error and the Compatibility page does not show it (the stage portraits are unaffected).
+- `BaseGuards` keeps the pack's prefab map only from `PrefabLoaded_Postfix`; when `basePlugins` was off as the pack loaded
+  (a simulated error at start, then Try again), the label takeover waits for a restart, like the filter itself.
+
 ### 1.3.0, continued: name tips on lines with a carriage return, and introduction cards that unlock nothing
 
 The in-game test of the 19 name-tip characters the update added (2026-10-17) found two gaps in the name tips. Both are
