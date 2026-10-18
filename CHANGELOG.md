@@ -3,7 +3,7 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
-## Unreleased (1.3.0)
+## 1.3.0 (2026-10-17)
 
 Works with the game's October 2026 update (game version `release_1.0.6000.3`), which made the game 64-bit, and with
 Lash's English Patch of 2026-10-16 (`EnglishPatch-2026.10.16.07.52`).
