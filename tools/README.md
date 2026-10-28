@@ -258,21 +258,35 @@ New keys are translated from the Chinese, compared with Lash's draft, and added 
 lacks them, so `publish.py build` ships them without a ledger entry; they are listed in the ledger as pass `update-2026-10` anyway).
 Working files go to `LOM_Localization/update_pass/` (untracked: they hold the game's text). Order of a run, from LOM_Localization:
 
+0. A later update is a pass of its own: set `LOM_UPDATE_PASS=update-<date>` (its ledger pass; its files go to
+   `LOM_Localization/update_pass_<date>/`), `LOM_UPDATE_LUA_OLD=lua_<previous game version>` and `LOM_UPDATE_GAME=<game version>`
+   (named in the notes of the strings rows it writes) for every tool below. Unset, the
+   tools work on the first pass (`update_pass/`, `update-2026-10`). The second pass (2026-10-27, game build 26237817,
+   `release_1.0.6001.0`) ran as `update-2026-10-27`.
 1. `publish.py source <srcdump.tsv>` first (records the new text, flags the changed rows), then `update/extract_lua.py` (the new
-   build's key-based story scripts into `gamedata/lua`; the old set is kept as `gamedata/lua_<old version>`).
+   build's key-based story scripts into `gamedata/lua`; the old set is kept as `gamedata/lua_<old version>`). The dump can come
+   from the game files instead of the harness: `update/dump_source.py <out.tsv> [--compare base_ref/game_source.tsv]` reads the
+   Traditional Lean tables of `Mortal_Data/sharedassets0.assets` (no game start; byte-identical to the harness `srcdump` for every
+   unchanged row) and prints what the update added, removed and changed.
 2. Copy the old and new dumps to `update_pass/old_game_source.tsv` / `new_game_source.tsv` and Lash's per-file tables to
    `update_pass/lash_1016/` (comparison only; `lashtables.py` reads them into `update_pass/lash_en.json`).
 3. `update/make_chunks.py plan|data|story|legend|changed` cuts the lines into chunks (`update_pass/chunks/<set>/`): `p_NNNN.txt` is the
    translator's view (settled terms of the chunk, voice samples, scene cast, preceding lines with their English, the next lines in
    Chinese), `p_NNNN.json` maps the line numbers to keys, `l_NNNN.txt` is Lash's draft (reviewer and referee only). Symbol-only rows and
-   long exact re-keyed lines never reach a model (`upd_common.classify_added`: `symbol`, `move`).
+   long exact re-keyed lines never reach a model (`upd_common.classify_added`: `symbol`, `move`). `changed` leaves out the rows whose
+   Chinese only gained or lost spaces (the line breaks unchanged): they keep their English and are listed in `restamp_spaces.txt`
+   for `--restamp`.
 4. `update/term_stats.py` (which glossary terms the published text really uses) and `update/term_candidates.py` +
    `terms_workflow.js` + `ingest_terms.py` (vocabulary that first occurs in the new text, settled once for all chunks) feed
    `update_pass/terms.tsv`, the pass's term sheet that the chunk views use.
 5. `update/update_workflow.js` (Workflow tool): per chunk a Sonnet translator that never sees Lash's draft, then a Sonnet reviewer who
    checks the translation against the Chinese and compares it with Lash's draft (`lash` same / minor / differs, and whose reading the
    Chinese supports); `mode: 'referee'` rules on the contested lines in batches, `mode: 'repair'` fixes lines that failed the checks.
-   The house card every agent reads is `update/translator_card.md`. The `changed` set uses a revise-or-keep prompt.
+   The house card every agent reads is `update/translator_card.md`. The `changed` set uses a revise-or-keep prompt. A small pass can
+   run the same steps as a few `lom-text` agents (Agent tool; the house card is their system prompt), each over several chunks, with
+   the prompts of `update_workflow.js`: save each agent's JSON answer to a file and turn it into `raw/` with
+   `update/raw_from_agents.py translate|compare|referee FILE...` instead of `collect`. The 2026-10-27 pass did, with 7 agents:
+   three translators (story; data and chronicle; changed), three reviewers, one referee.
 6. `update/apply_update.py`: `collect <journal.jsonl>` (agents' results into `raw/`), `batches` / `repairs` (write the referee and repair
    batch files and print the workflow args), `decide` (final line per key from the manual `overrides.tsv`, the unlock-condition template,
    the referee's ruling, the translator, the repair; each checked for line breaks, tags, placeholders, Chinese, full-width marks, length

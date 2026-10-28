@@ -9,6 +9,13 @@
     "rect": { "x": 255, "y": -155, "width": 260, "height": 110 },
     "text": { "fontSize": 70, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperLeft" }
   },
+  {
+    "id": "storylog-header",
+    "comment": "The game's new dialogue log (game 1.0.6001.0: /[UI]/TopPanel/StoryLogPanel, in Story and on the map) has the same vertical title strip (200x530, pivot top-left at 131,-154, 135px, wrap): 'Log' broke into 'Lo/g'. One horizontal word at the top of the left column (x=131..390, bounded by its VerticalLine).",
+    "path": "**/StoryLogPanel/Header",
+    "rect": { "pivot": [0, 1], "anchoredPos": [131, -154], "sizeDelta": [255, 110] },
+    "text": { "fontSize": 90, "hOverflow": "Overflow", "vOverflow": "Overflow", "alignment": "UpperLeft" }
+  },
 
   // ---------------------------------------------------------------------------
   // Position menu dialogs (Study, Forge, Kitchen, Section01_01, ... : the

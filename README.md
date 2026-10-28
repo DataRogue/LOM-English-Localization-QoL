@@ -34,7 +34,6 @@ installed.
 - **Horizontal layouts** where the game stacks Chinese text vertically.
 - **English numerals** instead of Chinese ones.
 - **Dialogue tuned for English:** line spacing and text speed, since English runs about twice as long as the Chinese.
-- **Long dialogue logs stay readable**, where the game's own backlog would go blank.
 
 ### Quality of life (all optional)
 
@@ -68,8 +67,8 @@ installed.
 ## Install
 
 You need Legend of Mortal on Steam for Windows, with the game language on **Traditional Chinese** (the default); the mod
-shows that language in English. It is tested with game version `release_1.0.6000.3` (Steam build 25987745, the 64-bit
-update of October 2026).
+shows that language in English. It is tested with game version `release_1.0.6001.0` (Steam build 26237817, the update of
+2026-10-27; the game is 64-bit since its update of 2026-10-16).
 
 1. Download `LOM-English-Localization-QoL-<version>-full.zip` from
    [Releases](https://github.com/DataRogue/LOM-English-Localization-QoL/releases/latest).

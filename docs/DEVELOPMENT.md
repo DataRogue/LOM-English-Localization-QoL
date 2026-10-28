@@ -27,7 +27,9 @@ These stay out of the repository (see `.gitignore`):
 `publish.py` and `release.py` need `base_ref/`, and it cannot be rebuilt from a fresh clone. `workspace/base_ref.lock`
 pins its exact files, and its scene file also holds 113 lines XUnity appended on the maintainer's machine. With
 `base_ref/` in place, `python tools/publish.py rebase <release dir>` moves to a newer release of Lash's English Patch, and
-`python tools/publish.py source <srcdump.tsv>` records the game's current text. Without it, use the fork path below.
+`python tools/publish.py source <srcdump.tsv>` records the game's current text (the harness `srcdump` in game, or
+`python tools/update/dump_source.py <out.tsv>` from the game files without starting the game). Without it, use the fork
+path below.
 
 Lash's English Patch changes its layout with its 2026.09.28 release, the first from its `llmkit-upgrade` branch. The
 single `Mods/English/StringTable.csv` becomes one table per game file. Its own BepInEx 5 plugins replace Binarizer and

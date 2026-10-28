@@ -2071,7 +2071,7 @@ namespace LOM_UI_EN
 
 		public const string NAME = "LOM_UI_EN";
 
-		public const string VERSION = "1.4.0";
+		public const string VERSION = "1.4.1";
 
 		/// <summary>The mod's public name (the plugin keeps NAME and GUID, so configs and logs stay the same).</summary>
 		public const string DisplayName = "LOM English Localization + QoL";
@@ -5809,8 +5809,32 @@ namespace LOM_UI_EN
 
 		public static int LastShown;
 
+		private static bool? _newLog;
+
+		/// <summary>
+		/// The game's own dialogue log (Mortal.Core.StoryLogPanel, since its update of 2026-10-27, release 1.0.6001.0) replaced
+		/// the Fungus backlog: one entry view per line in a scroll list, opened in the story and on the map. The Fungus log
+		/// still records but nothing shows it, so this guard has nothing to do. Looked up by name: older builds lack the type.
+		/// </summary>
+		public static bool GameHasNewLog
+		{
+			get
+			{
+				if (_newLog == null)
+				{
+					_newLog = typeof(Mortal.Core.SystemSettings).Assembly.GetType("Mortal.Core.StoryLogPanel") != null;
+				}
+				return _newLog.Value;
+			}
+		}
+
 		public static void Patch(Harmony h)
 		{
+			if (GameHasNewLog)
+			{
+				F.StoryLog.NotNeededWhy = "the game's own dialogue log (since its update of 2026-10-27) shows each line on its own, without a length limit";
+				return;
+			}
 			// Both patches are installed regardless of the settings and check them on every call, so the Mod Settings window can switch them live.
 			// Two parts, each in its own block: a game change to one Fungus type costs only its part.
 			Compat.Setup(F.StoryLog, delegate

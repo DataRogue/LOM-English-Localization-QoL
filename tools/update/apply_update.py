@@ -122,7 +122,9 @@ def check_line(zh, en, key):
         probs.append("tags")
     if sorted(PH.findall(zl)) != sorted(PH.findall(el)):
         probs.append("placeholders")
-    zb, eb = BRACKET_ANY.findall(zl.replace("［", "[").replace("］", "]")), BRACKET_ANY.findall(el)
+    # full-width ［］ and 【】 become [ ] in the English (the published convention: 工作【護衛】 = the [Guard] job)
+    zb = BRACKET_ANY.findall(zl.replace("［", "[").replace("］", "]").replace("【", "[").replace("】", "]"))
+    eb = BRACKET_ANY.findall(el)
     if not zl.startswith("解鎖條件") and (len(zb) != len(eb) or sorted(b for b in zb if not CJK.search(b)) != sorted(b for b in eb if b in zb)):
         probs.append("brackets")
     nz = len(CJK.findall(zl))
@@ -403,7 +405,8 @@ def load_finals(setspec, chunks):
 
 
 def dice_row(key, zh, en):
-    return [key, en.replace("\n", U.BS + "n"), "was: (no English entry) - dice-check header (%s); new in game 1.0.6000.3, code appends '......'" % zh.replace("\n", U.BS + "n")]
+    return [key, en.replace("\n", U.BS + "n"), "was: (no English entry) - dice-check header (%s); new in game %s, code appends '......'" % (
+        zh.replace("\n", U.BS + "n"), U.GAME_VERSION)]
 
 
 def write_rows(st, rows, live, label):
@@ -451,10 +454,11 @@ def write_rows(st, rows, live, label):
     return sorted(table_rows), sorted(dice_rows)
 
 
-def replace_rows(st, edits, live, label, note="update 1.0.6000.3"):
+def replace_rows(st, edits, live, label, note=None):
     """edits: {key: new English} for rows that already exist: the workspace table row, or the strings override when the key has
     one (the text players see). The ledger lists the table keys (a key already listed keeps its first entry)."""
     import rowspans
+    note = note or "update " + U.GAME_VERSION
     tab = {k: v for k, v in edits.items() if k not in st.ov and k in st.ws}
     ovr = {k: v for k, v in edits.items() if k in st.ov}
     missing = [k for k in edits if k not in st.ws and k not in st.ov]
@@ -517,7 +521,7 @@ def cmd_apply_changed(live):
     same = sorted(k for k in finals if k not in edits)
     print("changed set: %d lines ok, %d revised, %d keep their English (to restamp), %d failed" % (len(finals), len(edits), len(same), len(fails)))
     U.write_text(pdir("restamp.txt"), chr(10).join(same) + chr(10))
-    replace_rows(st, edits, live, "changed", note="Chinese changed in game 1.0.6000.3")
+    replace_rows(st, edits, live, "changed", note="Chinese changed in game " + U.GAME_VERSION)
     if fails:
         print("failures:", [f[3] for f in fails][:6])
 

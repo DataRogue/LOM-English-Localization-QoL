@@ -1475,3 +1475,96 @@ mistake. A screenshot now tells whose text it is.
     `SimulateHookErrors=translationNote` tripped the feature and came back with Try again; the 11 screens have no
     Chinese and equal 1.3.0's final B run except the note's own objects and a save time. Marked as checked: 1.4.0,
     release_1.0.6000.3, fingerprint 413033fedb72. Saves and registry restored.
+
+## 1.4.1 changes: the game's updates of 2026-10-20 and 2026-10-27, Lash's English Patch 2026.10.27.21.18
+
+The 1.4.0 code needed no change to run on the new game (see the code check below); 1.4.1 adds two small changes for the
+game's new dialogue log, and the update's text (see `tools/README.md`, update/, the pass `update-2026-10-27`).
+
+- **The new dialogue log** (the game's mod notes for 1.0.6001.0: the Fungus `NarrativeLogMenu` backlog is gone;
+  `Mortal.Core.StoryLogPanel` at `[UI]/TopPanel/StoryLogPanel` in Story and Free, entries in `Mortal.Core.StoryLogData`,
+  saved with the game, at most 300).
+  - Its text: each entry is a `StoryLogEntryView` (its own `Text`s) built at display time from keys through
+    `LocalizationManager.Instance.LocaleResolver`, whose only implementation is `LeanLocalizationResolver`
+    (`GetString`, `GetStoryText` -> `GetString`): the table hook serves this mod's English for the lines, the speakers
+    (`Character/<id>`) and the new `System/StoryLog/*` formats. Its header is the table key `System/Log` ("Log"), its close
+    button the shared `CloseButton_02` TMP "離開" (scene text "Leave", normally hidden). The Story scene still holds the old
+    `[UI]/MainUI/Layer_6/LogMenu/NarrativeLog` objects, which nothing opens now.
+  - `NarrativeLogGuard.GameHasNewLog` (the type `Mortal.Core.StoryLogPanel` exists, looked up by name): the
+    `storyLog` feature reports Not needed and installs nothing (its Fungus hooks would sit on methods nothing calls; the
+    65,000-vertex limit it worked around cannot happen in a list of entries), and Mod Settings leaves out its three
+    settings (Localization: Keep long logs visible, Log length; Advanced: Update the log only when opened). On an older
+    game both work as before.
+  - QuickSave: the map gate also refuses while `FreeManager.IsStoryLogOpen` (the game's `SaveActionPerformed` and
+    `MenuActionChanged` check it since this update; `OpenStoryLog` changes none of the fields the gate read before),
+    "Close the log first"; `Probe` requires it (part map) when the game has the new log. The story gate already holds:
+    `StoryManager.Log(true)` still sets `_logOpen` before it opens the panel.
+  - Nothing else the notes list touches this mod: it never used `StoryManager`'s removed `_narrativeLogMenu`,
+    `_narrativeLog`, `_narrativeView`, `_logCloseButton` or `WaitForLogCanvas`, patches neither `StoryManager.Log` nor
+    `ToggleLogButton`, and has no prefix on a `StoryMainUI.Display*` method (`DisplayRelationshipModification` changed
+    its parameters).
+
+- **The game.** Steam build 26237817, `Application.version` `release_1.0.6001.0` (Lash's notes name the 2026-10-20
+  update `1.0.6000.4`; no install of it was kept). Every file of `Mortal_Data` was rewritten; the code DLLs that changed
+  on 2026-10-27 are `Mortal.Battle/Combat/Core/Free/Story`. Compat fingerprint `f6a95db27b01` (was `413033fedb72`).
+- **Code check, offline** (scratchpad `CecilTool.exe` + `checknames.py`, the 1.3.0 method rebuilt):
+  - The plugin builds against the new DLLs, and its IL is identical to 1.4.0's instruction for instruction, assembly
+    references included. Only the PE debug directory differs: the portable PDB records each referenced assembly's MVID,
+    so a game update changes the build's bytes with no source change (`release.py`'s rebuild check needs a fresh build
+    and install after every game update).
+  - All 1,869 type and member references resolve in the new DLLs; all 191 by-name lookups into the game
+    (`Compat.Require`, `AccessTools`, `Traverse` fields, QuickSave's `Req` table) resolve (`StoryCharacterConfig.List`
+    is inherited from `CollectionData<T>`).
+- **Layout check, offline** (scratchpad `paths_check.py`): every UI path of the 128 harness dumps of 2026-10-17 (1,637
+  paths) was looked up in the new build's scenes, asset files and UI bundles. The 247 not found statically are all made
+  at run time (this mod's own objects, renamed list rows such as the Bag's book ids, story stage slots, the dropdown's
+  list, TMP sub-objects); the dialog and menu paths the rules name are where they were (`StoryCore/SayDialogs/...`,
+  `StoryCore/MenuDialogs/...`).
+- **Lash's English Patch 2026.10.27.21.18** (also 2026.10.18.10.08 and .21.52, text only): against 2026.10.18.09.29 only
+  `FanslationStudio.Plugins.dll` changed, and in it only the embedded `FanslationStudio.Plugins.Shared`: the string
+  patcher applies its code-string patches through a new `StringTranspiler.Patch` (an ILManipulator) instead of a
+  Harmony transpiler. `LoadTranslationsAndApplyPatches` still filters its contracts through
+  `GroupedDynamicStringContracts` first, the method `BaseGuards` prefixes, so the guard still takes this mod's lines
+  out. Every other guard target, `FanslationStudio.LegendOfMortal.Plugin.dll` and the configs are byte-identical; its
+  `resizers/UI_MainUI.yaml` gained 5 lines (the resizer stays held back by default).
+- **Text.** `tools/update/dump_source.py` (new) reads the game's Traditional Lean tables from `sharedassets0.assets`
+  without starting the game: 92,044 keys, byte-identical to the 2026-10-17 harness `srcdump` for every unchanged row.
+  Against it: 134 keys added (75 Story, 42 CombatTalking for the new duel fights `1806_*`, 6 CombatSkill, 6
+  `System/StoryLog/*` for the dialogue log's new choice, dice, affinity and stat entries, 3 LegendInfo, 2 Book), 5
+  removed, 91 changed (52 only in spaces).- **Translation** (pass `update-2026-10-27`, `update_pass_2026-10-27/`, Sonnet `lom-text` agents through
+  `tools/update/raw_from_agents.py`): 126 rows translated from the Chinese, 8 symbol-only rows copied. The reviewers
+  compared each with Lash's 2026.10.27 draft: 24 same, 99 wording only, 42 different (ours right in 38, both
+  acceptable in 4). The referee ruled the 10 flagged lines: the reviewer's fix in 8; for the two Kongtong Guardian
+  skills (`C948_1` / `C948_2`, 四護法 / 三護法) the group reading "Four / Three Guardians" (the published "Four Guardians",
+  and only three after the Fire Guardian's death) with the possessive every CombatSkill description uses (maintainer
+  override). 飛俠 in a new shout is the settled "Flying Hero". The dialogue log's dice rows use square brackets for
+  【】 (the published convention) and "Defy Heaven", the dice button's name for 逆天. Of the 91 changed rows, 16 were
+  revised (14 by the translator, one of them with the reviewer's fix 涵養 = self-restraint, not the Cultivation stat; 2
+  kept rows the reviewer fixed: a saying's quote marks, and a chronicle row whose English always lacked its line break),
+  23 kept their English and 52 only changed spaces: all 75 restamped. The two
+  game keys without English (`Library/Award/30020`, `30021`) are empty in the game. 92,087 table rows; publish check ok.
+- **The new log's header** (found in game): the panel's `Header` is the old log's vertical title strip again (200x530,
+  pivot top-left at 131,-154, 135 px, wrap), so "Log" broke into "Lo / g". New rule `storylog-header`
+  (`32_story_dialogs.json`, `**/StoryLogPanel/Header`): one horizontal word at the top of the left column (255x110,
+  90 px, overflow). The old `log-header` rule stays: the old objects are still in the Story scene.
+- **Checked in game** (run_20261027-215929, DLL 83B46ED8..., owner: "Yes, launch the game"):
+  - B (the maintainer's install): 19 features working, 4 not needed (storyLog with its new reason), quickSave 51
+    checks; the 11 screens without Chinese. Map: `FreeManager.OpenStoryLog` opens the new log (empty: the save predates
+    the update), F5 (`QuickSave.TrySave`) is refused with "Close the log first"; the map's new Log button reads "Log".
+    Story: `ch4_9_3_7` played with its new lines in English; the log (`StoryManager.ToggleLogButton true`) lists them
+    with English speaker names, 21 texts drawn whole (entries grow to 5 lines), F5 refused there too. Duel `1806_01`
+    (Tan Badao): English HUD, only the known hidden 一二三 placeholders. `tget` of 15 new and revised keys served this
+    mod's lines, 0 fallbacks. Mod Settings: version 1.4.1, the three log settings gone. Marked as checked: 1.4.1,
+    release_1.0.6001.0, fingerprint f6a95db27b01.
+  - A (the full candidate on the bare game): the same health, 0 Chinese on the screens, map log header and F5
+    refusal, name tips (Tang Buyi "Flying Hero", portrait Ready), duel; the extracted plugin folder equals the mod-only
+    zip (71 files).
+  - R (Lash 2026.10.27.21.18 as its installer does, --clean): his updater "UpToDate"; 20 working, 3 not needed; guards:
+    labels held back, resizer held back, prefab texts 128 of 149, code strings 8 of 154 (his new ILManipulator path
+    still filtered); the question on the first title, Lash's answer hands both layers back (title without Chinese), and
+    back; the 10 screens equal A's (only the corner note and two autosave times differ, 0 layout changes); story, log
+    and duel in English; SimulateHookErrors=all turned 10 features off and Try again brought all 20 back;
+    =basePlugins the same for that feature.
+  - C (SimulateGameChange=all on R): 18 features off, the title in Lash's English, Mod Settings opens and names the
+    problems; the map's hidden ResultPanel placeholders (新的回合, [內容], 開始) show in the scan, as before.
+  - Saves (4 autosave files) and the registry key restored, harness off.

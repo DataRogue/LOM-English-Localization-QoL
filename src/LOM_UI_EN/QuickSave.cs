@@ -90,6 +90,11 @@ namespace LOM_UI_EN
 			Req("Mortal.Story", "Mortal.Story.StoryManager", "story", "_panelOpen", "_menuOpen", "_logOpen", "_statusOpen", "_menuPanelController", "EnableAction", "Instance");
 			Req(Core, "Mortal.Core.MenuPanel", "story", "_continueButton", "_saveButton", "_loadButton");
 			Req("Mortal.Free", "Mortal.Free.FreeManager", "map", "_menuOpen", "_statOpen", "_saveOpen", "_menuPanel", "IsProcessing", "EnableHotKey", "Instance");
+			if (NarrativeLogGuard.GameHasNewLog)
+			{
+				// Since the game's update of 2026-10-27 the dialogue log opens on the map too, and the game's Save and Menu keys wait while it is open.
+				Req("Mortal.Free", "Mortal.Free.FreeManager", "map", "IsStoryLogOpen");
+			}
 			Req(Core, "Mortal.Core.MenuPanel", "map", "_continueButton", "_loadButton");
 			Req("Mortal.Battle", "Mortal.Battle.GameLevelManager", "battle", "_levelData", "_pausePanel", "IsGameOver", "IsReady", "EnableHotKey", "IsPause", "Instance");
 			Req("Mortal.Battle", "Mortal.Battle.BattleLevel", "battle", "DisablePause");
@@ -347,6 +352,11 @@ namespace LOM_UI_EN
 			if (fm.IsProcessing || statOpen || saveOpen)
 			{
 				return Gate.None("Close the open panel first");
+			}
+			// ... or the dialogue log is open (by name: older builds have no log on the map).
+			if (NarrativeLogGuard.GameHasNewLog && t.Property("IsStoryLogOpen").GetValue<bool>())
+			{
+				return Gate.None("Close the log first");
 			}
 			if (!menuOpen && !fm.EnableHotKey)
 			{

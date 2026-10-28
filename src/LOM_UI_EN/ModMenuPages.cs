@@ -1174,10 +1174,14 @@ namespace LOM_UI_EN
 			loc.Items.Add(new SectionItem("Dialogue"));
 			loc.Items.Add(Number(Plugin.CfgTextSpeed, "Text speed", "How fast dialogue types out. 2× suits English.", 0.5f, 6f, 0.25f, v => v.ToString("0.##", CultureInfo.InvariantCulture) + "×", TextSpeedPatch.ApplyAll));
 			loc.Items[loc.Items.Count - 1].Feature = F.TextSpeed;
-			loc.Items.Add(OnOff(Plugin.CfgLogGuard, "Keep long logs visible", "Stops the dialogue log from going blank in long chapters."));
-			loc.Items[loc.Items.Count - 1].Feature = F.StoryLog;
-			loc.Items.Add(Number(Plugin.CfgLogGlyphBudget, "Log length", "How much of the log is kept. Lower it if the log still goes blank.", 2000, 16000, 500, v => v.ToString("N0", CultureInfo.InvariantCulture) + " characters"));
-			loc.Items[loc.Items.Count - 1].IsEnabled = () => Plugin.CfgLogGuard.Value;
+			// The game's new dialogue log (2026-10-27) has no length limit and no rebuild per line: these settings would do nothing.
+			if (!NarrativeLogGuard.GameHasNewLog)
+			{
+				loc.Items.Add(OnOff(Plugin.CfgLogGuard, "Keep long logs visible", "Stops the dialogue log from going blank in long chapters."));
+				loc.Items[loc.Items.Count - 1].Feature = F.StoryLog;
+				loc.Items.Add(Number(Plugin.CfgLogGlyphBudget, "Log length", "How much of the log is kept. Lower it if the log still goes blank.", 2000, 16000, 500, v => v.ToString("N0", CultureInfo.InvariantCulture) + " characters"));
+				loc.Items[loc.Items.Count - 1].IsEnabled = () => Plugin.CfgLogGuard.Value;
+			}
 			pages.Add(loc);
 
 			MenuPage extras = new MenuPage
@@ -1278,8 +1282,11 @@ namespace LOM_UI_EN
 			adv.Items.Add(new TextItem(QuickSave.CfgLoadingText, "Quick load message", "{0} = slot, {1} = in-game date of the save."));
 			adv.Items[adv.Items.Count - 1].IsEnabled = () => QuickSave.CfgEnabled.Value && QuickSave.CfgToast.Value;
 			adv.Items.Add(new SectionItem("Performance"));
-			adv.Items.Add(OnOff(Plugin.CfgLazyLog, "Update the log only when opened", "The game rebuilds the whole log after every line; this waits until you open it."));
-			adv.Items[adv.Items.Count - 1].Feature = F.StoryLog;
+			if (!NarrativeLogGuard.GameHasNewLog)
+			{
+				adv.Items.Add(OnOff(Plugin.CfgLazyLog, "Update the log only when opened", "The game rebuilds the whole log after every line; this waits until you open it."));
+				adv.Items[adv.Items.Count - 1].Feature = F.StoryLog;
+			}
 			adv.Items.Add(OnOff(Plugin.CfgFullScenePass, "Rescan every scene", "Re-applies the layout fixes to every open scene on each load. Slower."));
 			adv.Items.Add(OnOff(Plugin.CfgNoInfoStackTraces, "No stack traces on info logs", "Makes ordinary log messages cheaper.", PerfPatches.ApplyStackTraceSetting));
 			adv.Items.Add(new SectionItem("Logs and testing"));

@@ -3,6 +3,29 @@
 Player-facing changes. The detailed engineering notes for every version are in
 [src/LOM_UI_EN/README.md](src/LOM_UI_EN/README.md).
 
+## 1.4.1 (2026-10-27)
+
+Works with the game's updates of 2026-10-20 and 2026-10-27 (game version `release_1.0.6001.0`) and with Lash's English
+Patch of 2026-10-27 (`EnglishPatch-2026.10.27.21.18`).
+
+- **The game's new dialogue log.** The update replaced the dialogue log (the Log button) with a new one that also opens
+  on the daily-life map. It shows this mod's English, speaker names and its header included (the header is laid out as
+  one word, where the game's tall title column broke it apart). Quick save (F5) and quick load
+  (F9) now wait while the log is open on the map, as the game's own Save key does. Mod Settings no longer offers "Keep
+  long logs visible", "Log length" and "Update the log only when opened": the new log lists every line on its own and
+  never goes blank, so there is nothing for them to do (they stay for an older game version).
+
+- **The update's new text is translated.** 134 new lines: story scenes the update added or extended in the Kongtong
+  chapters (Yu Xiaomei's farewell and the Crane Cliff scenes), 42 new duel shouts, two new Kongtong enemies and Yu Zhu's
+  hammer in duels, a new book, and three new chronicle entries in Status > Legend. Each was translated from the Chinese
+  and reviewed against it, with the same glossary and conventions as the rest of the mod.
+- **The story log records more.** The update's dialogue log now also lists your choices, dice checks (and "Defy
+  Heaven"), and changes of affinity and stats; those entries read in English too.
+- **Lines the update rewrote are translated again.** The update changed the Chinese of 91 existing lines. The 16 whose
+  meaning changed were revised (a rewritten conversation about the Kongtong disciples' disappearance, a chronicle entry
+  the update shortened, two duel effects that now also lower the urge to attack, and smaller fixes such as "the
+  following year" for "that same year"); typo fixes in the Chinese and changes of spacing keep their English.
+
 ## 1.4.0 (2026-10-17)
 
 Shows which translation is in use, for players and for bug reports, and works with Lash's English Patch of

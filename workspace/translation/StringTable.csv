@@ -5900,7 +5900,7 @@ Story/N_4_5_1_006,"He took her out to see the lantern festival, only to laugh an
 Story/N_4_5_1_005,"He took her down the mountain to learn the roads, then strode off so fast on his own that she got lost and cried, helpless."
 Story/N_4_5_1_004,"Just as she was about to enter her room, he suddenly slammed the door shut on her, then laughed out loud."
 Story/N_4_5_1_003,"To train his Qinggong, he carried her on his shoulders and ran along mountain trails, until she was jolted to the point of vomiting."
-Story/N_4_5_1_002,"Taking advantage of her nap, he put her on a wooden raft and let it drift with the current; the raft fell apart and she only woke when she swallowed water."
+Story/N_4_5_1_002,"Taking advantage of her nap, he put her in a paper boat and let it drift with the current; the boat sank and she only woke when she swallowed water."
 Story/N_4_5_1_001,"Junior Martial Sister thought back on the various misdeeds Eldest Senior Brother had committed in her childhood."
 Story/D_4_5_1_049,……。
 Story/D_4_5_1_048,"What about me? I am your Eldest Senior Brother!
@@ -10375,7 +10375,9 @@ Library/Desc/10047,"It wasn't originally your concern; you brought this upon you
 Library/Title/10047,"Caught in someone else's grudge and met with death."
 Library/Desc/10046,"Those who commit many wrongs will ultimately bring about their own downfall; without any real ability, they can't even become a villain."
 Library/Title/10046,"To act as a tiger's minion"
-Library/Desc/10045,"You were unable to conquer the fears within, allowing that unreal phantom to spread infinitely, leaving you breathless, ultimately choking off your breath."
+Library/Desc/10045,"You were unable to conquer the fears within,
+allowing that unreal phantom to spread without end,
+leaving you breathless, until your breath was finally choked off."
 Library/Title/10045,"Die of fear"
 Library/Desc/10044,"You, this enemy of Kongtong, have finally paid in full for your sins, and met your end by execution."
 Library/Title/10044,"Jianghu Vendetta Order: Kongtong"
@@ -25260,7 +25262,8 @@ LegendInfo/Section_01_Free_03_01_01_002,"You were rescued, but the first thing y
 LegendInfo/Section_01_Free_03_01_01_001,"You listened from the side, wary of him starting trouble, and the instant the Soul-Stealing Disciple stepped forward, you reacted at once, snatching back your weapon to block him and closing into combat. Being clearly the better fighter, you moved to press your advantage, but the young woman, anxious to save him, hauled you back from behind—and that single pull proved overwhelming, as though seized by an unimaginable force. It felt like being snatched up by a flying dragon and flung into the vast river of stars: you soared through the air as if riding cloud and mist, crashed into the shelves, and lay half-buried in the wreckage. The Soul-Stealing Disciple, though saved by her, showed no gratitude—he spoke with cold finality, flicked his sleeves, and stormed off."
 LegendInfo/Section_01_Free_03_01_005,"Unexpectedly, as soon as she opened her mouth, she insisted that you accompany her to the blacksmith shop, inexplicably asking you to let her work on your weapons. With a look of delight, she exclaimed that she wanted to polish your blades for free. Just as you were feeling troubled, a member of the Soul-Stealing Gate, dressed in blue, burst into the forge with high spirits. His expression froze, and he became furious, claiming that this young woman was being unfair. She had promised to polish his weapons but suddenly changed her mind to prioritize you. Enraged, he fumed with anger, his mouth running non‑stop, carelessly hurling hurtful words."
 LegendInfo/Section_01_Free_03_01_004,"A green‑clad young woman dressed as a blacksmith stood at the entrance of the blacksmith's shop. Though her eyes were half‑closed and her brows slightly furrowed, her expression was clearly displeased, staring at you intently enough to make your heart sink slightly. You didn't know where you had offended her. But you didn't need to know her or have a reason for being disliked‑this wasn't the first time you'd encountered such treatment."
-LegendInfo/Section_01_Free_03_01_003,"At the blacksmith's shop door stood a green‑clad young woman dressed as a blacksmith, her eyes half‑closed, brows slightly furrowed, her expression one of displeasure. Yet she resembled a spring bamboo shoot newly sprouted in the forest, fresh and beautiful, endearing. Seeing this, you couldn't help but feel a stirring in your heart."
+LegendInfo/Section_01_Free_03_01_003,"At the blacksmith's shop door stood a green-clad young woman dressed as a blacksmith, her eyes half-closed, brows slightly furrowed, her expression one of displeasure. Yet she resembled a spring bamboo shoot newly sprouted in the forest, fresh and beautiful, endearing.
+Seeing this, you couldn't help but feel a stirring in your heart."
 LegendInfo/Section_01_Free_03_01_002,"One day, you wandered idly to Iron Fist Lane on Kongtong Mountain."
 LegendInfo/Section_01_Free_03_01_001,"On this day, as instructed, you arrived at Iron Fist Lane on Kongtong Mountain to report in, seeking a position to earn your keep."
 LegendInfo/Section_01_Free_02_01_006,"When you finished your set and asked Xiahou Lan to critique it, she spoke without mercy, saying that if you went out into the Jianghu, you'd lie dead in the street before you knew it—words that stung you deeply. Yet when it came to teaching, she was no less thorough: rather than simply handing down set moves, she pointed straight to the flaws in your attack and defense, explaining them so plainly that everything suddenly became clear to you. This alone showed her insight into martial arts was no small thing—she was not only formidable in her own skill, but also gifted at guiding others."
@@ -50810,7 +50813,7 @@ Story/D_6_10_1_219,"The way you talk... sigh."
 Story/D_6_10_1_218,"Although we are not the Mud Cult, we are not incapable of being a match for ten thousand men."
 Story/D_6_10_1_217,"You know the Tang Clan is narrow-minded and holds a grudge forever. None of us are as fiery-tempered as our Sect Leader, who'd travel a thousand miles for revenge, but we're not easy to handle either. If the Wulin heroes come stirring trouble on Tang Clan ground again, they'll live to regret it."
 Story/D_6_10_1_216,"Out of respect for the Eldest Young Lord, of course I can't hold a grudge.
-If the Wulin Alliance Heroes still refuse to stop and insist on bullying the Tang Clan, that's a different matter."
+But if the Wulin Alliance Heroes still refuse to stop and insist on bullying the Tang Clan, that's a different matter."
 Story/D_6_10_1_215,"They were temporarily deceived by villains, but with the new leader taking the helm, they should no longer err. The Nangong Family will also gently advise from the side."
 Story/D_6_10_1_214,"No wonder they call you Master of Fairness in the Wulin — already here pleading for the Wulin Alliance."
 Story/D_6_10_1_213,"Most in the Wulin pour their energies into martial training and have little learning to speak of — many can't even read a word, which makes them easy to stir up and quick to follow the crowd. In this matter, I hope the Tang Clan will be broad-minded enough to let it go."
@@ -79901,8 +79904,8 @@ CombatSkill/Desc/S148,"Obsession: When the opponent is Xiahou Lan, Perseverance 
 CombatSkill/Desc/S149,"Killing Intent: Feels no pain; removes [Timid] and [Anger] every Round."
 CombatSkill/Desc/S150,"Fond Memories: Mei, Lan, Zhu, and Ju: Recovers extra Qi every Round."
 CombatSkill/Desc/S151,"Fond Memories: You: Recovers extra Qi every Round."
-CombatSkill/Desc/S153,"Painful Memories: Thousand Lantern Tower: Each Round, high chance of falling into the [Timid] Status Effect."
-CombatSkill/Desc/S154,"Painful Memories: Left With Nothing: Having lost all courage to survive, no longer gains Qi."
+CombatSkill/Desc/S153,"Painful Memories: Thousand Lantern Tower: Each Round, high chance of falling into the [Timid] Status Effect, and lowers Attack Desire."
+CombatSkill/Desc/S154,"Painful Memories: Left With Nothing: Having lost all courage to survive, no longer gains Qi, and lowers Attack Desire."
 CombatSkill/Desc/S155,"All-Out Brace: Brace chance greatly increased, and Block rate greatly increased. Removes [Anger] and [Timid] every Round."
 CombatSkill/Desc/S156,"Weapon damaged: Venerable Golden Crow channeled his Iron Pipa Skill Internal Force into his iron hammer and shattered your weapon. Blade/Sword -100"
 CombatSkill/Desc/S157_1,"All-Out Assault: Ultimate becomes [Blazing Sun Hammer], with no Qi limit, dealing damage based on your total Qi when it is unleashed."
@@ -91759,15 +91762,15 @@ It's not rare for them to hound someone to death without understanding the situa
 Story/D_S2201_01_025,"And on the day of the Sect Leader's wedding, another big thing happened."
 Story/D_S2201_01_026,"What?"
 Story/D_S2201_01_027,"I heard the Iron Fist and Mystic Skill Direct Disciples went missing one after the other within a single day.
-Just as people suspected the Flying Heaven Direct Disciple of foul play, Yu Xiaomei went missing too."
-Story/D_S2201_01_028,"I heard the Iron Fist and Mystic Skill Direct Disciples went missing one after the other within a single day.
-Just as people suspected the Flying Heaven Direct Disciple of foul play, even Lady Mei went missing."
+Everyone says the Flying Heaven Direct Disciple dealt them a foul blow to eliminate her rivals...
+Junior Sister Xiaomei actually did such a thing... I really misjudged her."
+Story/D_S2201_01_028,"I heard the Iron Fist Gate's Direct Disciple went missing, and someone was hastily put in her place.
+Everyone says the Flying Heaven Direct Disciple dealt her a foul blow to eliminate the competition.
+What can I say? Truly, no poison is deadlier than a woman's heart."
 Story/D_S2201_01_029,"As for the Direct Disciple of the Soul-Stealing Gate, Heroine Xiahou, the Soul-Stealing Orchid,
 she never gave the Soul-Stealing Sect Leader's orders a second thought and drifted off who knows where long ago."
 Story/D_S2201_01_030,"What?"
-Story/D_S2201_01_031,"Strange, isn't it? They say the Kongtong Four Maidens were scheming against each other to become the first Lady of the Sect Leader.
-But the moment the Sect Leader was chosen, they all scattered in a flash.
-Maybe that damned fatso Venerable Golden Crow was just too revolting."
+Story/D_S2201_01_031,"That being so, who will become the First Lady of the Sect Leader is obvious."
 Story/D_S2300_01_170,"You're sweeping? Let me help you, shall I?"
 Story/D_S2300_01_171,"What's with you? I'm almost done sweeping, and now you pop up to steal my credit."
 Story/D_S2300_01_172,"Ha, you saw right through me."
@@ -102696,7 +102699,7 @@ Story/N_S2321_06_02_002,"Zhao Fang gave a slight signal with his eyes. Meng Gong
 Story/N_S2321_06_03_03_001,"Armed with a single long spear, Ding Chenglie did indeed win battle after battle and crushed the elite of the Jin Kingdom's Dragon Nurturing Courtyard.
 He upheld the might of the Great Song's army, brought glory to the realm, and earned the esteem of his superiors and the cheers of his comrades."
 Story/N_S2321_06_03_03_002,"Speaking of family, you don't recall your parents' faces; instead, the faces of everyone at the Tang Clan rise before your eyes."
-Story/N_S2321_07_02_001,"You hold the hard-to-swallow biscuit in your hand, tasting nothing.
+Story/N_S2321_07_02_001,"You hold the hard-to-swallow rations in your hand, tasting nothing.
 Suddenly sorrow wells up from within, and tears fall one by one onto the biscuit, vanishing without a trace."
 Story/N_S2321_07_02_002,"That Miss in your heart is like a red flower blooming wildly in spring, bright and radiant.
 Once she carried a thread of spring light and lit your way, but you should know that flowers have their season and people their partings and reunions.
@@ -102709,7 +102712,7 @@ Story/N_S2321_07_02_005,"With that he cups his fists to you in salute, showing h
 Story/N_S2321_07_02_006,"Suddenly you recall some old affairs and tales that everyone knows and that you never took to heart."
 Story/N_S2321_07_02_007,"She turned over every chest and cabinet, leaving your room in a total mess, yet the room stayed silent."
 Story/N_S2321_07_02_008,"You and Meng Gong cup your fists to each other and part ways.
-That same year, General Zhao Fang, defender of Xiangyang, died in office, and that night a great star fell over Xiangyang.
+The following year, General Zhao Fang, defender of Xiangyang, died in office, and that night a great star fell over Xiangyang.
 Not long after, Meng Zhengzong also died of illness at his post in Zaoyang."
 Story/N_S2321_07_02_009,"But the Great Song was never short of rising talent. Meng Gong took up the great banner and became its bulwark in turn.
 Ten years later he led his troops to break the Jin, winning brilliant military merit, and later ages praised him as the last great general of the Song Dynasty."
@@ -104361,8 +104364,7 @@ Story/T_S2200_03_05_002,"Time to get serious."
 Story/T_S2200_03_05_003,"What a pity. When I trade blows with people, my life is the stake, and it has never felt so thoroughly exhilarating.
 It's as though a few more exchanges would let me grasp something."
 Story/T_S2201_01_001,"Ah... that uneasy feeling is getting stronger and stronger."
-Story/T_S2201_01_002,"Though he's a damned bastard who deserves not a shred of sympathy,
-if I were in their place, I'd probably end up the same... Sigh."
+Story/T_S2201_01_002,"So in the end it came to this after all... Fate cannot be defied."
 Story/T_S2300_01_007,"The Tang Clan isn't actually free of livelihood worries or debts to repay.
 But Third Senior Brother takes care of all that, so I'd better not mention it."
 Story/T_S2300_01_008,"As for the villagers, their attitudes vary from person to person.
@@ -105180,11 +105182,7 @@ LegendInfo/Ch_4_8_2_006,"Mindful of courtesy, you said no, but could not hide yo
 LegendInfo/Ch_4_8_2_007,"You smilingly assured her it was nothing of the kind. Yu Xiaomei smiled on, but in her heart she felt Xiao Zhu deserved better, and she made up her mind to meddle.
 Otherwise, with Xiao Zhu's straightforward heart, meeting a hypocrite like you, who speaks human to humans and ghost to ghosts, she could only be toyed with and would surely end up in a bleak fate."
 LegendInfo/Ch_4_9_3_7_001,"Without your knowing, Yu Xiaomei took her leave of Third Senior Brother and quietly departed.
-The Tang Clan no longer had the strength to protect her, and every day she stayed in Shu would bring the Tang Clan endless trouble. However reluctant her heart, she had to act as though she had no attachment at all; she had long been used to letting go.
-The more she loved something, the further she had to push it away, whether her best friend, the Tang Clan, or you.
-Only that way could she keep you all safe from the claws of the Thousand Lantern Tower.
-She reckoned that with the Sect Leader election approaching, both Flying Heaven Gate and the Thousand Lantern Tower, which had planted her as a spy, must be at their wits' end, grasping at any remedy in their panic, and might even be looking for someone to replace her as the new Xiaomei. If she returned to the Kongtong Sect now to beg forgiveness, she would still have some use, and the pain of the flesh was unavoidable, but at least she would not be killed at once.
-In time, when she married the new Sect Leader of Kongtong and became the First Lady of the Sect Leader, her words would naturally carry weight, and she could persuade the two sects to make peace, protect the Tang Clan, and fulfill her mission as a bridge. Wasn't that Old Patriarch Nangong's wish as well? She only hoped that in the years left to her she could contribute a little."
+The Tang Clan no longer had the strength to protect her, and every day she stayed in Shu would bring the Tang Clan endless trouble. However reluctant her heart, she had to act as though she had no attachment at all; she had long been used to letting go."
 LegendInfo/Ch_4_9_3_8_001,"Dreadful news kept coming to the Tang Clan, and one pillar of the sect after another was lost. Its internal troubles were not yet cured, and outside enemies eyed it like tigers. Since the Patriarch settled on Meishan and founded the sect, it had never fallen so low.
 Every school of the Wulin felt threatened, relations turned sharply worse, and the Tang Clan, with its leanings toward the crooked path, became the target of all.
 Xiao Zhu had not failed to think of standing at your side and living or dying with the Tang Clan, but she also knew well that the two of you were merely mediocre talents, that talk of dreams was no more than idle fancy, and that the most you could hope for was a quiet life.
@@ -107879,10 +107877,10 @@ LegendInfo/S2600_01_002,"Nangong Qian could not hide his displeasure at the sigh
 He knew he was the one who had dragged you into this misfortune, and he felt rather sorry about it. But then again, with a face like yours, if you were not struck by misfortune today you would be sooner or later; he could shield you for a moment but not for a lifetime, and you might as well get it over with and be reborn sooner.
 With that thought, the Second Young Lord's heart felt eased at once."
 LegendInfo/S2600_01_003,"Nangong Qian silently thanked his luck. He never expected that the moment you arrived, before you had said two words, your face alone would draw them all over to you. Once they were done beating you, they could not beat him again."
-LegendInfo/S2600_01_01_001,"Nangong Qian could not hide his displeasure at the sight. Timid though he was, he did not forget his family's teachings now and then, and he remembered that you had stood up and spoken for him back then. Now that he was studying at Kongtong Sect as his family's representative, he could hardly stay unmoved before an injustice; besides, strictly speaking, it was his own foolishness that had angered them first and dragged you in.
+LegendInfo/S2600_01_01_001,"Nangong Qian could not hide his displeasure at the sight. Timid though he was, he had never forgotten his family's teachings, and he remembered that you had stood up and spoken for him back then. Now that he was studying at Kongtong Sect as his family's representative, he could hardly stay unmoved before an injustice; besides, strictly speaking, it was his own foolishness that had angered them first and dragged you in.
 He straightened his chest at once and rebuked the Flying Heaven Gate's Fire Guardian for conduct that was improper.
 But he never thought that he was merely a latecomer to the Jianghu with thin connections, and a concubine's son besides. Others were polite to him not because they truly thought highly of him, so what standing did he have to talk so big?
-That Flying Heaven Gate Guardian, Yan Jiang, was nicknamed 'Mountain Fire', and as the name suggests, one can imagine how unimpressive his Cultivation was. Every time Nangong Qian opened his mouth, Yan Jiang's junior brother trembled in terror, fearing that his senior brother would lose his temper and kill this young lord without a thought for the consequences, offending the Nangong Family.
+That Flying Heaven Gate Guardian, Yan Jiang, was nicknamed 'Mountain Fire', and as the name suggests, one can imagine how unimpressive his self-restraint was. Every time Nangong Qian opened his mouth, Yan Jiang's junior brother trembled in terror, fearing that his senior brother would lose his temper and kill this young lord without a thought for the consequences, offending the Nangong Family.
 He had barely managed to have his attention diverted by you, and it looked as if the matter could be played down, needing only the sacrifice of one insignificant fellow like you to preserve the friendship between Kongtong and Nangong. Just as he was feeling relieved, this tactless, useless young lord actually poured oil on the fire and publicly shamed his senior brother. Now Yan Jiang could bear it no longer, and Mountain Fire was about to erupt."
 LegendInfo/S2600_01_01_002,"Seeing Yan Jiang's dark expression, you meant to protect Nangong Qian, but he shoved you aside with one hand,"
 LegendInfo/S2600_01_01_003,"and slapped Nangong Qian across the face, so hard that stars burst before his eyes and the world spun, and he nearly crashed to the ground."
@@ -107924,7 +107922,7 @@ LegendInfo/S2600_02_04_001,"The silver lining in your misfortune was that you ha
 The Iron Fist Gate people could not stand the Flying Heaven Gate's swagger, and cared nothing for who was right or wrong. The moment they got a chance they leapt out from every street corner and alley, swinging mallets without sorting friend from foe, and the whole place turned into a brawl."
 LegendInfo/S2600_02_04_002,"The Young Hero in plain white, eating pickled melon nearby, had been worrying that the Jianghu was too calm for him to make a name and earn his awe. Now that a quarrel had broken out, he waded gleefully into the muddy water, fully convinced that with his martial arts he would surely shine."
 LegendInfo/S2600_02_05_001,"You managed to slip away and regrouped at Crane Cliff.
-This was the heartland of the Flying Heaven Gate, and as the saying goes, ""the most dangerous place is the safest place."" The Flying Heaven Disciples hunting you would never in a hundred years have guessed that a rogue as bold as you would circle back and hide right under their eaves."
+This was the heartland of the Flying Heaven Gate, and as the saying goes, 'the most dangerous place is the safest place.' The Flying Heaven Disciples hunting you would never in a hundred years have guessed that a rogue as bold as you would circle back and hide right under their eaves."
 LegendInfo/S2600_02_05_002,"Because of his birth, Nangong Qian was not welcomed by his family, and because of his family's standing and upbringing, he had never had playmates his own age; his life had been rather stifling.
 Being shoved onto the stage like a driven duck, forced into a crime like today's, and then hiding to snicker over the trouble he had caused was a first in his life. He found it quite novel, and his heart still pounded even after he caught his breath.
 As for calming down, thinking of the consequences, and regretting it to the marrow, that was another matter entirely."
@@ -107952,7 +107950,7 @@ LegendInfo/S2700_01_01_001,"Back at the Great Smithy, you found the floor, once 
 She did not blame you, but she could not hide her disappointment. Those smashed toys were not only the fruit of her labor but things made with fine hopes, in the wish that they would bring people happiness.
 Stolen and smashed, how could anyone not lose heart?"
 LegendInfo/S2700_02_01_001,"You quickly caught up with the culprit and saw he was a half-grown boy. In his panic, he took the first way out and tried to use his small frame to dart into the crowd and shake you off, but how could he?
-You shot out an arm and grabbed him by the topknot, and only then saw that what he had stolen was a rattle drum, worth only a few wen.
+You shot out an arm and grabbed the little brat, and only then saw that what he had stolen was a rattle drum, worth only a few wen.
 Caught red-handed, he flew into a shame-fueled rage and turned around to accuse you of being a kidnapper."
 LegendInfo/S2700_02_01_002,"You were deeply wronged. True, you had done plenty of evil, but you had no experience in trafficking people, so for him to say this of you was a slander! It made you angrier than being falsely accused of wrongdoing. To avoid becoming a poor wronged soul, you resolved to sell him."
 LegendInfo/S2700_02_01_003,"Before long his mother arrived at the scene. As his own mother, how could she not know what kind of brat her child was? But he was her only son. How could she not take his side, and how could she not play favorites?"
@@ -108919,3 +108917,187 @@ LegendInfo/Travel_601_903_006,"After Danxiazi leaves in high spirits, with no on
 LegendInfo/Travel_601_903_007,"Talented Woman Wei believed you were unlike anyone else, a lotus rising unstained from the mud. Little did she know she had given her whole heart to a fickle man: once you had won her, your affections moved elsewhere."
 LegendInfo/Travel_601_903_008,"Before leaving, she already handed over the reins of the Mystic Skill Gate to her successor. Once she has your consent as Sect Leader, she can resign her post as Gate Leader and hurry to the Tang Clan to be with you.
 You want to get close to her, but though Talented Woman Wei is usually poised and gracious, she is in fact very thin-skinned. Fearing that others will laugh at her bashful state, after a little intimate talk she is overcome with shyness, can no longer face you, and flees in a fluster."
+Book/Desc/6015,"The peerless Flying Heaven Gate art you grasped while dancing with Yu Xiaomei. Stripped of its form, it keeps only its true essence: the Immortal Crane's Elusive Dance."
+Book/Name/6015,"Hand-Copied Immortal Crane's Elusive Fist"
+CombatSkill/Desc/C947,"Yu Zhu's 'Tang Clan Hidden Weapon: Great Iron Hammer': Poised and waiting, hurls it the moment an opening appears. Medium chance of dealing overwhelming damage; after inflicting the [Imbalance] and [Shock] Status Effects, the effect transforms."
+CombatSkill/Desc/C948_1,"Four Guardians' 'Kongtong Guardian': Launches four high-Crit minor attacks each round to unsettle the opponent, raising our side's Dodge and Block rates."
+CombatSkill/Desc/C948_2,"Three Guardians' 'Kongtong Guardian': Launches three high-Crit minor attacks each round to unsettle the opponent, slightly raising our side's Dodge and Block rates."
+CombatSkill/Name/C947,"Yu Zhu"
+CombatSkill/Name/C948_1,"Four Guardians"
+CombatSkill/Name/C948_2,"Three Guardians"
+CombatTalking/1806_01_02_001,"Well, well, Tang Clan—fortune's wheel turns at last!
+Your two great pillars, the Flying Hero and the Ruthless Young Master, are both gone. Let's see who dares meet my blade today!"
+CombatTalking/1806_01_02_002,"Benefactor, your thirst for killing runs too deep, and karmic retribution will surely fall upon you.
+Better to lay down your butcher's blade, and let us send you to the Western Paradise right here and now."
+CombatTalking/1806_01_02_003,"Damn monk, what did you say!"
+CombatTalking/1806_01_03_001,"Tan here has no quarrel with your Tang Clan. It's just that I played with women until I got burned. My name stinks, and my fine blade's been seized.
+So I've no choice but to borrow your blood to wash my reputation."
+CombatTalking/1806_01_03_002,"Amitabha. Sir, your name does stink, and no amount of washing will ever clear it.
+This little monk suggests soaking yourself in a cesspit. It's called hiding a tree in the forest: no one could tell whether it's the filth that stinks, or you, or whether you and the filth were one and the same all along."
+CombatTalking/1806_01_03_003,"Damn monk, what did you say!"
+CombatTalking/1806_03_01_001,"Zhao, you young whelp, you once had a bright future.
+Yet you chose to run with the Tang Clan's fiends and sink of your own free will. Even death is no more than you deserve, and you can blame no one but yourself."
+CombatTalking/1806_03_01_002,"Zhao, you villain! You've done evil without end, and today your wickedness overflows!"
+CombatTalking/1806_03_01_003,"Immortal Maiden, you are a person of cultivation, yet you meddle in the quarrels of the mortal world and entangle yourself in karma,
+and an Immortal Maiden's cultivation is hard won. Do you truly not fear sowing evil karma and seeing your attainment ruined in a single day?"
+CombatTalking/1806_03_01_004,"...Little monk, this karma did not begin with me. I came to put an end to it.
+Let's fight. Spare me the talk."
+CombatTalking/1806_04_001,"Guh! If only... if only I had Mountain-Splitter in hand...!"
+CombatTalking/1806_04_002,"Ugh—how can this be! Isn't a handsome face supposed to win forever...?"
+CombatTalking/1806_04_003,"Ah! You dare... I curse you all—may you die wretched deaths!"
+CombatTalking/1806_05_01_001,"...Xiahou Lan, we've fought this long, and you still haven't recognized me?"
+CombatTalking/1806_05_01_002,"I don't recognize you. Are you my friend, or my enemy?"
+CombatTalking/1806_05_01_003,"Enemy?! I went through untold hardship just to—"
+CombatTalking/1806_05_01_004,"If you're an enemy, then die. Spare me the chatter."
+CombatTalking/1806_05_01_005,"Kill one first."
+CombatTalking/1806_05_01_006,"Die."
+CombatTalking/1806_05_01_007,"Xiahou Lan is so ruthless!"
+CombatTalking/1806_05_01_008,"Master, you're so mighty!"
+CombatTalking/1806_05_01_009,"Don't use the word 'mighty' to describe a woman, you dim disciple with no filter on your tongue."
+CombatTalking/1806_05_01_010,"The Snow Mountain Sect Leader unleashes her divine might!"
+CombatTalking/1806_05_01_011,"Heh, you're the only one who knows how to butter me up."
+CombatTalking/1806_06_01_001,"Now's my chance!"
+CombatTalking/1806_06_01_002,"You... you despicable woman!"
+CombatTalking/1806_06_01_003,"You... we issued a fair and open challenge. How could you attack by stealth?"
+CombatTalking/1806_06_01_004,"You... shameless, despicable—a den of snakes and rats, just as I thought!"
+CombatTalking/1806_06_01_005,"La la la la la~"
+CombatTalking/1806_07_01_001,"Ha!"
+CombatTalking/1806_07_01_002,"Hmph!"
+CombatTalking/1806_07_01_003,"Brother Ye is so strong!"
+CombatTalking/1806_07_01_004,"Forgive the poor show. It's all thanks to the two of you lending a hand."
+CombatTalking/1806_08_01_001,"Take that!"
+CombatTalking/1806_08_01_002,"Ha!"
+CombatTalking/1806_08_01_003,"Heroine Long on our side is such a comfort!"
+CombatTalking/1806_08_01_004,"Sister Xiang, so mighty!"
+CombatTalking/1806_08_01_005,"Sister Xiang is amazing!"
+CombatTalking/1806_08_01_006,"Coming to see you again, little brother!"
+CombatTalking/1806_09_01_001,"Junior Martial Sister looses a great swarm of Hidden Weapons, veiling her intent in the Soundless Heaven and Earth Stance, swift as a bolting hare,
+and in concert with the flying shuttles, strikes out thirty-six moves in the blink of an eye, deciding the victory at once."
+CombatTalking/1806_09_01_002,"Junior Martial Sister! This... this... were you this powerful all along?"
+CombatTalking/1806_09_01_003,"Hm? Hm. It was nothing. They just left openings."
+LegendInfo/Ch_4_9_3_7_002,"She reckoned that with the Sect Leader election approaching, the Fire Dragon Immortal Monarch must be at wits' end, grasping at any remedy in a panic, and might even be looking for someone to replace her as the new Xiaomei. If she returned to the Kongtong Sect now to beg forgiveness, she would still have some use, and the pain of the flesh was unavoidable, but at least she would not be killed at once."
+LegendInfo/Ch_4_9_3_7_003,"The more she loved something, the further she had to push it away, whether her best friend, the Tang Clan, or you.
+Only that way could she keep you all safe from the claws of the Thousand Lantern Tower.
+She reckoned that with the Sect Leader election approaching, both Flying Heaven Gate and the Thousand Lantern Tower, which had planted her as a spy, must be at their wits' end, grasping at any remedy in their panic, and might even be looking for someone to replace her as the new Xiaomei. If she returned to the Kongtong Sect now to beg forgiveness, she would still have some use, and the pain of the flesh was unavoidable, but at least she would not be killed at once."
+LegendInfo/Ch_4_9_3_7_004,"In time, when she married the new Sect Leader of Kongtong and became the First Lady of the Sect Leader, her words would naturally carry weight, and she could persuade the two sects to make peace, protect the Tang Clan, and fulfill her mission as a bridge. Wasn't that Old Patriarch Nangong's wish as well? She only hoped that in the years left to her she could contribute a little."
+Story/D_4_6_12_035,"How heartless..."
+Story/D_4_6_12_036,"No, it's not my place to say so."
+Story/D_4_6_12_037,"A'Huo, we're all just small fry swimming in the Jianghu. Once the hidden currents sweep in, none of us can help ourselves.
+I hope you won't hold my heartlessness against me."
+Story/D_4_6_12_038,"I thought you'd ignored the signal, but you were here all along...
+Whose lad does Wangu Temple bury, and how many sticks of incense does Thousand Lantern Tower burn?"
+Story/D_4_6_12_039,"A hundred years of life sealed in the Annals List, four sticks of incense in Thousand Lantern Tower."
+Story/D_4_6_12_040,"This subordinate greets the Superior Envoy."
+Story/D_4_6_12_041,"The Flying Hero is dead and our business here is done. Let's go."
+Story/D_4_6_12_042,"This subordinate has found that the Direct Disciple of the Iron Fist Gate of the Kongtong Sect is here as well.
+I request the Superior Envoy's instructions: shall we...?"
+Story/D_4_6_12_043,"Hm? Who trained you?
+Didn't your Drill Instructor ever teach you not to do anything superfluous?"
+Story/D_4_6_12_044,"This... we were told that, yes, but she..."
+Story/D_4_6_12_045,"Let me teach you a lesson. As a killer, an Assassin, you must be cold and professional.
+Complete your mission with precision. Anyone you weren't told to kill, you'd best not touch so much as a chicken.
+Don't waste your time on people who don't matter."
+Story/D_4_6_12_046,"You can't fathom the schemes of those above, and if you can't, don't get clever on your own.
+Otherwise you could have a dozen heads and still not have enough to lose~"
+Story/D_4_6_12_047,"Yes, yes! The Flying Hero being dead, this subordinate will go back and report at once. Farewell!"
+Story/D_4_6_12_048,"...I wanted to say a few more words to her, to urge her to run far away.
+But it seems I'd better say nothing at all, never meet her again, and just quietly vanish like this."
+Story/D_4_9_3_7_044,"But you turned your back on the Kongtong Sect. Aren't you afraid of being punished if you go back?"
+Story/D_4_9_3_7_045,"Of course I'm afraid. I'm scared to death.
+That's exactly why I have no choice but to go back."
+Story/D_4_9_3_7_046,"What do you mean by that? I would like to hear it in full."
+Story/D_4_9_3_7_047,"The Sect Leader election is drawing near, and I doubt the Flying Heaven Gate could easily find someone to replace me.
+If I return to Kongtong to beg forgiveness, I'm still a Direct Disciple, and becoming the first Lady of the Sect Leader will be only a matter of time."
+Story/D_4_9_3_7_048,"In other words, to the Kongtong Sect, Yu Xiaomei is still very much of use.
+Some suffering of the flesh is unavoidable, but they won't take my life on the spot."
+Story/D_4_9_3_7_049,"Whereas if I stay with the Tang Clan, I'll be heading down a dead-end road sooner or later, and I'll only bring the Tang Clan trouble.
+The Fire Dragon Immortal Monarch is far too narrow-minded to let me live out my years in peace on Meishan."
+Story/D_4_9_3_7_050,"Peaceful old age, you say? You are still in the very bloom of youth."
+Story/D_4_9_3_7_051,"Still, what you say is reasonable. The Tang Clan is far from what it once was and can hardly be spoken of alongside Kongtong.
+By duty or by feeling, there is no reason to keep you. If you've made up your mind, then go on your way."
+Story/D_4_9_3_7_052,"Ah, Xiaomei, you're here..."
+Story/D_4_9_3_7_053,"Playing house is over, Stubby."
+Story/D_4_9_3_7_054,"We're through."
+Story/D_4_9_3_7_055,"W-what's wrong? Did I do something bad?"
+Story/D_4_9_3_7_056,"No, I simply can't stand the sight of you, that's all.
+The Tang Clan is clearly done for. I'm going back to the Kongtong Sect, and as for you, go wherever you please."
+Story/D_4_9_3_7_057,"How can you do this to me—Xiaomei~!"
+Story/D_4_9_3_8_025,"...Zhao Huo, let's retire from the Jianghu."
+Story/D_4_9_3_8_026,"Your Eldest Senior Brother was so skilled, and even he ended up like that.
+I know you're hurting, but nobody could have done anything about a thing like this, right?"
+Story/D_4_9_3_8_027,"Everyone in the Tang Clan is a good person. If I could, of course I wouldn't want any of them to meet misfortune.
+But you and I, we're just this useless. We can't do anything right, we can't do anything at all."
+Story/D_4_9_3_8_028,"Please, I-I don't want you to turn into that one day too.
+I'm afraid that next time it'll be me by your side, only able to watch helplessly as I see you off..."
+Story/D_5_1_1_046,"...Who wouldn't look out for their own interests?
+I'm the one with no ability, who can't protect anyone. How can I blame her for leaving?"
+Story/D_5_1_1_047,"Still, does what she did count as deserting in the face of battle?
+By our sect's rules, shouldn't she be called to account and sentenced, and only then expelled from the sect?"
+Story/D_5_1_1_048,"...What is this supposed to be?
+She's gone, so what the hell use is a knife left behind?"
+Story/D_5_3_2_Break_072,"I've heard what my brothers have been saying, you know."
+Story/D_8_2_5_6_018,"Times have changed. Right now I'm an enemy of the Tang Clan, and I came here specially to kill your whole family.
+Young Hero Zhao had better not be naive and sentimental about the past."
+Story/D_8_8_1_311,"Senior Brother, are you going out?"
+Story/D_8_8_1_312,"Yes. Come to think of it, I haven't told you yet. Welcome home."
+Story/D_8_8_1_313,"Moling, quick, think of something!
+Stick out that big butt of yours and block for me! Aren't we good friends?!"
+Story/D_S2201_01_032,"{size=30}What!{/size}"
+Story/D_S2201_01_033,"...Sigh."
+Story/D_Section_01_Free_08_04_108,"What Brother Zhao here says is no lie.
+This humble one met your sect's Direct Disciple by chance at dawn, and we have been at Crane Cliff ever since, conversing most merrily."
+Story/D_Section_01_Free_08_07_001,"I made a complete mess of the Grand Trial, so I'd better put in some hard work.
+Can't beat people, so I come to Crane Cliff to beat birds."
+Story/D_Section_01_Free_08_07_002,"Oh, you're A'Jin, right?"
+Story/D_Section_01_Free_08_07_003,"Oh, it's you. Have you seen my Senior Sister Xiaomei?"
+Story/D_Section_01_Free_08_07_004,"Haven't seen hide nor hair of her today."
+Story/D_Section_01_Free_08_07_005,"Hm... there's something I don't know whether I should bring up.
+Forget it, I'll tell you anyway."
+Story/D_Section_01_Free_08_07_006,"I'm only telling you because you seem fairly close to Senior Sister Xiaomei.
+You, you should head back for today."
+Story/D_Section_01_Free_08_07_007,"Why?"
+Story/D_Section_01_Free_08_07_008,"This morning, while Senior Brother Golden Crow was in the privy, someone suddenly threw a fire-folder at him and blew him clean up into the air.
+There's no proof, but Senior Brother Golden Crow is furious and has people out hunting for Senior Sister Xiaomei everywhere."
+Story/D_Section_01_Free_08_07_010,"Lucky for you that it was me you ran into.
+Others may not be as easy to talk to as I am. Off you go now, and from now on, if you've no business here,
+you'd do best not to come to Crane Cliff either."
+Story/D_Section_01_Free_08_07_011,"All right, thanks.
+I'll just wait for this storm to blow over and come back."
+Story/D_Section_01_Free_08_07_012,"I'm afraid it won't be that easy."
+Story/D_Section_01_Free_08_07_013,"Is he really that petty?"
+Story/D_Section_01_Free_08_07_014,"A bit, yes."
+Story/D_Section_01_Free_08_07_015,"Then I'll lay it all out for you."
+Story/D_Section_01_Free_08_07_016,"I'm all ears."
+Story/D_Section_01_Free_08_07_017,"Oh, sure. Go ahead and tell me."
+Story/D_Section_01_Free_08_07_018,"I'd like to hear the details."
+Story/D_Section_01_Free_08_07_019,"If you were just one more minnow of the Jianghu, nobody would give you a thought, and that would be that.
+But you stood out far too much at the Kongtong Grand Trial. You've drawn too much attention."
+Story/D_Section_01_Free_08_07_020,"Think about it. My Senior Brother Golden Crow may well be the future Sect Leader, and Senior Sister Xiaomei is the wife he's already set his mind on.
+You keep hanging around her and now you've been marked. Do you think you'll have good days ahead?
+If your features were even the slightest bit more presentable, you'd have been throttled long ago."
+Story/D_Section_01_Free_08_07_021,"This..."
+Story/D_Section_01_Free_08_07_022,"Next time you come and somebody catches you meeting Senior Sister Xiaomei in secret at Crane Cliff,
+that person may not be as easygoing as I am."
+Story/D_Section_01_Free_08_07_023,"...Understood. Thanks."
+Story/N_4_9_3_3_002,"You know full well this has nothing to do with Xiao Zhu, but when you think of the Kongtong Sect and the Qingcheng Sect plotting together
+and bringing about Eldest Senior Brother's death, you have no strength left to pay her any mind."
+Story/N_4_9_3_7_004,"Xiaomei used her Qinggong, leapt a few times, and vanished without a trace.
+Xiao Zhu was left chasing after her, missed her footing, and fell flat on the ground, scraping her chin until it bled.
+She cried alone for a while, not from the pain, but simply from heartbreak."
+Story/N_4_9_3_7_005,"Xiaomei embarked on her journey alone, returning to Kongtong."
+Story/T_4_9_3_7_004,"This is most likely just fate.
+I've fought against it, and I've pinned my hopes on others too.
+But it's about time I gave up..."
+Story/T_S2320_01_009,"So this is Crane Cliff... the scenery truly is fine.
+I only wonder why Xiaomei asked me to come here."
+Story/T_Section_01_Free_08_04_012,"Huh? So that means this uncanny fellow was lying in ambush by my side since dawn, and I had no idea?"
+System/StoryLog/DiceFate,"[{0}] {1} ({2}) → {3} Defy Heaven"
+System/StoryLog/Relationship,"{0} Affinity {1}"
+Story/D_4_9_3_8_029,"..."
+Story/D_8_2_5_6_019,"..."
+Story/D_8_8_1_314,"!?"
+Story/D_Section_01_Free_08_07_009,"..."
+System/StoryLog/Choice,"▶ {0}"
+System/StoryLog/Dice,"[{0}] {1} ({2}) → {3}"
+System/StoryLog/EnemyModify,"{0} {1} {2}"
+System/StoryLog/Stat,"{0} {1}"

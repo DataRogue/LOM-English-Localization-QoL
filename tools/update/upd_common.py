@@ -15,10 +15,14 @@ import ledger
 sys.stdout.reconfigure(encoding="utf-8")
 BS = chr(92)
 CJK = re.compile(r"[㐀-鿿豈-﫿]")
-PASS_DIR = os.path.join(P.LOCALIZATION, "update_pass")
+# A later game update is a pass of its own: LOM_UPDATE_PASS names it (its review-ledger pass, update-<date>; its files go to
+# update_pass_<date>), LOM_UPDATE_LUA_OLD the previous game version's script folder under gamedata/. Unset: the first pass.
+PASS_NAME = os.environ.get("LOM_UPDATE_PASS") or "update-2026-10"
+GAME_VERSION = os.environ.get("LOM_UPDATE_GAME") or "1.0.6000.3"     # the game version the pass is for (notes in strings rows)
+PASS_DIR = os.path.join(P.LOCALIZATION, "update_pass" if PASS_NAME == "update-2026-10" else
+                        "update_pass_" + re.sub(r"^update-", "", PASS_NAME))
 LUA_DIR = os.path.join(P.REAL_LOCALIZATION, "gamedata", "lua")
-LUA_OLD_DIR = os.path.join(P.REAL_LOCALIZATION, "gamedata", "lua_1.0.5000.13")
-PASS_NAME = "update-2026-10"
+LUA_OLD_DIR = os.path.join(P.REAL_LOCALIZATION, "gamedata", os.environ.get("LOM_UPDATE_LUA_OLD") or "lua_1.0.5000.13")
 
 
 def pdir(*parts):

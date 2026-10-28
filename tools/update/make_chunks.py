@@ -440,8 +440,15 @@ def cmd_data(st, per):
 
 def cmd_changed(st, per):
     """The rows whose Chinese changed in the update: the new Chinese, the old Chinese the current English was written for, and the
-    current English (the strings override when there is one). Story rows in scene order, the others in key order."""
-    keys = [k for k in st.changed if st.english(k).strip() and CJK.search(st.new[k])]
+    current English (the strings override when there is one). Story rows in scene order, the others in key order. Rows whose
+    Chinese only gained or lost spaces (the line breaks unchanged) keep their English unreviewed: they are listed in
+    update_pass/restamp_spaces.txt for publish.py source --restamp."""
+    def spaces_only(k):
+        a, b = st.old[k].replace("\r\n", "\n"), st.new[k].replace("\r\n", "\n")
+        return a.count("\n") == b.count("\n") and re.sub(r"[ \t　]", "", a) == re.sub(r"[ \t　]", "", b)
+    spaced = sorted(k for k in st.changed if st.english(k).strip() and spaces_only(k))
+    U.write_text(pdir("restamp_spaces.txt"), "".join(k + "\n" for k in spaced))
+    keys = [k for k in st.changed if st.english(k).strip() and CJK.search(st.new[k]) and k not in set(spaced)]
     extra = {k: (st.old[k], st.english(k)) for k in keys}
     story = {k for k in keys if k.startswith("Story/")}
     terms = build_terms(st)
@@ -470,8 +477,8 @@ def cmd_changed(st, per):
         write_chunk("changed", n, text, ids, lash_for(st, ids), meta)
         manifest.append({"chunk": n, "category": "changed", "editable": len(ids), "scripts": meta["scripts"][:3], "chars": len(text)})
     U.write_json(pdir("chunks", "changed", "manifest.json"), manifest)
-    print("changed: %d chunks, %d rows (%d story rows, %d others; %d not reached by a script)" % (
-        len(chunks), sum(m["editable"] for m in manifest), len(story), len(other), nunref))
+    print("changed: %d chunks, %d rows (%d story rows, %d others; %d not reached by a script); %d rows only changed spaces "
+          "(restamp_spaces.txt)" % (len(chunks), sum(m["editable"] for m in manifest), len(story), len(other), nunref, len(spaced)))
 
 
 def main():
